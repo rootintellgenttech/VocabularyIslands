@@ -7,10 +7,15 @@ Vue.use(VueRouter);
 const routes = [
   // 直接將根路徑 '/' 指向 Login 元件
   {
-    path: '/',
-    name: 'F_Login',
+    path: '/login/:token?',
+    name: 'Login',
     component: Login,
     meta: { hideSidebar: true }
+  },
+  {
+    path: '/dashboard',
+    name: 'TeacherDashboard',
+    component: () => import('../page/Back/TeacherDashboard.vue')
   },
   {
     path: '/home',
@@ -27,6 +32,11 @@ const routes = [
     name: 'SecondaryIsland',
     component: () => import('../page/Front/SecondaryIsland.vue')
   },
+   {
+    path: '/achievementisland',
+    name: 'AchievementIsland',
+    component: () => import('../page/Front/AchievementIsland.vue')
+  },
   {
     // level: 級別 (primary/secondary), wordCount: 單字量 (abc, 300, 800, 1200)
     path: '/words/:level/:wordCount',
@@ -41,7 +51,7 @@ const routes = [
     props: { level: 'primary', wordCount: 'abc' }
   },
   {
-    path: '/lesson/:unitId',
+    path: '/lesson/:level/:wordCount?/:unitId',
     name: 'LessonDetail',
     component: () => import('../page/Front/LessonDetail.vue'),
     props: true
@@ -53,13 +63,6 @@ const routes = [
     component: () => import('../page/Front/StageDetail.vue'),
     props: { unitId: 'listen', level: 'primary' }
   },
-  {
-    path: '/listening-quiz/:stageId/:level',
-    name: 'ListeningQuizPage',
-    component: () => import('../page/Front/ListeningQuizPage.vue'),
-    props: true
-  },
-
   // 小英雄大本營 (國小)
   {
     path: '/hero-detail/primary',
@@ -71,7 +74,7 @@ const routes = [
     path: '/hero-quiz/:stageId/:level',
     name: 'HeroQuizPage',
     component: () => import('../page/Front/HeroQuizPage.vue'),
-    props: true 
+    props: true
   },
   // 國中聽力海灣 (國中)
   {
@@ -129,13 +132,13 @@ const routes = [
     component: () => import('../page/Front/TrialHall.vue')
   },
   {
-        path: '/trial-quiz/:level/:examId', 
-        name: 'TrialQuizPage',
-        component: () => import('../page/Front/TrialQuizPage.vue'),
-        props: true
-    },
-    {
-    path: '/trial-result-detail/:finalScore', 
+    path: '/trial-quiz/:level/:examId',
+    name: 'TrialQuizPage',
+    component: () => import('../page/Front/TrialQuizPage.vue'),
+    props: true
+  },
+  {
+    path: '/trial-result-detail/:finalScore',
     name: 'TrialResultDetail',
     component: () => import('../page/Front/TrialResultDetail.vue'),
     props: true

@@ -9,9 +9,12 @@
   },
   "dependencies": {
     "@lucky-canvas/vue": "^0.1.11",
+    "apexcharts": "^5.3.6",
+    "axios": "^1.13.2",
     "core-js": "^3.8.3",
     "element-ui": "^2.15.14",
     "vue": "^2.6.14",
+    "vue-apexcharts": "^1.7.0",
     "vue-custom-scrollbar": "^1.4.4",
     "vue-multiselect": "^2.1.9",
     "vue-router": "^3.6.5",

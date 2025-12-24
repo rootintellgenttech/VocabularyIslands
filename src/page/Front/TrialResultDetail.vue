@@ -4,185 +4,228 @@
         <div class="result-content-card">
             <header class="result-header">
                 <div class="header-left">
-                    <i class="fas fa-angle-left back-icon" @click="goBack"></i>
-                    <h1 class="exam-info-title">{{ examName }} <span class="student-info">{{ studentClass }} {{
-                        studentName }}</span></h1>
+                    <div class="back-btn-wrap" @click="goBack">
+                        <i class="fas fa-angle-left back-icon"></i> 返回
+                    </div>
+                    <h1 class="exam-info-title">
+                        {{ displayTitle }}
+                        <span class="student-info">{{ studentClass }} {{ studentName }}</span>
+                    </h1>
                 </div>
+
                 <div class="header-right">
-                    <span class="final-score-value">{{ finalScore }} 分</span>
+                    <div class="score-display">
+                        <template v-if="isStarMode">
+                            <span class="final-score-value">{{ starCount }} 顆星星</span>
+                        </template>
+                        <template v-else>
+                            <span class="final-score-value">{{ finalScore }} 分</span>
+                        </template>
+                    </div>
                 </div>
             </header>
 
-            <el-tabs v-model="activePartId" class="part-tabs">
-                <el-tab-pane v-for="part in quizParts" :key="part.id" :label="part.title" :name="part.id">
+     <el-tabs v-model="activePartId" class="part-tabs" v-if="quizParts && quizParts.length > 0">
+    <el-tab-pane v-for="part in quizParts" :key="part.id" :label="part.title" :name="part.id">
+        <el-table :data="part.questions" style="width: 100%" :row-class-name="tableRowClassName" border height="550">
+            <el-table-column prop="index" label="序" width="60" align="center"></el-table-column>
+            
+            <el-table-column label="題目" min-width="180">
+                <template slot-scope="scope">
+                    <div v-if="part.qType === 'Listening'" class="audio-trigger-row" @click="playAudio(scope.row.audioSrc)">
+                        <i class="fas fa-volume-up" style="cursor: pointer;"></i> 點擊播放
+                    </div>
+                    <span v-else>{{ scope.row.question }}</span>
+                </template>
+            </el-table-column>
 
-                    <el-table :data="part.questions" style="width: 100%" :row-class-name="tableRowClassName" border
-                        height="550" max-height="550">
+            <el-table-column label="我的答案" min-width="120">
+                <template slot-scope="scope">
+                    <span :class="{ 'text-danger': !scope.row.isCorrect }">{{ scope.row.myAnswer }}</span>
+                </template>
+            </el-table-column>
 
-                        <el-table-column prop="index" label="序列" width="50">
-                        </el-table-column>
+            <el-table-column prop="correctAnswer" label="正確答案" min-width="120" class-name="text-success"></el-table-column>
+            
+            <el-table-column label="結果" width="80" align="center">
+                <template slot-scope="scope">
+                    <i :class="['fas', scope.row.isCorrect ? 'fa-check correct-icon' : 'fa-times wrong-icon']"></i>
+                </template>
+            </el-table-column>
+        </el-table>
+    </el-tab-pane>
+</el-tabs>
 
-                        <el-table-column prop="question" label="題目" min-width="120">
-                            <template slot-scope="scope">
-                                <span v-if="part.qType === 'Listening'" class="audio-tip-text audio-trigger"
-                                    @click="playAudio(scope.row.question)">
-                                    <i class="fas fa-volume-up" style="cursor: pointer;margin-right: 8px;;"></i> 點擊發音
-                                </span>
-                                <span v-else>{{ scope.row.question }}</span>
-                            </template>
-                        </el-table-column>
+            <div v-else-if="quizParts && quizParts.length === 1" class="single-part-container">
+               <el-table :data="quizParts[0].questions" style="width: 100%" :height="600" :row-class-name="tableRowClassName" border>
+        <el-table-column prop="index" label="序列" width="60" align="center"></el-table-column>
 
-                        <el-table-column prop="myAnswer" label="我的答案" min-width="120">
-                        </el-table-column>
+        <el-table-column label="題目" min-width="180">
+            <template slot-scope="scope">
+               <div v-if="quizParts[0].qType === 'Listening'" class="audio-trigger-row" 
+         @click="playAudio(scope.row.audioSrc)"> <i class="fas fa-volume-up" style="cursor: pointer;"></i> 點擊播放
+    </div>
+    <span v-else>{{ scope.row.question }}</span>
+            </template>
+        </el-table-column>
 
-                        <el-table-column prop="correctAnswer" label="正確答案" min-width="120">
-                        </el-table-column>
+        <el-table-column prop="myAnswer" label="我的答案" min-width="120">
+            <template slot-scope="scope">
+                <span :class="{ 'text-danger': !scope.row.isCorrect }">{{ scope.row.myAnswer || '未作答' }}</span>
+            </template>
+        </el-table-column>
 
-                        <el-table-column prop="isCorrect" label="結果" width="80" align="center">
-                            <template slot-scope="scope">
-                                <i
-                                    :class="['fas', scope.row.isCorrect ? 'fa-check correct-icon' : 'fa-times wrong-icon']"></i>
-                            </template>
-                        </el-table-column>
+        <el-table-column prop="correctAnswer" label="正確答案" min-width="120" class-name="text-success"></el-table-column>
 
-                    </el-table>
-                </el-tab-pane>
-            </el-tabs>
+        <el-table-column prop="explanation" label="題目解釋" min-width="200">
+            <template slot-scope="scope">
+                <span class="explanation-text">{{ scope.row.explanation || '-' }}</span>
+            </template>
+        </el-table-column>
+
+        <el-table-column label="結果" width="80" align="center">
+            <template slot-scope="scope">
+                <i :class="['fas', scope.row.isCorrect ? 'fa-check correct-icon' : 'fa-times wrong-icon']"></i>
+            </template>
+        </el-table-column>
+    </el-table>
+            </div>
+
         </div>
     </div>
 </template>
 
 <script>
-const QUIZ_CONFIG = {
-    // 國小 (ps-)
-    'part1-eng-chi': { title: '第一部分：英選中', qType: 'EngToChi' },
-    'part2-chi-eng': { title: '第二部分：中選英', qType: 'ChiToEng' },
-    'part3-listening': { title: '第三部分：單字聽力測驗', qType: 'Listening' },
-    
-    // 國中 (ms-)
-    'ms-part1-eng-chi': { title: '國中 第一部分：英選中', qType: 'EngToChi' },
-    'ms-part2-chi-eng': { title: '國中 第二部分：中選英', qType: 'ChiToEng' },
-    'ms-part3-listening': { title: '國中 第三部分：單字聽力測驗', qType: 'Listening' },
-    'ms-part4-context': { title: '第四部分：文意測驗', qType: 'ContextFill' } 
-};
-
-// 模擬後端回傳的答題記錄數據
-const MOCK_RESULTS_DATA = [
-    // Part 1: 英選中
-    { id: 'part1-eng-chi', isCorrect: true, question: 'Apple', myAnswer: '蘋果', correctAnswer: '蘋果' },
-    { id: 'part1-eng-chi', isCorrect: false, question: 'Banana', myAnswer: '橘子', correctAnswer: '香蕉' },
-    { id: 'part1-eng-chi', isCorrect: true, question: 'Cat', myAnswer: '貓', correctAnswer: '貓' },
-
-    // Part 2: 中選英
-    { id: 'part2-chi-eng', isCorrect: false, question: '老師', myAnswer: 'Student', correctAnswer: 'Teacher' },
-    { id: 'part2-chi-eng', isCorrect: true, question: '學生', myAnswer: 'Student', correctAnswer: 'Student' },
-
-    // Part 3: 聽力
-    { id: 'part3-listening', isCorrect: true, question: 'Book', myAnswer: '書', correctAnswer: '書' },
-    { id: 'part3-listening', isCorrect: false, question: 'Pen', myAnswer: '筆記本', correctAnswer: '筆' },
-{ 
-        id: 'ms-part4-context', 
-        isCorrect: true, 
-        question: 'I see a monkey at Shoushan Zoo.',
-        myAnswer: 'a', 
-        correctAnswer: 'a', 
-        qType: 'ContextFill' 
-    },
-    { 
-        id: 'ms-part4-context', 
-        isCorrect: false, 
-        question: 'He is playing basketball.', 
-        myAnswer: 'is playing', 
-        correctAnswer: 'plays', 
-        qType: 'ContextFill' 
-    }
-];
-
-
 export default {
     name: 'TrialResultDetail',
     props: {
-        examId: { type: String, default: 'part1-eng-chi' }, // 假定當前頁面預設顯示的第一個 tab
+        examId: { type: String, required: true },
         finalScore: { type: [String, Number], default: 0 },
+        examTitle: { type: String, default: '' },
+        resultList: { type: Array, default: () => [] },
+        backRoute: { type: Object, default: () => null }
     },
     data() {
         return {
-            examName: '國小單字試煉',
-            studentClass: 'X年X班',
-            studentName: '學生名稱',
-            activePartId: 'part1-eng-chi', // 當前選中的 Tab
-            rawResults: [], // 原始的答題記錄
+            studentClass: '6年2班',
+            studentName: '陳小明',
+            activePartId: '',
+            finalResultData: [],
         };
     },
     computed: {
-        // 整理 Tabs 和對應的題目數據
-        quizParts() {
-            const parts = Object.keys(QUIZ_CONFIG).map(id => ({
-                id,
-                title: QUIZ_CONFIG[id].title,
-                qType: QUIZ_CONFIG[id].qType,
-                questions: this.getQuestionsByPartId(id),
-            }));
-            return parts;
+        displayTitle() {
+            return this.examTitle || '測驗結果';
+        },
+        isStarMode() {
+        // 如果 examId 包含 'ps-' 或 'ms' (正式考試)，則不顯示星星模式
+        const isExam = this.examId.includes('ps-') || this.examId.includes('ms');
+        if (isExam) return false;
+        
+        // 非 part 開頭的通常是單字島=星星
+        return !this.examId.startsWith('part');
+    },
+       starCount() {
+            return parseInt(this.finalScore) || 0;
+        },
+quizParts() {
+    if (!this.finalResultData || this.finalResultData.length === 0) return [];
+
+    const partNameMap = {
+        'EngToChi': '第一部分 英翻中',
+        'ChiToEng': '第二部分 中翻英',
+        'Listening': '第三部分 單字聽力',
+        'ContextFill': '第四部分 文意測驗'
+    };
+
+    // 1. 依照 partKey 進行分組
+    const groups = {};
+    this.finalResultData.forEach(q => {
+        const key = q.partKey || 'EngToChi';
+        // 使用符合規範的安全屬性檢查
+        if (!Object.prototype.hasOwnProperty.call(groups, key)) {
+            groups[key] = [];
         }
+        groups[key].push(q);
+    });
+
+    // 2. 依照固定順序產生 Tab 數據
+    const order = ['EngToChi', 'ChiToEng', 'Listening', 'ContextFill'];
+    
+    return Object.keys(groups)
+        .map(key => ({
+            id: key,
+            title: partNameMap[key] || '其他內容',
+            qType: key === 'Listening' ? 'Listening' : 'General',
+            questions: groups[key]
+        }))
+        .sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+}
     },
  created() {
-        // 模擬從後端載入數據
-        this.rawResults = MOCK_RESULTS_DATA;
-        // 預設選中第一個 Tab
-        this.activePartId = Object.keys(QUIZ_CONFIG)[0];
-    },
-    methods: {
-     goBack() {
-            this.$router.push('/trial-hall');
-        },
-       getQuestionsByPartId(partId) {
-            let index = 1;
-            return this.rawResults
-                .filter(q => q.id === partId)
-                .map(q => ({
-                    index: index++,
-                    question: q.question,
-                    myAnswer: q.myAnswer,
-                    correctAnswer: q.correctAnswer,
-                    isCorrect: q.isCorrect,
-                }));
-        },
-        // 根據對錯狀態設定表格行的 class (錯誤標註紅色)
-        tableRowClassName({ row }) {
-            // 如果 isCorrect 為 false (錯誤)，返回 'wrong-row' class
-            if (!row.isCorrect) {
-                return 'wrong-row';
+    console.log("詳情頁已載入，收到 Props - examId:", this.examId, "題數:", this.resultList?.length);
+
+    if (this.resultList && Array.isArray(this.resultList) && this.resultList.length > 0) {
+        this.finalResultData = this.resultList;
+        console.log("使用傳入的 Props 資料");
+    } else {
+        // 如果 Props 沒領到，強制從緩存抓
+        const cachedData = sessionStorage.getItem('tempTrialResult');
+        if (cachedData) {
+            try {
+                this.finalResultData = JSON.parse(cachedData);
+                console.log("成功從 sessionStorage 恢復資料，題數:", this.finalResultData.length);
+            } catch (e) {
+                console.error("解析快取資料失敗:", e);
+                this.finalResultData = [];
             }
+        } else {
+            console.error("⚠️ 完全找不到任何作答數據 (Props & Storage 皆無)");
+            this.finalResultData = [];
+        }
+    }
+
+ this.$nextTick(() => {
+        if (this.quizParts.length > 0) {
+            this.activePartId = this.quizParts[0].id;
+        }
+    });
+},
+    methods: {
+ goBack() {
+        if (this.backRoute && this.backRoute.name) {
+            this.$router.replace(this.backRoute).catch(err => {
+                console.error("導航失敗，路由可能不存在:", err);
+                // 發生錯誤時跳回對應的大島嶼
+                const fallback = this.examTitle.includes('聽力') || this.examTitle.includes('英雄') 
+                                 ? (this.backRoute.params.level === 'primary' ? '/primaryisland' : '/secondaryisland')
+                                 : '/home';
+                this.$router.replace(fallback);
+            });
+        } else {
+            this.$router.replace('/home');
+        }
+    },
+        tableRowClassName({ row }) {
+            if (!row.isCorrect) return 'wrong-row';
             return '';
         },
-        playAudio(wordToSpeak) {
-            if (!wordToSpeak) {
-                console.warn('無單字可播放');
-                return;
-            }
-
-            console.log('播放發音 (結果頁): ' + wordToSpeak);
-
-            const utterance = new SpeechSynthesisUtterance(wordToSpeak);
-            utterance.lang = 'en-US'; // 確保使用英文發音
-            utterance.rate = 1;
-
-            // 在播放新的音訊之前取消當前正在進行的語音
+        playAudio(text) {
+            if (!text) return;
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.8;
             window.speechSynthesis.cancel();
             window.speechSynthesis.speak(utterance);
-        },
-
-    },
-    beforeDestroy() {
-        window.speechSynthesis.cancel();
+        }
     }
 };
 </script>
 
+
 <style lang="scss" scoped>
 .result-detail-page {
-    padding: 0 14%;
+    padding: 0 14% 4%;
     min-height: unset;
 }
 
@@ -194,21 +237,20 @@ export default {
     color: $main-black-text;
 
     .header-left {
-        display: flex;
-        align-items: center;
-        gap: 15px;
+        @include flex-center;
+    }
 
-        .back-icon {
-            font-size: 24px;
-            cursor: pointer;
-            color: $main-dark-blue;
-        }
+    .back-btn-wrap {
+       color: #333;
+    font-size: 18px;
+    font-weight: bold;
+ cursor: pointer;
     }
 
     .exam-info-title {
         font-size: 28px;
         font-weight: 800;
-        margin: 0;
+        margin: 0 0 0 16px;
 
         .student-info {
             font-size: 16px;
@@ -293,21 +335,22 @@ export default {
 }
 
 @media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
-    .result-detail-page{
+    .result-detail-page {
         padding: 0 6% 4%;
-    .result-header {
-        padding: 24px 0;
 
-        .exam-info-title {
-            display: flex;
-            flex-direction: column;
-            font-size: 18px;
+        .result-header {
+            padding: 24px 0;
 
-            .student-info {
-                margin-left: 0;
+            .exam-info-title {
+                display: flex;
+                flex-direction: column;
+                font-size: 18px;
+
+                .student-info {
+                    margin-left: 0;
+                }
             }
         }
     }
- }
 }
 </style>

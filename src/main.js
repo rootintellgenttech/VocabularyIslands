@@ -5,7 +5,7 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import locale from 'element-ui/lib/locale/lang/zh-TW';
 import VueLuckyCanvas from '@lucky-canvas/vue'
-
+import VueApexCharts from 'vue-apexcharts'
 import vueCustomScrollbar from 'vue-custom-scrollbar'
 import "vue-custom-scrollbar/dist/vueScrollbar.css"
 
@@ -20,9 +20,10 @@ const customLocale = {
     }
   }
 };
-
+Vue.use(VueApexCharts)
 Vue.use(ElementUI, { locale: customLocale });
 Vue.use(VueLuckyCanvas);
+Vue.component('apexchart', VueApexCharts)
 
 Vue.component('vue-custom-scrollbar', vueCustomScrollbar);
 Vue.config.productionTip = false;

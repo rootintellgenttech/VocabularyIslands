@@ -13,12 +13,12 @@
                     <div v-for="(item, index) in units" :key="item.id"
                         :class="['unit-card-container', { 'is-up': index % 2 !== 0 || index === units.length - 1 }]">
                         <div class="island-card">
-                            <img :src="item.imgColor" :alt="item.name" :class="{ 'is-bw': item.progress === 0 }" />
+                         <img :src="item.imgColor" :alt="item.name" :class="{ 'is-bw': item.stars === 0 }" />
                         </div>
                         <div class="stats-row">
                             <div class="stat-group">
                                 <img src="../../assets/image/elementary/star.png" alt="⭐">
-                                <span>{{ item.stars }}/{{ item.totalStars }}</span>
+                               <span>{{ item.stars }}/{{ item.totalStars }}</span>
                             </div>
                         </div>
                         <div class="unit-title">{{ item.name }}</div>
@@ -35,57 +35,87 @@
 </template>
 
 <script>
+import api from '@/config/api';
 
 export default {
     name: 'AbcIsland',
+    props: {
+        scrollSettings: {
+            suppressScrollY: true,
+            suppressScrollX: false,
+            wheelPropagation: false
+        }
+    },
     data() {
         return {
+            islandTitle: 'ABC啟航島', 
             units: [
-                {
-                    id: 'af', name: 'A-F', route: 'lesson/af', progress: 1, stars: 10, totalStars: 15,
-                    imgColor: require('@/assets/image/elementary/a-c.png'),
-                },
-                {
-                    id: 'gl', name: 'G-L', route: 'lesson/gl', progress: 0, stars: 0, totalStars: 50,
-                    imgColor: require('@/assets/image/elementary/g-i.png'),
-                },
-                {
-                    id: 'mr', name: 'M-R', route: 'lesson/mr', progress: 1, stars: 20, totalStars: 50,
-                    imgColor: require('@/assets/image/elementary/m-o.png'),
-                },
-                {
-                    id: 'sz', name: 'S-Z', route: 'lesson/sz', progress: 0, stars: 0, totalStars: 50,
-                    imgColor: require('@/assets/image/elementary/x-z.png'),
-                },
-                {
-                    id: 'final', name: 'ABC總復習', route: 'lesson/final', progress: 1, stars: 20, totalStars: 20,
-                    imgColor: require('@/assets/image/elementary/abc-final.png'),
-                },
+                { id: 'af', name: 'A-F', route: 'lesson/af', progress: 0, stars: 0, totalStars: 0, imgColor: require('@/assets/image/elementary/a-c.png') },
+                { id: 'gl', name: 'G-L', route: 'lesson/gl', progress: 0, stars: 0, totalStars: 0, imgColor: require('@/assets/image/elementary/g-i.png') },
+                { id: 'mr', name: 'M-R', route: 'lesson/mr', progress: 0, stars: 0, totalStars: 0, imgColor: require('@/assets/image/elementary/m-o.png') },
+                { id: 'sz', name: 'S-Z', route: 'lesson/sz', progress: 0, stars: 0, totalStars: 0, imgColor: require('@/assets/image/elementary/x-z.png') },
+                { id: 'final', name: 'ABC 總復習', route: 'lesson/final', progress: 0, stars: 0, totalStars: 0, imgColor: require('@/assets/image/elementary/abc-final.png') },
             ],
-            scrollSettings: {
-                suppressScrollY: true,  // 關閉直向滾動
-                suppressScrollX: false, // 開啟橫向滾動
-                wheelPropagation: false
-            }
         };
     },
+    mounted() {
+        this.updateStarsFromApi();
+    },
     methods: {
- enterUnit(unit) {
-            console.log(`進入單元: ${unit.id}`);
+  async updateStarsFromApi() {
+    try {
+        const ABC_TOTAL_MAP = {
+            'A-F': 10,
+            'G-L': 10,
+            'M-R': 10,
+            'S-Z': 10,
+            'ABC 總復習': 25
+        };
+
+        const res = await api.get('/students/test-summary/');
+        
+        //取得 "ABC啟航島" 資料 (用於 A-F, G-L 等)
+        const abcData = res.data.islands.find(i => i.island_name === "ABC啟航島");
+        
+        //取得 "ABC 總復習" 資料
+        const abcFinalData = res.data.islands.find(i => i.island_name === "ABC 總復習");
+
+        this.units = this.units.map(unit => {
+            let matched = null;
+
+            // 如果是 "ABC 總復習"，直接拿該島嶼的 total_stars
+            if (unit.name === 'ABC 總復習') {
+                if (abcFinalData) {
+                    matched = { total_stars: abcFinalData.total_stars };
+                }
+            } 
+            // 其他一般單元 (A-F, G-L...)，去 "ABC啟航島" 裡面找
+            else if (abcData) {
+                matched = abcData.units.find(u => u.unit_name === unit.name);
+            }
+
+            return {
+                ...unit,
+                stars: matched ? matched.total_stars : 0,
+                totalStars: ABC_TOTAL_MAP[unit.name] || 0
+            };
+        });
+        
+    } catch (err) {
+        console.error('更新星星失敗:', err);
+    }
+},
+      enterUnit(unit) {
+            console.log('--- AbcIsland Navigation Debug ---');
+            console.log('Target Unit ID:', unit.id); // 這裏應該是 af, gl, mr, sz 或 final
+            console.log('Target Unit Name:', unit.name);
+
             this.$router.push({
                 name: 'LessonDetail',
-                params: {
-                    unitId: unit.id,
-                    level: 'primary' 
-                }
-            }).catch(err => {
-                if (err.name !== 'NavigationDuplicated') {
-                    throw err;
-                }
-            });
+                params: { level: 'primary', wordCount: 'abc', unitId: unit.id }
+            }).catch(err => { if (err.name !== 'NavigationDuplicated') throw err; });
         },
         goBack() {
-            // 返回到國小島嶼頁面
             this.$router.push('/primaryisland');
         },
     }

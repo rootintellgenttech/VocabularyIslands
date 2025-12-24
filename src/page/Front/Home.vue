@@ -23,15 +23,17 @@
 <script>
 export default {
     name: 'Home',
+      props:{
+            scrollSettings: {
+                suppressScrollY: true,  // 關閉直向滾動
+                suppressScrollX: false, // 開啟橫向滾動
+                wheelPropagation: false
+            }
+    },
     data() {
         return {
             // 側邊欄是否展開，初始為 false (收合)
             isMenuExpanded: false,
-            scrollSettings: {
-                suppressScrollY: true, // 關閉縱向
-                suppressScrollX: false, // 開啟橫向
-                wheelPropagation: false
-            },
             // 島嶼資料
             islands: [
                 {
@@ -56,7 +58,7 @@ export default {
                 {
                     name: '成就島',
                     imagePath: require('../../assets/image/home/achievement-island.png'),
-                    // route: '/secondaryisland', 
+                    route: '/achievementIsland', 
                 },
             ],
         };

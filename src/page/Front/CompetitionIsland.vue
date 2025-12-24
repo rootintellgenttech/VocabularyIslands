@@ -1,7 +1,7 @@
 <template>
     <div class="competition-page">
         <div class="return-last-page" @click="goToHome">
-            <i class="fas fa-angle-left"></i> 返回首頁
+            <i class="fas fa-angle-left"></i> 返回
         </div>
         <h1 class="page-title">競技島</h1>
             <div class="content-wrapper">
@@ -190,7 +190,7 @@
         <el-dialog 
             custom-class="challenge-confirm-modal" 
             :visible.sync="challengeDialogVisible" 
-            width="480px"
+            width="500px"
             center 
             :close-on-click-modal="false" 
             :show-close="false">
@@ -228,6 +228,13 @@ const ICONS = {
 
 export default {
     name: 'CompetitionIsland',
+    props:{
+         rankingScrollSettings: {
+                suppressScrollY: false, 
+                suppressScrollX: true, 
+                wheelPropagation: false
+            },
+    },
     data() {
         return {
           currentTime: new Date(), 
@@ -272,11 +279,7 @@ export default {
                     { id: 'speed', title: '速度對決', description: '限時問答挑戰', point: '贏得60分', island: '國中聽力海灣', iconClass: 'THUNDER_ICON', level: 'both' },
                 ]
             },
-            rankingScrollSettings: {
-                suppressScrollY: false, 
-                suppressScrollX: true, 
-                wheelPropagation: false
-            },
+           
         };
     },
     computed: {

@@ -13,10 +13,82 @@
 
 <script>
 import Sidebar from '@/components/Sidebar.vue';
+import api from '@/config/api';
 
 export default {
   components: {
     Sidebar
+  },
+  data() {
+    return {
+      refreshTimer: null 
+    };
+  },
+  mounted() {
+    // 當頁面載入或刷新時，如果已經是登入狀態，立刻啟動自動更新
+    if (localStorage.getItem('refreshToken')) {
+      this.startTokenRefreshTimer();
+    }
+  },
+  watch: {
+    // 監控路由變化，如果是從登入頁進來，確保定時器有啟動
+    '$route'() {
+      if (localStorage.getItem('refreshToken') && !this.refreshTimer) {
+        this.startTokenRefreshTimer();
+      }
+    }
+  },
+  methods: {
+    async startTokenRefreshTimer() {
+      // 避免重複設定定時器
+      if (this.refreshTimer) return;
+
+      console.log('[系統] 啟動 Token 自動更新計時器 (每 25 分鐘刷新一次)');
+
+      // 設定定時器：25 分鐘 = 25 * 60 * 1000 毫秒
+      this.refreshTimer = setInterval(async () => {
+        const refreshToken = localStorage.getItem('refreshToken');
+        
+        if (!refreshToken) {
+          this.stopTokenRefreshTimer();
+          return;
+        }
+
+        try {
+          console.log('[系統] 正在執行預約自動更新 Token...');
+          // 刷新接口
+          const response = await api.post('students/refresh/', { 
+            refresh: refreshToken 
+          });
+          
+          // 兼容 access 或 token 兩種 key
+          const newAccessToken = response.data.token || response.data.access;
+          const newRefreshToken = response.data.refresh;
+
+          if (newAccessToken) {
+            localStorage.setItem('accessToken', newAccessToken);
+            localStorage.setItem('refreshToken', newRefreshToken);
+            console.log('[系統] 自動更新成功，Token 已續期。');
+          }
+        } catch (error) {
+          console.error('[系統] 自動更新失敗:', error);
+          // 如果連刷新都失敗，代表 refreshToken 也過期了，停止計時器
+          this.stopTokenRefreshTimer();
+        }
+      }, 25 * 60 * 1000); 
+    },
+    
+    stopTokenRefreshTimer() {
+      if (this.refreshTimer) {
+        clearInterval(this.refreshTimer);
+        this.refreshTimer = null;
+        console.log('[系統] 定時器已停止');
+      }
+    }
+  },
+  beforeDestroy() {
+    // 當組件銷毀時清理定時器，避免記憶體洩漏
+    this.stopTokenRefreshTimer();
   }
 };
 </script>
@@ -30,13 +102,33 @@ body {
   margin: 0;
 }
 
+.el-form--label-top .el-form-item__label {
+    display: flex !important; 
+    // justify-content: center;
+padding:0 !important
+}
+
+.loading-container {
+    @include flex-center;
+    font-size: 24px;
+    font-weight: 600;
+    color: $main-black-text;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px 0
+}
+
+.el-table .cell{
+  font-size: 16px;
+    }
+
 .level-scroll-container {
   height: 350px;
   padding:6px 0;
 }
 
 .islands-scroll-container {
-  margin: 4%;
+  margin: 4% 4% 4% 6%;
 }
 
 .island-map-container {
@@ -148,7 +240,7 @@ body {
   border-radius: 16px !important;
 }
 
-.challenge-confirm-modal,
+.challenge-confirm-modal,.confirm-pw-modal,.confirm-change-pw-modal,
 .exit-confirm-modal {
   border: 6px solid var(--btn-g, #4ABCB1);
   border-radius: 16px !important;
@@ -175,11 +267,14 @@ button {
   filter: grayscale(100%);
 }
 
+
+
 .tinder-card {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: 20px;
+  min-width: 600px;
   box-shadow: 0 6px 10px -2px rgba(0, 0, 0, 0.15) !important
 }
 
@@ -306,14 +401,17 @@ button {
 
 @media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
 
+    .tinder-card{
+                min-width: unset;
+            }
+
   .main-card {
-        width: auto !important;
-            padding: 0 !important;
+        width: 500px !important;
+
         .question-content{
                   padding: 5% !important;
                 .question-wrap .question-title{
- 
-    font-size: 12rem;
+    font-size:32px;
                   }
         }
   

@@ -1,8 +1,12 @@
 const { defineConfig } = require('@vue/cli-service')
+
 module.exports = defineConfig({
   transpileDependencies: true,
-    lintOnSave: false,
-      css: {
+  lintOnSave: false,
+  devServer: {
+    allowedHosts: 'all', // 允許 ngrok 的域名訪問
+  },
+  css: {
     loaderOptions: {
       scss: {
         additionalData: `
