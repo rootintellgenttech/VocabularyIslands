@@ -117,7 +117,7 @@
             </div>
 
             <!-- 快速身份登錄 -->
-            <div class="dev-test-zone">
+            <!-- <div class="dev-test-zone">
               <p class="dev-title">🛠️ 開發測試快速通道 (點擊直接登入)</p>
               <div class="dev-btn-grid">
                 <button v-for="(role, index) in testRoles" :key="index" class="dev-role-btn" :class="role.class"
@@ -125,7 +125,7 @@
                   {{ role.name }}
                 </button>
               </div>
-            </div>
+            </div> -->
 
           </div>
         </el-col>
