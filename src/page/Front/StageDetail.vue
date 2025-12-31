@@ -43,7 +43,6 @@
 <script>
 import api from '@/config/api';
 
-
 export default {
     name: 'StageDetail',
     props: {

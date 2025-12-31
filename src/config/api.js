@@ -3,6 +3,9 @@ import axios from 'axios';
 const api = axios.create({
   baseURL: 'http://192.168.3.50:9005/api/',
   timeout: 10000,
+  headers: {
+        'ngrok-skip-browser-warning': 'true'
+    }
 });
 
 api.interceptors.request.use(

@@ -21,7 +21,7 @@ export default {
   },
   data() {
     return {
-      refreshTimer: null 
+      refreshTimer: null
     };
   },
   mounted() {
@@ -48,7 +48,7 @@ export default {
       // 設定定時器：25 分鐘 = 25 * 60 * 1000 毫秒
       this.refreshTimer = setInterval(async () => {
         const refreshToken = localStorage.getItem('refreshToken');
-        
+
         if (!refreshToken) {
           this.stopTokenRefreshTimer();
           return;
@@ -57,10 +57,10 @@ export default {
         try {
           console.log('[系統] 正在執行預約自動更新 Token...');
           // 刷新接口
-          const response = await api.post('students/refresh/', { 
-            refresh: refreshToken 
+          const response = await api.post('students/refresh/', {
+            refresh: refreshToken
           });
-          
+
           // 兼容 access 或 token 兩種 key
           const newAccessToken = response.data.token || response.data.access;
           const newRefreshToken = response.data.refresh;
@@ -75,9 +75,9 @@ export default {
           // 如果連刷新都失敗，代表 refreshToken 也過期了，停止計時器
           this.stopTokenRefreshTimer();
         }
-      }, 25 * 60 * 1000); 
+      }, 25 * 60 * 1000);
     },
-    
+
     stopTokenRefreshTimer() {
       if (this.refreshTimer) {
         clearInterval(this.refreshTimer);
@@ -103,28 +103,51 @@ body {
 }
 
 .el-form--label-top .el-form-item__label {
-    display: flex !important; 
-    // justify-content: center;
-padding:0 !important
+  display: flex !important;
+  // justify-content: center;
+  padding: 0 !important
 }
 
 .loading-container {
-    @include flex-center;
-    font-size: 24px;
-    font-weight: 600;
-    color: $main-black-text;
-    justify-content: center;
-    flex-direction: column;
-    gap: 10px 0
+  @include flex-center;
+  font-size: 24px;
+  font-weight: 600;
+  color: $main-black-text;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px 0
 }
 
-.el-table .cell{
-  font-size: 16px;
+.result-title {
+  margin-top: 16px;
+}
+
+.timer-bar-wrap {
+  .timer-progress {
+    border: 2px solid #e1e0e0;
+    border-radius: 16px;
+
+   .el-progress-bar__innerText {
+      font-size: 16px;
+      font-weight: bold;
+      color: #ffffff !important;
     }
+
+    :deep(.el-progress-bar__inner) {
+      transition: width 1s linear;
+      background-color: #e74c3c;
+    }
+  }
+}
+
+
+.el-table .cell {
+  font-size: 16px;
+}
 
 .level-scroll-container {
   height: 350px;
-  padding:6px 0;
+  padding: 6px 0;
 }
 
 .islands-scroll-container {
@@ -240,7 +263,10 @@ padding:0 !important
   border-radius: 16px !important;
 }
 
-.challenge-confirm-modal,.confirm-pw-modal,.confirm-change-pw-modal,
+.challenge-confirm-modal,
+.confirm-pw-modal,
+.confirm-change-pw-modal,
+.settings-modal,
 .exit-confirm-modal {
   border: 6px solid var(--btn-g, #4ABCB1);
   border-radius: 16px !important;
@@ -399,22 +425,32 @@ button {
 //   border: none
 // }
 
-@media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
+@media (orientation: landscape) and (max-height: 1199.98px) and (pointer: coarse) {
+  .return-last-page {
+    padding: 16px 0 0 0;
+  }
+}
 
-    .tinder-card{
-                min-width: unset;
-            }
+@media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
+  .return-last-page {
+    padding: 16px 0 0 32px;
+  }
+
+  .tinder-card {
+    min-width: unset;
+  }
 
   .main-card {
-        width: 500px !important;
+    width: 500px !important;
 
-        .question-content{
-                  padding: 5% !important;
-                .question-wrap .question-title{
-    font-size:32px;
-                  }
-        }
-  
+    .question-content {
+      padding: 5% !important;
+
+      .question-wrap .question-title {
+        font-size: 32px;
+      }
+    }
+
   }
 
   .page-title {

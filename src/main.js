@@ -8,6 +8,9 @@ import VueLuckyCanvas from '@lucky-canvas/vue'
 import VueApexCharts from 'vue-apexcharts'
 import vueCustomScrollbar from 'vue-custom-scrollbar'
 import "vue-custom-scrollbar/dist/vueScrollbar.css"
+import html2canvas from 'html2canvas';
+
+Vue.prototype.$html2canvas = html2canvas;
 
 const customLocale = {
   ...locale,

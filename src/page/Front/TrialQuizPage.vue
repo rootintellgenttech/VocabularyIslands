@@ -3,11 +3,11 @@
         <div v-if="currentPhase === 'quiz'" :class="['main-card']">
 
             <!-- 一鍵完成考試 -->
-            <!-- <div v-if="isDevelopment" class="test-god-toolbar"
+            <div v-if="isDevelopment" class="test-god-toolbar"
                 style="padding: 10px; background: #fff3cd; border-bottom: 1px solid #ffeeba; display: flex; gap: 10px; justify-content: center;">
                 <el-button type="warning" size="mini" @click="godModeSkipCurrentPart">⏩ 跳過本階段</el-button>
                 <el-button type="danger" size="mini" @click="godModeCompleteWholeExam">🔥 一鍵全卷交卷</el-button>
-            </div> -->
+            </div>
 
             <template v-if="currentPhase === 'quiz' && currentQuestion">
                 <div class="header-wrap">
@@ -162,39 +162,21 @@ import api from '@/config/api';
 
 // 測驗配置：設定各關卡的屬性
 const EXAM_MASTER_SETTINGS = {
-    // 國小 第一/第二階段
-    'ps-1': {
-        'EngToChi': { time: 15, totalScore: 50, next: 'part2-chi-eng' },
-        'ChiToEng': { time: 15, totalScore: 40, next: 'part3-listening' },
-        'Listening': { time: 5, totalScore: 10, next: null }
-    },
+    // 國小 第二階段
     'ps-2': {
         'EngToChi': { time: 15, totalScore: 50, next: 'part2-chi-eng' },
         'ChiToEng': { time: 15, totalScore: 40, next: 'part3-listening' },
         'Listening': { time: 5, totalScore: 10, next: null }
     },
-    // 國中 7年級 第一階段
-    'ms7-1': {
-        'EngToChi': { time: 10, totalScore: 40, next: 'part2-chi-eng' },
-        'ChiToEng': { time: 10, totalScore: 40, next: 'part3-listening' },
-        'Listening': { time: 5, totalScore: 20, next: null }
-    },
     // 國中 7年級 第二階段
-    'ms7-2': {
+   'ms7-2': {
         'EngToChi': { time: 10, totalScore: 40, next: 'part2-chi-eng' },
         'ChiToEng': { time: 10, totalScore: 32, next: 'part3-listening' },
         'Listening': { time: 5, totalScore: 8, next: 'ms-part4-context' },
         'ContextFill': { time: 15, totalScore: 20, next: null }
     },
-    // 國中 8年級 第一階段
-    'ms8-1': {
-        'EngToChi': { time: 10, totalScore: 40, next: 'part2-chi-eng' },
-        'ChiToEng': { time: 10, totalScore: 32, next: 'part3-listening' },
-        'Listening': { time: 5, totalScore: 8, next: 'ms-part4-context' },
-        'ContextFill': { time: 15, totalScore: 20, next: null }
-    },
-    // 國中 8年級 第二階段
-    'ms8-2': {
+    // 國中 8 年級 第一階段
+     'ms8-2': {
         'EngToChi': { time: 10, totalScore: 40, next: 'part2-chi-eng' },
         'ChiToEng': { time: 10, totalScore: 32, next: 'part3-listening' },
         'Listening': { time: 5, totalScore: 8, next: 'ms-part4-context' },
@@ -273,16 +255,16 @@ export default {
     },
     // 攔截瀏覽器返回鍵與內部跳轉
     beforeRouteLeave(to, from, next) {
-    // 如果是在 'complete' (完成)、'intro' (介紹頁)、或 'isLoading'，直接放行
-    if (this.currentPhase === 'complete' || this.currentPhase === 'intro' || this.isLoading) {
-        next();
-    } else {
-        // 只有在 'quiz' (作答中) 才會攔截
-        this.exitDialogVisible = true;
-        this.nextRoute = to;
-        next(false); // 攔截導航（這會觸發 aborted 警告，但不影響功能）
-    }
-},
+        // 如果是在 'complete' (完成)、'intro' (介紹頁)、或 'isLoading'，直接放行
+        if (this.currentPhase === 'complete' || this.currentPhase === 'intro' || this.isLoading) {
+            next();
+        } else {
+            // 只有在 'quiz' (作答中) 才會攔截
+            this.exitDialogVisible = true;
+            this.nextRoute = to;
+            next(false); // 攔截導航（這會觸發 aborted 警告，但不影響功能）
+        }
+    },
     mounted() {
         // 攔截「關閉分頁」或「重整網頁」
         window.addEventListener('beforeunload', this.handleBeforeUnload);
@@ -334,159 +316,175 @@ export default {
         },
 
         // 使用者點擊對話框的「確定離開並提交」
-   async confirmExit() {
-    this.exitDialogVisible = false;
-    
-    if (this.currentPhase === 'quiz') {
-        this.autoFillAllRemainingWithNull();
-        await this.submitEntireExam();
-    }
-    
-    // 跳轉回大廳或目的地
-    const targetPath = this.nextRoute ? this.nextRoute.path : '/trial-hall';
-    this.$router.push(targetPath).catch(() => {});
-},
-autoFillAllRemainingWithNull() {
-        const parts = this.examData.parts;
-        Object.keys(parts).forEach(pKey => {
-            parts[pKey].forEach(q => {
-                // 檢查 userAnswers 是否已經有這題 ID (使用外部 ID 比對)
-                const isAnswered = this.userAnswers.some(ans => ans.question_id === q.external_id);
-                if (!isAnswered) {
-                    this.userAnswers.push({
-                    question_id: q.external_id
-                });
-                }
-            });
-        });
-        console.log(`[強制交卷] 已補齊剩餘題目，總提交數: ${this.userAnswers.length}`);
-    },
+        async confirmExit() {
+            this.exitDialogVisible = false;
 
-    handlePartTimeout() {
-        console.warn(` 階段 ${this.examId} 時間到！自動補齊...`);
-        for (let i = this.currentQuestionIndex; i < this.currentPartQuestions.length; i++) {
-            const q = this.currentPartQuestions[i];
-            const alreadyAnswered = this.userAnswers.some(a => a.question_id === q.id);
-            if (!alreadyAnswered) {
-this.userAnswers.push({
-                question_id: q.id
-            });
+            if (this.currentPhase === 'quiz') {
+                this.autoFillAllRemainingWithNull();
+                await this.submitEntireExam();
             }
-        }
-        this.handleSummaryContinue();
-    },
+
+            // 跳轉回大廳或目的地
+            const targetPath = this.nextRoute ? this.nextRoute.path : '/trial-hall';
+            this.$router.push(targetPath).catch(() => { });
+        },
+        autoFillAllRemainingWithNull() {
+            const parts = this.examData.parts;
+            Object.keys(parts).forEach(pKey => {
+                parts[pKey].forEach(q => {
+                    // 檢查 userAnswers 是否已經有這題 ID (使用外部 ID 比對)
+                    const isAnswered = this.userAnswers.some(ans => ans.question_id === q.external_id);
+                    if (!isAnswered) {
+                        this.userAnswers.push({
+                            question_id: q.external_id
+                        });
+                    }
+                });
+            });
+            console.log(`[強制交卷] 已補齊剩餘題目，總提交數: ${this.userAnswers.length}`);
+        },
+
+        handlePartTimeout() {
+            console.warn(` 階段 ${this.examId} 時間到！自動補齊...`);
+            for (let i = this.currentQuestionIndex; i < this.currentPartQuestions.length; i++) {
+                const q = this.currentPartQuestions[i];
+                const alreadyAnswered = this.userAnswers.some(a => a.question_id === q.id);
+                if (!alreadyAnswered) {
+                    this.userAnswers.push({
+                        question_id: q.id
+                    });
+                }
+            }
+            this.handleSummaryContinue();
+        },
         godModeSkipCurrentPart() {
-    console.log(`[God Mode] 正在自動完成階段: ${this.currentQuizConfig.title}`);
-    
-    for (let i = this.currentQuestionIndex; i < this.currentPartQuestions.length; i++) {
-        const q = this.currentPartQuestions[i];
-        
-        // 尋找正確答案對應的原始選項物件，以取得 external_id
-        const correctOpt = q.rawOptions.find(o => o.description === q.correctAnswer) || q.rawOptions[0];
-        
-        this.userAnswers.push({
-            question_id: q.id,
-            selected_option_id: correctOpt ? correctOpt.external_id : null
-        });
-    }
+            console.log(`[God Mode] 正在自動完成階段: ${this.currentQuizConfig.title}`);
 
-    this.$message.success(`${this.currentQuizConfig.title} 已自動完成`);
-    this.handleSummaryContinue();
-},
+            for (let i = this.currentQuestionIndex; i < this.currentPartQuestions.length; i++) {
+                const q = this.currentPartQuestions[i];
 
-//God Mode 2: 一鍵完成整份考卷 (全自動)
-async godModeCompleteWholeExam() {
-    console.log('[God Mode] 啟動全卷自動完成...');
+                const correctOpt = q.rawOptions.find(o => o.description === q.correctAnswer) || q.rawOptions[0];
+
+                this.userAnswers.push({
+                    question_id: q.id,
+                    selected_option_id: correctOpt ? correctOpt.external_id : null
+                });
+            }
+
+            this.$message.success(`${this.currentQuizConfig.title} 已自動完成`);
+            this.handleSummaryContinue();
+        },
+
+        //Godmode 一鍵完成考試
+    async godModeCompleteWholeExam() {
     this.isLoading = true;
-    
-    // 清空目前的答案紀錄，直接從 examData.parts 掃描所有題目
     const allAnswers = [];
     const parts = this.examData.parts;
 
+    if (!parts) {
+        this.$message.error("找不到考卷內容");
+        this.isLoading = false;
+        return;
+    }
+
     Object.keys(parts).forEach(pKey => {
         const questions = parts[pKey];
+        if (!Array.isArray(questions)) return;
+
         questions.forEach(q => {
-            // 尋找正確答案對應的 id
-            const correctOpt = q.options.find(o => o.description === q.answer) || q.options[0];
-            
+            const realAnswer = (q.answer || q.correct_answer || "").toString().trim();
+            const options = q.options || [];
+
+            // 如果沒有選項，這題無法自動作答，跳過
+            if (options.length === 0) return;
+
+            const correctOpt = options.find(o => 
+                (o.description || o.text || "").toString().trim() === realAnswer
+            );
+
             allAnswers.push({
-                question_id: q.external_id,
-                selected_option_id: correctOpt ? correctOpt.external_id : null
+                // 優先使用 external_id，否則使用 id
+                question_id: q.external_id || q.id,
+                // 如果找到正確答案就選它，找不到就選第一個選項（保底不空白）
+                selected_option_id: correctOpt ? (correctOpt.external_id || correctOpt.id) : (options[0].external_id || options[0].id)
             });
         });
     });
 
-    this.userAnswers = allAnswers;
-    console.log(`[God Mode] 已填充 ${this.userAnswers.length} 題答案，準備提交`);
-    
-    // 停止計時器並直接提交
+    this.userAnswers = allAnswers.sort(() => Math.random() - 0.5);
+
+    console.log(`[God Mode] 準備提交 ${this.userAnswers.length} 題答案`);
+
+    // 確保存入標題
+    const examName = this.examData.info || "試煉挑戰卷";
+    sessionStorage.setItem('tempTrialTitle', examName);
+
     if (this.timerInterval) clearInterval(this.timerInterval);
     await this.submitEntireExam();
 },
+  loadQuizConfig(examId) {
+    const meta = PART_METADATA[examId];
+    if (!meta) return this.goBack();
 
-        loadQuizConfig(examId) {
-            const meta = PART_METADATA[examId];
-            if (!meta) return this.goBack();
+    const cleanCode = (this.examCode || "").trim(); 
+    const specificSet = EXAM_MASTER_SETTINGS[cleanCode]?.[meta.type];
 
-            const specificSet = EXAM_MASTER_SETTINGS[this.examCode]?.[meta.type];
+    // 抓取真實題目數據
+    const rawQuestions = this.examData.parts[meta.type] || [];
 
-            // 只有在真正「考試中」才自動提交
-            if (!specificSet) {
-                const partSequence = ['part1-eng-chi', 'part2-chi-eng', 'part3-listening', 'ms-part4-context'];
-                const currentIndex = partSequence.indexOf(examId);
-                const nextId = partSequence[currentIndex + 1];
+    if (!specificSet) {
+        console.warn(`⚠️ 找不到設定: ExamCode=${cleanCode}, Type=${meta.type}`);
+        this.currentQuizConfig = {
+            title: meta.title,
+            qType: meta.type,
+            instruction: meta.instruction,
+            maxQuestions: rawQuestions.length,
+            timeLimitMinutes: 15, // 預設 15 分鐘
+            totalScore: 100,      // 預設 100 分
+            nextPart: null        // 沒設定就當作最後一關
+        };
+    } else {
+        this.currentQuizConfig = {
+            title: meta.title,
+            qType: meta.type,
+            instruction: meta.instruction,
+            maxQuestions: rawQuestions.length,
+            timeLimitMinutes: specificSet.time,
+            totalScore: specificSet.totalScore,
+            nextPart: specificSet.next
+        };
+    }
 
-                if (nextId) {
-                    return this.loadQuizConfig(nextId);
-                } else {
-                    // 只有在 quiz 階段 (真正作答中) 才允許自動提交
-                    if (this.currentPhase === 'quiz') {
-                        return this.submitEntireExam();
-                    }
-                    return; // 剛載入時如果沒匹配到，不執行任何動作
-                }
-            }
+    // 🚀 關鍵修改：確保題目物件被正確映射 (Map)
+    // 之前可能是這裡映射失敗導致 currentQuestionIndex 找不到內容
+    this.currentPartQuestions = rawQuestions.map(q => ({
+        id: q.external_id || q.id,
+        title: q.question_text,
+        audioWord: q.question_text,
+        questionParts: meta.type === 'ContextFill' ? (q.question_text || "").split(/(_______)/g) : null,
+        options: (q.options || []).map(opt => ({ 
+            value: opt.description || opt.text, 
+            label: opt.description || opt.text 
+        })),
+        rawOptions: q.options || [],
+        correctAnswer: q.answer || q.correct_answer
+    }));
 
-            // 抓取真實題目
-            const rawQuestions = this.examData.parts[meta.type] || [];
+    // 初始化狀態
+    this.currentPhase = 'intro';
+    this.currentQuestionIndex = 1; // 題目從 1 開始顯示
+    this.selectedAnswer = null;
 
-            // 設定當前配置
-            this.currentQuizConfig = {
-                title: meta.title,
-                qType: meta.type,
-                instruction: meta.instruction,
-                maxQuestions: rawQuestions.length,
-                timeLimitMinutes: specificSet.time,
-                totalScore: specificSet.totalScore,
-                nextPart: specificSet.next
-            };
-
-            // 5. 格式化題目
-            this.currentPartQuestions = rawQuestions.map(q => ({
-                id: q.external_id,
-                title: q.question_text,
-                audioWord: q.question_text,
-                questionParts: meta.type === 'ContextFill' ? q.question_text.split(/(_______)/g) : null,
-                options: q.options.map(opt => ({ value: opt.description, label: opt.description })),
-                rawOptions: q.options,
-                correctAnswer: q.answer
-            }));
-
-            this.currentPhase = 'intro';
-            this.currentPartScore = 0;
-            this.currentQuestionIndex = 1;
-            this.selectedAnswer = null;
-
-            if (this.currentPartQuestions.length > 0) {
-                this.currentQuestion = this.currentPartQuestions[0];
-            }
-        },
-
+    if (this.currentPartQuestions.length > 0) {
+        this.currentQuestion = this.currentPartQuestions[0];
+    } else {
+        console.error(`❌ 單元 ${meta.type} 內沒有題目資料`);
+    }
+},
         handleSubmit() {
             if (!this.selectedAnswer) return;
 
             // 1. 取得當前題目在 API 中的原始資料（為了拿真正的 option ID）
-            // 假設您的選項 label 和 description 是一致的，我們需要找到對應的 ID
             const currentRawQuestion = this.currentPartQuestions[this.currentQuestionIndex - 1];
             const selectedOptionObj = currentRawQuestion.rawOptions.find(o => o.description === this.selectedAnswer);
 
@@ -583,7 +581,7 @@ async godModeCompleteWholeExam() {
 
                 this.currentPhase = 'complete';
 
-                console.log('✅ 考試提交成功，得分：', this.finalTotalScore);
+                console.log(' 考試提交成功，得分：', this.finalTotalScore);
             } catch (error) {
                 console.error('Submit Failed:', error);
                 alert('試卷提交失敗，請檢查網路連線');
@@ -617,7 +615,7 @@ async godModeCompleteWholeExam() {
             console.log('播放發音: ' + wordToSpeak);
             const utterance = new SpeechSynthesisUtterance(wordToSpeak);
             utterance.lang = 'en-US';
-            utterance.rate = 1;
+            utterance.rate = 0.3;
             window.speechSynthesis.cancel();
             window.speechSynthesis.speak(utterance);
         },
@@ -715,36 +713,74 @@ async godModeCompleteWholeExam() {
             }
         },
         // 前往查看考試結果
-      showResultDetail() {
-    console.log('準備跳轉結果詳情，總分:', this.finalTotalScore);
+async showResultDetail() {
+    this.isLoading = true; // 開啟 Loading 避免重複點擊
+    try {
+        console.log(`準備獲取歷史詳情，試卷代碼: ${this.examCode}`);
 
-    //  格式化 API 回傳的 details 資料，使其符合詳情頁表格欄位
-    const formattedResult = this.reportData.map((item, index) => {
-        // 判斷是否包含英文（決定發音源）
-        const hasEnglish = /[a-zA-Z]/.test(item.question_text);
-        
-        return {
-            index: index + 1,
-            question: item.question_text,
-            audioSrc: hasEnglish ? item.question_text : item.correct_answer,
-            myAnswer: item.selected_text || '未作答',
-            correctAnswer: item.correct_answer,
-            isCorrect: item.is_correct,
-            explanation: item.explanation || ''
-        };
-    });
+        const response = await api.get('/students/exam-papers/history/', {
+            params: { code: this.examCode }
+        });
 
-    // 2. 執行跳轉
-    this.$router.push({
-        name: 'TrialResultDetail',
-        params: {
-            examId: this.examCode, // 使用目前的 examCode (如 ps-1)
-            finalScore: this.finalTotalScore,
-            examTitle: this.partTitle, // 使用目前的試卷標題
-            resultList: formattedResult,
-            backRoute: { name: 'TrialHall' } // 設定返回路徑
+        let record = response.data;
+
+        if (Array.isArray(record)) {
+            record = record[0]; 
         }
-    });
+
+        if (!record || !record.questions) {
+            throw new Error("查無詳細答題紀錄");
+        }
+
+        const examName = record.exam_name || this.partTitle || "試煉挑戰卷";
+        sessionStorage.setItem('tempTrialTitle', examName);
+
+        let formattedResult = [];
+
+        record.questions.forEach(partGroup => {
+            const pKey = partGroup.part_key; // 例如 "EngToChi"
+
+            if (Array.isArray(partGroup.questions)) {
+                partGroup.questions.forEach(q => {
+                    // 判斷發音來源
+                    const hasEnglish = /[a-zA-Z]/.test(q.question_text);
+                    
+                    formattedResult.push({
+                        index: 0,
+                        question: q.question_text,
+                        audioSrc: hasEnglish ? q.question_text : q.correct_answer,
+                        myAnswer: q.selected_text || '未作答',
+                        correctAnswer: q.correct_answer,
+                        isCorrect: q.is_correct,
+                        explanation: q.explanation || '',
+                        partKey: pKey
+                    });
+                });
+            }
+        });
+
+        console.log(`轉換完成，共 ${formattedResult.length} 題，準備跳轉...`);
+
+        // 3. 存入緩存並跳轉
+        sessionStorage.setItem('tempTrialResult', JSON.stringify(formattedResult));
+
+        this.$router.push({
+            name: 'ResultDetail',
+            params: {
+                examId: this.examCode,
+                finalScore: this.finalTotalScore, // 或使用 record.score
+                examTitle: examName,
+                resultList: formattedResult,
+                backRoute: { name: 'TrialHall' }
+            }
+        });
+
+    } catch (error) {
+        console.error('獲取詳情失敗:', error);
+        this.$message.error('無法載入答題結果，請稍後再試');
+    } finally {
+        this.isLoading = false;
+    }
 },
     },
     beforeDestroy() {

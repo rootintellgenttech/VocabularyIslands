@@ -3,21 +3,15 @@
         <div class="return-last-page" @click="goBack">
             <i class="fas fa-angle-left"></i> 返回
         </div>
-        <!-- <div v-if="isDevelopment" class="god-mode-selection">
-    <p style="color: #666; font-size: 14px; margin-bottom: 10px;">🛠️ God Mode: 直接選擇試卷測試串接</p>
-    <div class="god-btns" style="display: flex; gap: 10px; flex-wrap: wrap;">
-        <el-button 
-            v-for="target in examTargets" 
-            :key="target.id"
-            type="info" 
-            plain 
-            size="small"
-            @click="selectExamFromGodMode(target)"
-        >
-            {{ target.name }} ({{ target.id }})
-        </el-button>
-    </div>
-</div> -->
+        <div v-if="isDevelopment" class="god-mode-selection">
+            <p style="color: #666; font-size: 14px; margin-bottom: 10px;">🛠️ God Mode: 直接選擇試卷測試串接</p>
+            <div class="god-btns" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <el-button v-for="target in examTargets" :key="target.id" type="info" plain size="small"
+                    @click="selectExamFromGodMode(target)">
+                    {{ target.name }} ({{ target.id }})
+                </el-button>
+            </div>
+        </div>
         <h1 class="page-title">試煉殿堂</h1>
         <div class="main-card">
 
@@ -44,58 +38,60 @@
                         </button>
                     </div>
                     <div class="card-body-content">
-<div v-if="activeTab === 'challenge'" class="challenge-area">
-    <div class="exam-info-box">
-        <div class="exam-info">
-            <h3 class="exam-title">{{ formatExamName(nextAvailableExam.name) }}</h3>
-            <div class="exam-details">
-                <p class="detail-item">
-                    <i class="far fa-clock"></i>
-                    檢測期程: 即日起 ~ 2025-12-31
-                </p>
-                <p class="detail-item">
-                    <i class="fas fa-hourglass-half"></i>
-                    考試時長: 35分鐘
-                </p>
-                <p class="detail-item">
-                    <i class="fas fa-list-ol"></i>
-                    測驗部分: {{ nextAvailableExam.parts.length }} 個單元
-                </p>
-            </div>
-        </div>
+                        <div v-if="activeTab === 'challenge'" class="challenge-area">
+                            <div class="exam-info-box">
+                                <div class="exam-info">
+                                    <h3 class="exam-title">{{ formatExamName(nextAvailableExam.name) }}</h3>
+                                    <div class="exam-details">
+                                        <p class="detail-item">
+                                            <i class="far fa-clock"></i>
+                                            檢測期程: 即日起 ~ 2025-12-31
+                                        </p>
+                                        <p class="detail-item">
+                                            <i class="fas fa-hourglass-half"></i>
+                                            考試時長: 35分鐘
+                                        </p>
+                                        <p class="detail-item">
+                                            <i class="fas fa-list-ol"></i>
+                                            測驗部分: {{ nextAvailableExam.parts.length }} 個單元
+                                        </p>
+                                    </div>
+                                </div>
 
-        <button class="start-exam-btn" @click="showStartExamDialog(nextAvailableExam)">
-            開始考試
-        </button>
-    </div>
-</div>
-           <vue-custom-scrollbar v-else class="history-area" :settings="scrollSettings" v-loading="isLoadingHistory">
-    <div v-if="historyList.length === 0 && !isLoadingHistory" class="no-data-info">
-        <i class="fas fa-folder-open"></i>
-        <p>目前尚無任何考試紀錄</p>
-    </div>
+                                <button class="start-exam-btn" @click="showStartExamDialog(nextAvailableExam)">
+                                    開始考試
+                                </button>
+                            </div>
+                        </div>
+                        <vue-custom-scrollbar v-else class="history-area" :settings="scrollSettings"
+                            v-loading="isLoadingHistory">
+                            <div v-if="historyList.length === 0 && !isLoadingHistory" class="no-data-info">
+                                <i class="fas fa-folder-open"></i>
+                                <p>目前尚無任何考試紀錄</p>
+                            </div>
 
-   <div v-for="(record, idx) in historyList" :key="idx" 
-     class="score-info-box" style="cursor: pointer;"
-     @click="goToHistoryDetail(record)">
-        <div class="exam-info">
-            <h3 class="exam-title">{{ formatExamName(record.exam_name) }}</h3>
-             <div class="exam-details">
-            <p class="detail-item">
-                <i class="far fa-calendar-check"></i> 
-                作答時間：{{ formatHistoryTime(record.answer_time) }}
-            </p>
-            <p class="detail-summary">
-                總題數: {{ record.summary.total }} | 答對: <span style="color: #27ae60;">{{ record.summary.correct }}</span> | 答錯: <span style="color: #e74c3c;">{{ record.summary.wrong }}</span>
-            </p>
-        </div>
-        </div>
-        <div class="display-final-score">
-            <p class="final-score">{{ record.score }}</p>
-            <p>分數</p>
-        </div>
-    </div>
-</vue-custom-scrollbar>
+                            <div v-for="(record, idx) in historyList" :key="idx" class="score-info-box"
+                                style="cursor: pointer;" @click="goToHistoryDetail(record)">
+                                <div class="exam-info">
+                                    <h3 class="exam-title">{{ formatExamName(record.exam_name) }}</h3>
+                                    <div class="exam-details">
+                                        <p class="detail-item">
+                                            <i class="far fa-calendar-check"></i>
+                                            作答時間：{{ formatHistoryTime(record.answer_time) }}
+                                        </p>
+                                        <p class="detail-summary">
+                                            總題數: {{ record.summary.total }} | 答對: <span style="color: #27ae60;">{{
+                                                record.summary.correct }}</span> | 答錯: <span style="color: #e74c3c;">{{
+                                                    record.summary.wrong }}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="display-final-score">
+                                    <p class="final-score">{{ record.score }}</p>
+                                    <p>分數</p>
+                                </div>
+                            </div>
+                        </vue-custom-scrollbar>
                     </div>
                 </el-col>
 
@@ -128,7 +124,7 @@
 
             <span slot="footer" class="dialog-footer">
                 <el-button @click="examDialogVisible = false">取 消</el-button>
-                <el-button class="start-exam-btn" @click="showStartExamDialog(examTargets[0])">開始考試</el-button>
+                <el-button class="start-exam-btn" @click="confirmStartExam">開始考試</el-button>
             </span>
         </el-dialog>
         <!-- <div v-if="isDevelopment" class="god-mode-panel">
@@ -162,85 +158,81 @@ export default {
             isDevelopment: true,
             isGenerating: false,
             genProgress: '',
-            // 定義 6 個目標考卷的配置
             examTargets: [
-                { stage: 1, id: 'ps-1', name: '國小英語單字檢測-1', level: 'primary', words: 300, parts: ['EngToChi', 'ChiToEng', 'Listening'] },
-                { stage: 1, id: 'ms7-1', name: '7年級英語單字檢測-1', level: 'secondary-7', words: 300, parts: ['EngToChi', 'ChiToEng', 'Listening'] },
-                { stage: 1, id: 'ms8-1', name: '8年級英語單字檢測-1', level: 'secondary-8', words: 800, parts: ['EngToChi', 'ChiToEng', 'Listening', 'ContextFill'] },
                 { stage: 2, id: 'ps-2', name: '國小英語單字檢測-2', level: 'primary', words: 300, parts: ['EngToChi', 'ChiToEng', 'Listening'] },
                 { stage: 2, id: 'ms7-2', name: '7年級英語單字檢測-2', level: 'secondary-7', words: 800, parts: ['EngToChi', 'ChiToEng', 'Listening'] },
                 { stage: 2, id: 'ms8-2', name: '8年級英語單字檢測-2', level: 'secondary-8', words: 1200, parts: ['EngToChi', 'ChiToEng', 'Listening', 'ContextFill'] }
             ],
             historyList: [],
-isLoadingHistory: false,
-selectedExamTarget: null,
+            isLoadingHistory: false,
+            selectedExamTarget: null,
         };
     },
     watch: {
-    activeTab(newTab) {
-        if (newTab === 'history') {
-            this.fetchAllHistory();
-        }
-    }
-},
-computed: {
-    // 測試-自動尋找下一個可挑戰的試卷
-    nextAvailableExam() {
-        if (!this.historyList || this.historyList.length === 0) {
-            return this.examTargets[0]; // 若無紀錄，預設顯示第一個
-        }
-        
-        // 取得所有已完成試卷的 code (例如 ['ms8-1', 'ms8-2', 'ms7-1', 'ps-1'])
-        const completedCodes = this.historyList.map(h => h.code);
-        
-        // 從目標清單中過濾出「不在已完成清單」中的第一個
-        const next = this.examTargets.find(target => !completedCodes.includes(target.id));
-        
-        return next || this.examTargets[0]; // 如果全做完了，就顯示第一個
-    }
-},
-    methods: {
-async fetchAllHistory() {
-        this.isLoadingHistory = true;
-        this.historyList = []; // 先清空舊資料
-        
-        const validRecords = [];
-
-        // 使用 for...of 循環，或是個別處理 Promise，確保不會因為一個報錯就全部掛掉
-        for (const target of this.examTargets) {
-            try {
-                const res = await api.get('/students/exam-papers/history/', {
-                    params: { code: target.id }
-                });
-
-                // 如果成功拿到資料，且資料包含 questions
-                if (res.data && res.data.questions) {
-                    validRecords.push(res.data);
-                }
-            } catch (err) {
-                // 如果後端回傳 "尚未作答此試卷"，我們就安靜地跳過，不報錯
-                console.log(`試卷 ${target.id} 尚未有紀錄，跳過。`);
+        activeTab(newTab) {
+            if (newTab === 'history') {
+                this.fetchAllHistory();
             }
         }
-
-        // 依照作答時間排序 (由新到舊)
-        this.historyList = validRecords.sort((a, b) => 
-            new Date(b.answer_time) - new Date(a.answer_time)
-        );
-
-        this.isLoadingHistory = false;
     },
+    computed: {
+        // 測試-自動尋找下一個可挑戰的試卷
+        nextAvailableExam() {
+            if (!this.historyList || this.historyList.length === 0) {
+                return this.examTargets[0]; // 若無紀錄，預設顯示第一個
+            }
 
-    formatHistoryTime(timeStr) {
-        if (!timeStr) return '';
-        const date = new Date(timeStr);
-        const y = date.getFullYear();
-        const m = String(date.getMonth() + 1).padStart(2, '0');
-        const d = String(date.getDate()).padStart(2, '0');
-        const hh = String(date.getHours()).padStart(2, '0');
-        const mm = String(date.getMinutes()).padStart(2, '0');
-        return `${y}-${m}-${d} ${hh}:${mm}`;
+            // 取得所有已完成試卷的 code
+            const completedCodes = this.historyList.map(h => h.code);
+
+            // 從目標清單中過濾出「不在已完成清單」中的第一個
+            const next = this.examTargets.find(target => !completedCodes.includes(target.id));
+
+            return next || this.examTargets[0]; // 如果全做完了，就顯示第一個
+        }
     },
+    methods: {
+        async fetchAllHistory() {
+            this.isLoadingHistory = true;
+            this.historyList = []; // 先清空舊資料
+
+            const validRecords = [];
+
+            // 使用 for...of 循環，或是個別處理 Promise，確保不會因為一個報錯就全部掛掉
+            for (const target of this.examTargets) {
+                try {
+                    const res = await api.get('/students/exam-papers/history/', {
+                        params: { code: target.id }
+                    });
+
+                    // 如果成功拿到資料，且資料包含 questions
+                    if (res.data && res.data.questions) {
+                        validRecords.push(res.data);
+                    }
+                } catch (err) {
+                    // 如果後端回傳 "尚未作答此試卷"，我們就安靜地跳過，不報錯
+                    console.log(`試卷 ${target.id} 尚未有紀錄，跳過。`);
+                }
+            }
+
+            // 依照作答時間排序 (由新到舊)
+            this.historyList = validRecords.sort((a, b) =>
+                new Date(b.answer_time) - new Date(a.answer_time)
+            );
+
+            this.isLoadingHistory = false;
+        },
+
+        formatHistoryTime(timeStr) {
+            if (!timeStr) return '';
+            const date = new Date(timeStr);
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            const hh = String(date.getHours()).padStart(2, '0');
+            const mm = String(date.getMinutes()).padStart(2, '0');
+            return `${y}-${m}-${d} ${hh}:${mm}`;
+        },
         goBack() {
             this.$router.push('/home');
         },
@@ -248,73 +240,66 @@ async fetchAllHistory() {
             if (tab === 'history') return '歷史記錄';
             return '試煉挑戰';
         },
-showStartExamDialog(target) {
-        this.selectedExamTarget = target;
-        this.examDialogVisible = true;
-    },
+        showStartExamDialog(target) {
+            this.selectedExamTarget = target;
+            this.examDialogVisible = true;
+        },
 
-    // 確保點擊「瞭解」後執行正式流程
-    async confirmStartExam() {
-        this.examDialogVisible = false;
-        if (!this.selectedExamTarget) return;
-        
-        this.selectExamFromGodMode(this.selectedExamTarget);
-    },
+        // 確保點擊「瞭解」後執行正式流程
+        async confirmStartExam() {
+            this.examDialogVisible = false;
+            if (!this.selectedExamTarget) return;
 
-       // God Mode 專用選擇函式
-async selectExamFromGodMode(target) {
-    this.isGenerating = true;
-    try {
-        console.log(`正在獲取試卷 ${target.id}...`);
-        
-        const response = await api.get('/students/exam-papers/', {
-            params: {
-                code: target.id 
-            }
-        });
+            this.selectExamFromGodMode(this.selectedExamTarget);
+        },
 
-        const examData = response.data;
-        console.log('API 原始回傳數據:', examData);
+        // God Mode 專用選擇函式
+        async selectExamFromGodMode(target) {
+            this.isGenerating = true;
+            try {
+                const response = await api.get('/students/exam-papers/', { params: { code: target.id } });
+                const examData = response.data;
 
-        // 判斷第一個要進入的 Part
-        // 優先順序：EngToChi -> ChiToEng -> Listening -> ContextFill
-        let firstPartId = 'part1-eng-chi';
-        if (!examData.parts.EngToChi) {
-            if (examData.parts.ChiToEng) firstPartId = 'part2-chi-eng';
-            else if (examData.parts.Listening) firstPartId = 'part3-listening';
-            else if (examData.parts.ContextFill) firstPartId = 'ms-part4-context';
-        }
+                if (!examData.info) {
+                    examData.info = target.name;
+                }
 
-        this.$router.push({
-            name: 'TrialQuizPage',
-            params: {
-                level: target.level,
-                examId: firstPartId, 
-                examData: examData,
-                examCode: target.id
-            }
-        });
+                if (examData && examData.parts) {
+                    Object.keys(examData.parts).forEach(pKey => {
+                        examData.parts[pKey] = examData.parts[pKey].sort(() => Math.random() - 0.5);
+                        examData.parts[pKey].forEach(q => {
+                            if (q.options) q.options = q.options.sort(() => Math.random() - 0.5);
+                        });
+                    });
+                }
 
-    } catch (error) {
-        console.error('獲取試卷失敗:', error);
-        this.$message.error('無法取得試卷，請確認網路連線');
-    } finally {
-        this.isGenerating = false;
-    }
-},
+                const availablePartKeys = Object.keys(examData.parts);
+                const firstPartKey = availablePartKeys[0]; // 例如 "EngToChi"
+                const firstPartId = this.getPartIdByApiMode(firstPartKey); // 轉為 "part1-eng-chi"
 
-// 輔助函式：根據 API 返回的 Key 對應到我們前端配置的 ID
-getPartIdByApiMode(apiPartKey) {
-    const map = {
-        'EngToChi': 'part1-eng-chi',
-        'ChiToEng': 'part2-chi-eng',
-        'Listening': 'part3-listening',
-        'ContextFill': 'ms-part4-context'
-    };
-    return map[apiPartKey] || 'part1-eng-chi';
-},
-    
-    async generateAllExamData() {
+                this.$router.push({
+                    name: 'TrialQuizPage',
+                    params: {
+                        level: target.level,
+                        examId: firstPartId,
+                        examData: examData,
+                        examCode: target.id
+                    }
+                });
+            } catch (err) { console.error(err); }
+            finally { this.isGenerating = false; }
+        },
+        getPartIdByApiMode(apiPartKey) {
+            const map = {
+                'EngToChi': 'part1-eng-chi',
+                'ChiToEng': 'part2-chi-eng',
+                'Listening': 'part3-listening',
+                'ContextFill': 'ms-part4-context'
+            };
+            return map[apiPartKey] || 'part1-eng-chi';
+        },
+
+        async generateAllExamData() {
             this.isGenerating = true;
             this.genProgress = '開始連線 API (God Mode)...';
             const finalData = {};
@@ -323,75 +308,62 @@ getPartIdByApiMode(apiPartKey) {
                 'EngToChi': '英翻中',
                 'ChiToEng': '中翻英',
                 'Listening': '聽力',
-                'ContextFill':'克漏字'
+                'ContextFill': '克漏字'
             };
 
-           const exams = [
-        // 第一階段
-        { id: 'ps-1', name: '國小-1', island: '300字島', parts: [
-            { type: 'EngToChi', count: 100 }, { type: 'ChiToEng', count: 80 }, { type: 'EngToChi', count: 20, isListening: true }
-        ]},
-        { id: 'ms7-1', name: '7年級-1', island: '300字島', parts: [
-            { type: 'EngToChi', count: 100 }, { type: 'ChiToEng', count: 100 }, { type: 'EngToChi', count: 20, isListening: true }
-        ]},
-        { id: 'ms8-1', name: '8年級-1', island: '800字島', parts: [
-            { type: 'EngToChi', count: 100 }, { type: 'ChiToEng', count: 80 }, { type: 'EngToChi', count: 20, isListening: true }, { type: 'ContextFill', count: 50 }
-        ]},
-        // 第二階段
-        { id: 'ps-2', name: '國小-2', island: '300字島', parts: [
-            { type: 'EngToChi', count: 100 }, { type: 'ChiToEng', count: 80 }, { type: 'EngToChi', count: 20, isListening: true }
-        ]},
-        { id: 'ms7-2', name: '7年級-2', island: '800字島', parts: [
-            { type: 'EngToChi', count: 100 }, { type: 'ChiToEng', count: 80 }, { type: 'EngToChi', count: 20, isListening: true }, { type: 'ContextFill', count: 50 }
-        ]},
-        { id: 'ms8-2', name: '8年級-2', island: '1200字島', parts: [
-            { type: 'EngToChi', count: 100 }, { type: 'ChiToEng', count: 80 }, { type: 'EngToChi', count: 20, isListening: true }, { type: 'ContextFill', count: 50 }
-        ]}
-    ];
+            const exams = [
+                {
+                    id: 'ps-2', name: '國小英語單字檢測-2', island: '300字島', parts: [
+                        { type: 'EngToChi', count: 100 }, { type: 'ChiToEng', count: 80 }, { type: 'EngToChi', count: 20, isListening: true }
+                    ]
+                },
+                {
+                    id: 'ms7-2', name: '7年級英語單字檢測-2', island: '800字島', parts: [
+                        { type: 'EngToChi', count: 100 }, { type: 'ChiToEng', count: 80 }, { type: 'EngToChi', count: 20, isListening: true }, { type: 'ContextFill', count: 50 }
+                    ]
+                },
+                {
+                    id: 'ms8-2', name: '8年級英語單字檢測-2', island: '1200字島', parts: [
+                        { type: 'EngToChi', count: 100 }, { type: 'ChiToEng', count: 80 }, { type: 'EngToChi', count: 20, isListening: true }, { type: 'ContextFill', count: 50 }
+                    ]
+                }
+            ];
 
-    try {
-        for (const exam of exams) {
-            finalData[exam.id] = { info: exam.name, parts: {} };
-            
-            for (let i = 0; i < exam.parts.length; i++) {
-                const part = exam.parts[i];
-                const typeName = typeMapping[part.type];
-                
-                // 為了標記這組數據日後是給「聽力測驗」用的，我們在 Key 值做區別
-                const partKey = part.isListening ? 'Listening' : part.type;
-                
-                this.genProgress = `抓取中: ${exam.name} -> ${part.isListening ? '聽力(英翻中)' : typeName}...`;
+            try {
+                for (const exam of exams) {
+                    finalData[exam.id] = { info: exam.name, parts: {} };
 
-                const payload = {
-                    "島嶼": exam.island,
-                    "題型": typeName, // 聽力部分這裡會傳送 "英翻中"
-                    "題數": part.count,
-                    "include_answer": true
-                };
+                    for (let i = 0; i < exam.parts.length; i++) {
+                        const part = exam.parts[i];
+                        const typeName = typeMapping[part.type];
+                        const partKey = part.isListening ? 'Listening' : part.type;
 
-                console.log('God Mode Request:', payload);
-                
-                // 使用 import 進來的 api
-                const response = await api.post('/questionbank/generate/', payload);
-                
-                // 將獲取的數據存入對應的 Key (EngToChi, ChiToEng, Listening, ContextFill)
-                finalData[exam.id].parts[partKey] = response.data;
+                        this.genProgress = `抓取中: ${exam.name} -> ${part.isListening ? '聽力(英翻中)' : typeName}...`;
 
-                // 稍微延遲避免頻率過快
-                await new Promise(resolve => setTimeout(resolve, 800));
+                        const payload = {
+                            "島嶼": exam.island,
+                            "題型": typeName,
+                            "題數": part.count,
+                            "include_answer": true
+                        };
+
+                        const response = await api.post('/questionbank/generate/', payload);
+                        finalData[exam.id].parts[partKey] = response.data;
+
+                        await new Promise(resolve => setTimeout(resolve, 800));
+                    }
+                }
+
+                this.downloadObjectAsJson(finalData, "Trial_Exams_Stage2_Only_Database");
+                this.genProgress = ' 第二階段數據獲取成功！';
+
+            } catch (error) {
+                console.error('God Mode Error:', error);
+                this.genProgress = `❌ 錯誤: ${error.message}`;
+            } finally {
+                this.isGenerating = false;
             }
-        }
-
-        this.downloadObjectAsJson(finalData, "Trial_Exams_Full_Database");
-        this.genProgress = '✅ 所有數據獲取成功！聽力部分已透過「英翻中」格式抓取完成。';
-
-    } catch (error) {
-        console.error('God Mode Error:', error);
-        this.genProgress = `❌ 錯誤: ${error.message}`;
-    } finally {
-        this.isGenerating = false;
-    }
-},
+        },
 
         downloadObjectAsJson(exportObj, exportName) {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
@@ -403,64 +375,59 @@ getPartIdByApiMode(apiPartKey) {
             downloadAnchorNode.remove();
         },
         formatExamName(apiName) {
-    if (!apiName) return '未知名稱';
+            if (!apiName) return '未知名稱';
 
-    // 名稱映射表
-    const nameMap = {
-        '國小英文測驗 1': '國小英語單字檢測-1',
-        '國小英文測驗 2': '國小英語單字檢測-2',
-        '國中英文測驗 ms7-1': '7年級英語單字檢測-1',
-        '國中英文測驗 ms7-2': '7年級英語單字檢測-2',
-        '國中英文測驗 ms8-1': '8年級英語單字檢測-1',
-        '國中英文測驗 ms8-2': '8年級英語單字檢測-2'
-    };
+            // 名稱映射表
+            const nameMap = {
+                '國小英文測驗 2': '國小英語單字檢測-2',
+                '7年級英語單字檢測-2': '7年級英語單字檢測-2',
+                '8年級英語單字檢測-2': '8年級英語單字檢測-2'
+            };
 
-    // 如果 API 回傳的名稱在映射表中，則回傳對應的正式名稱，否則回傳原始名稱
-    return nameMap[apiName.trim()] || apiName;
-},
-goToHistoryDetail(record) {
-    console.log("原始 API 紀錄:", record);
-    const formattedName = this.formatExamName(record.exam_name);
-    
-    let allFormattedList = [];
+            // 如果 API 回傳的名稱在映射表中，則回傳對應的正式名稱，否則回傳原始名稱
+            return nameMap[apiName.trim()] || apiName;
+        },
+        goToHistoryDetail(record) {
+            console.log("原始 API 紀錄:", record);
+            const formattedName = this.formatExamName(record.exam_name);
 
-    // 第一層遍歷：各個測驗部分 (EngToChi, ChiToEng...)
-    record.questions.forEach((partGroup) => {
-        const pKey = partGroup.part_key; // 取得該組的 Part Key
+            let allFormattedList = [];
 
-        // 第二層遍歷：該部分內的每一題
-        partGroup.questions.forEach((q) => {
-            const hasEnglish = /[a-zA-Z]/.test(q.question_text);
-            const finalAudioSrc = hasEnglish ? q.question_text : q.correct_answer;
+            record.questions.forEach((partGroup) => {
+                const pKey = partGroup.part_key;
 
-            allFormattedList.push({
-                index: allFormattedList.length + 1, // 重新計算總序號
-                question: q.question_text,
-                audioSrc: finalAudioSrc,
-                myAnswer: q.selected_text || '未作答',
-                correctAnswer: q.correct_answer,
-                isCorrect: q.is_correct,
-                explanation: q.explanation || '',
-                partKey: pKey 
+                partGroup.questions.forEach((q) => {
+                    const hasEnglish = /[a-zA-Z]/.test(q.question_text);
+                    const finalAudioSrc = hasEnglish ? q.question_text : q.correct_answer;
+
+                    allFormattedList.push({
+                        index: q.index || 0,
+                        question: q.question_text,
+                        audioSrc: finalAudioSrc,
+                        myAnswer: q.selected_text || '未作答',
+                        correctAnswer: q.correct_answer,
+                        isCorrect: q.is_correct,
+                        explanation: q.explanation || '',
+                        partKey: pKey
+                    });
+                });
             });
-        });
-    });
 
-    console.log("✅ 扁平化處理完成，總題數:", allFormattedList.length);
+            // 存入標題與結果到 sessionStorage
+            sessionStorage.setItem('tempTrialResult', JSON.stringify(allFormattedList));
+            sessionStorage.setItem('tempTrialTitle', formattedName);
 
-    sessionStorage.setItem('tempTrialResult', JSON.stringify(allFormattedList));
-
-    this.$router.push({
-        name: 'TrialResultDetail',
-        params: {
-            examId: record.code,
-            finalScore: record.score,
-            examTitle: formattedName,
-            resultList: allFormattedList,
-            backRoute: { name: 'TrialHall' }
+            this.$router.push({
+                name: 'ResultDetail',
+                params: {
+                    examId: record.code,
+                    finalScore: record.score,
+                    examTitle: formattedName,
+                    resultList: allFormattedList,
+                    backRoute: { name: 'TrialHall' }
+                }
+            });
         }
-    });
-}
     }
 
 };
@@ -469,12 +436,16 @@ goToHistoryDetail(record) {
 <style lang="scss" scoped>
 .trial-hall-page {
     padding-left: 100px;
-.left-section{
-     min-width: 350px;  
-}
-    .right-section{
+
+
+    .left-section {
+        min-width: 350px;
+    }
+
+    .right-section {
         min-width: 500px;
     }
+
     .challenge-confirm-modal {
 
         .description,
@@ -505,7 +476,8 @@ goToHistoryDetail(record) {
 
 .main-card {
     @include main-card;
-    width: fit-content;
+    min-width: unset;
+    width: fit-content !important;
     padding: 4% 50px;
     height: 100%;
 
@@ -515,7 +487,8 @@ goToHistoryDetail(record) {
         flex-direction: column;
         gap: 16px 0;
         margin: 4px;
-        .no-data-info{
+
+        .no-data-info {
             color: $main-grey-text;
             margin-top: 24px;
             font-size: 18px
@@ -596,12 +569,22 @@ goToHistoryDetail(record) {
         width: 100%;
     }
 
+    .exam-info-box .exam-info {
+        justify-content: center;
+    }
+
+    .score-info-box .exam-info {
+        justify-content: flex-start;
+    }
+
     .exam-info-box,
     .score-info-box {
         width: 650px;
+        min-height: 200px;
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: stretch;
+        padding-right: 0;
         padding-left: 24px;
         border: 3px solid #C7D3D1;
         border-radius: 16px;
@@ -609,9 +592,8 @@ goToHistoryDetail(record) {
 
         .exam-info {
             display: flex;
-            flex-direction: column;
-            align-items: self-start;
             gap: 12px 0;
+            flex-direction: column;
 
             .exam-title {
                 font-size: 40px;
@@ -628,21 +610,23 @@ goToHistoryDetail(record) {
 
                 .detail-item {
                     color: $main-grey-text;
+
                     i {
-                    margin-right: 8px;
-                    color: #5D9CEC;
+                        margin-right: 8px;
+                        color: #5D9CEC;
+                    }
                 }
-            }
-            .detail-summary{
-                margin-top: 4px;
-            }
+
+                .detail-summary {
+                    margin-top: 4px;
+                }
             }
 
         }
 
 
         .start-exam-btn {
-            height: 200px;
+            height: auto;
             text-wrap: nowrap;
             @include common-btn;
             border-radius: 0 16px 16px 0;
@@ -674,7 +658,7 @@ goToHistoryDetail(record) {
 
 @media (min-width: 768px) and (pointer: coarse) {
     .trial-hall-page {
-        padding-left: 6%;
+        padding: 6%;
 
         .main-card {
             padding: 25px 5%;
@@ -708,7 +692,7 @@ goToHistoryDetail(record) {
 
 @media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
     .trial-hall-page {
-        padding: 24px 40px;
+        padding: 24px 8%;
 
         .page-title {
             margin-top: 16px;
@@ -717,17 +701,22 @@ goToHistoryDetail(record) {
 
     .main-card {
 
-        .exam-info-box .exam-info {
+        .exam-info-box .exam-info,
+        .score-info-box .exam-info {
             padding-right: 16px;
 
             .exam-title {
-                font-size: 22px;
+                font-size: 24px;
             }
         }
 
         .exam-info-box,
         .score-info-box {
             width: 100%;
+        }
+
+        .score-info-box {
+            padding: 16px;
         }
 
         .card-header-content {
@@ -739,6 +728,7 @@ goToHistoryDetail(record) {
             }
 
         }
+
 
     }
 

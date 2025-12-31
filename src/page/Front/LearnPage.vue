@@ -89,111 +89,105 @@ export default {
             });
         },
 
-        async fetchLearningData() {
-            this.isLoading = true;
-            this.isFinished = false;
-            try {
-                console.log('--- [LearnPage Debug] ---');
-                console.log('UnitID:', this.unitId, '| Label:', this.stageLabel, '| Name:', this.unitName);
+    async fetchLearningData() {
+    this.isLoading = true;
+    this.isFinished = false;
+    try {
+        console.log('--- [LearnPage ABC Debug] ---');
+        let payload = {};
 
-                let payload = {};
+        // 判斷是否為 ABC 相關模式
+        const isAbcMode = (this.wordCount === 'abc' || this.unitId === 'final' || ['af', 'gl', 'mr', 'sz'].includes(this.unitId));
 
-                // 路徑 1：ABC 模式
-                if (this.wordCount === 'abc' || this.unitId === 'final' || ['af', 'gl', 'mr', 'sz'].includes(this.unitId)) {
-                    console.log('✅ 進入路徑 1: ABC 學習模式');
-                    
-                    if (this.stageLabel === 'A-Z') {
-                        payload = {
-                            "島嶼": "ABC啟航島",
-                            "題數": 26,
-                            "include_answer": true
-                        };
-                    } else {
-                        const targetLabel = this.stageLabel || this.unitName;
-                        payload = {
-                            "關卡": targetLabel, 
-                            "題數": 26,
-                            "include_answer": true
-                        };
-                    }
-                }
-                // 路徑 2：一般單字島
-                else {
-                    console.log('✅ 進入路徑 2: 單字島學習模式');
-                    const isTotalReview = this.isTotal || this.stageLabel === 'ALL';
-                    
-                    let islandName = '300字島';
-                    if (this.wordCount === '800') islandName = '800字島';
-                    else if (this.wordCount === '1200') islandName = '1200字島';
+        if (isAbcMode) {
+            console.log('✅ 進入修正後的 ABC 學習路徑');
+            
+            // 決定單元名稱 (例如: A-F, G-L)
+            const unitMapping = { 'af': 'A-F', 'gl': 'G-L', 'mr': 'M-R', 'sz': 'S-Z' };
+            const currentUnit = unitMapping[this.unitId] || this.stageLabel || this.unitName;
 
-                    payload = {
-                        "島嶼": islandName,
-                        "單元": this.unitName,
-                        "關卡": isTotalReview ? undefined : this.stageLabel,
-                        "題數": 1200,
-                        "include_answer": true
-                    };
-                }
-
-                console.log(' Learn API Request Payload:', JSON.stringify(payload, null, 2));
-                
-                const response = await api.post('/questionbank/generate/', payload);
-                const apiData = response.data;
-
-                if (!apiData || apiData.length === 0) {
-                    throw new Error('API 回傳資料為空');
-                }
-
-                // --- 資料處理核心 ---
-                let cards = apiData
-                    .filter(item => item.type !== 'cloze')
-                    .map((item, index) => {
-                        const hasChinese = (str) => /[\u4e00-\u9fa5]/.test(str);
-                        
-                        let audioText = '';
-                        if (item.question_text && !hasChinese(item.question_text)) {
-                            audioText = item.question_text;
-                        } else if (item.answer && !hasChinese(item.answer)) {
-                            audioText = item.answer;
-                        }
-
-                        return {
-                            id: Date.now() + index, 
-                            mainText: item.question_text, 
-                            subText: item.answer,
-                            audioSrc: audioText, 
-                            isImageMode: false
-                        };
-                    });
-
-                // ABC 模式特殊處理 (開啟圖片模式)
-                const isAbcMode = (this.wordCount === 'abc' || this.unitId === 'final' || ['af', 'gl', 'mr', 'sz'].includes(this.unitId));
-                
-                if (isAbcMode) {
-                    cards = apiData.map((item, index) => ({
-                        id: Date.now() + index,
-                        mainText: item.question_text || item.answer, 
-                        subText: null, 
-                        audioSrc: item.question_text,
-                        isImageMode: true 
-                    }));
-                }
-
-                if (cards.length > 0) {
-                    this.queue = cards.sort(() => Math.random() - 0.5);
-                } else {
-                    alert('本單元沒有學習卡片');
-                    this.goBack();
-                }
-
-            } catch (error) {
-                console.error('Fetch learning data failed:', error);
-                alert('無法載入學習卡片，請檢查網絡');
-                this.goBack();
-            } finally {
-                this.isLoading = false;
+            if (this.stageLabel === 'A-Z') {
+                // A-Z 總學習：只傳島嶼與題型
+                payload = {
+                    "島嶼": "ABC啟航島",
+                    "題型": "字母",
+                    "題數": 26,
+                    "include_answer": true
+                };
+            } else {
+                payload = {
+                    "島嶼": "ABC啟航島",
+                    "單元": currentUnit, 
+                    "題型": "字母",    
+                    "題數": 26,
+                    "include_answer": true
+                };
             }
-        },
+        } else {
+            // 一般單字島學習模式 
+            let islandName = '300字島';
+            if (this.wordCount === '800') islandName = '800字島';
+            else if (this.wordCount === '1200') islandName = '1200字島';
+
+            payload = {
+                "島嶼": islandName,
+                "單元": this.unitName,
+                "關卡": this.stageLabel === 'ALL' ? undefined : this.stageLabel,
+                "題數": 1200,
+                "include_answer": true
+            };
+        }
+
+        console.log(' Learn API Request Payload:', JSON.stringify(payload, null, 2));
+        
+        const response = await api.post('/questionbank/generate/', payload);
+        const apiData = response.data;
+
+        if (!apiData || apiData.length === 0) throw new Error('API 回傳資料為空');
+
+        // --- 資料處理 ---
+        let cards = [];
+        if (isAbcMode) {
+            // ABC 模式：字母發音與圖片
+            cards = apiData.map((item, index) => ({
+                id: Date.now() + index,
+                mainText: item.question_text || item.answer, 
+                subText: null, 
+                audioSrc: item.question_text, // 播報字母名稱
+                isImageMode: true 
+            }));
+        } else {
+            // 一般單字模式：中英對照
+            cards = apiData
+                .filter(item => item.type !== 'cloze')
+                .map((item, index) => {
+                    const hasChinese = (str) => /[\u4e00-\u9fa5]/.test(str);
+                    let audioText = (!hasChinese(item.question_text)) ? item.question_text : item.answer;
+                    return {
+                        id: Date.now() + index,
+                        mainText: item.question_text, 
+                        subText: item.answer,
+                        audioSrc: audioText, 
+                        isImageMode: false
+                    };
+                });
+        }
+
+        if (cards.length > 0) {
+            // 隨機排序學習卡片
+            this.queue = cards.sort(() => Math.random() - 0.5);
+        } else {
+            throw new Error('本單元沒有有效的學習卡片');
+        }
+
+    } catch (error) {
+        console.error('Fetch learning data failed:', error);
+        alert('無法載入學習內容，請稍後再試');
+        this.goBack();
+    } finally {
+        this.isLoading = false;
+    }
+},
 
         onSubmit({ item, type }) {
             console.log(`卡片: ${item.mainText}, 選擇: ${type}`);
@@ -226,7 +220,7 @@ export default {
             
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'en-US';
-            utterance.rate = 0.8;
+            utterance.rate = 0.3;
             window.speechSynthesis.cancel();
             window.speechSynthesis.speak(utterance);
         },

@@ -1,36 +1,36 @@
 <template>
     <div class="abc-page">
         <h1 class="page-title">ABC啟航島</h1>
-  <vue-custom-scrollbar class="islands-scroll-container" :settings="scrollSettings">
-                <div class="island-map-container">
+        <vue-custom-scrollbar class="islands-scroll-container" :settings="scrollSettings">
+            <div class="island-map-container">
 
-                    <div class="unit-card-container back-to-island is-up" @click="goBack">
-                        <div class="island-card">
-                            <img src="@/assets/image/home/elementary-island.png" alt="返回國小島嶼" class="island-image" />
-                        </div>
-                        <button class="return-btn">返回國小島</button>
+                <div class="unit-card-container back-to-island is-up" @click="goBack">
+                    <div class="island-card">
+                        <img src="@/assets/image/home/elementary-island.png" alt="返回國小島嶼" class="island-image" />
                     </div>
-                    <div v-for="(item, index) in units" :key="item.id"
-                        :class="['unit-card-container', { 'is-up': index % 2 !== 0 || index === units.length - 1 }]">
-                        <div class="island-card">
-                         <img :src="item.imgColor" :alt="item.name" :class="{ 'is-bw': item.stars === 0 }" />
-                        </div>
-                        <div class="stats-row">
-                            <div class="stat-group">
-                                <img src="../../assets/image/elementary/star.png" alt="⭐">
-                               <span>{{ item.stars }}/{{ item.totalStars }}</span>
-                            </div>
-                        </div>
-                        <div class="unit-title">{{ item.name }}</div>
-
-
-
-                        <button class="enter-btn" @click="enterUnit(item)">
-                            開始學習
-                        </button>
-                    </div>
+                    <button class="return-btn">返回國小島</button>
                 </div>
-          </vue-custom-scrollbar>
+                <div v-for="(item, index) in units" :key="item.id"
+                    :class="['unit-card-container', { 'is-up': index % 2 !== 0 || index === units.length - 1 }]">
+                    <div class="island-card">
+                        <img :src="item.imgColor" :alt="item.name" :class="{ 'is-bw': item.stars === 0 }" />
+                    </div>
+                    <div class="stats-row">
+                        <div class="stat-group">
+                            <img src="../../assets/image/elementary/star.png" alt="⭐">
+                            <span>{{ item.stars }}/{{ item.totalStars }}</span>
+                        </div>
+                    </div>
+                    <div class="unit-title">{{ item.name }}</div>
+
+
+
+                    <button class="enter-btn" @click="enterUnit(item)">
+                        開始學習
+                    </button>
+                </div>
+            </div>
+        </vue-custom-scrollbar>
     </div>
 </template>
 
@@ -48,7 +48,7 @@ export default {
     },
     data() {
         return {
-            islandTitle: 'ABC啟航島', 
+            islandTitle: 'ABC啟航島',
             units: [
                 { id: 'af', name: 'A-F', route: 'lesson/af', progress: 0, stars: 0, totalStars: 0, imgColor: require('@/assets/image/elementary/a-c.png') },
                 { id: 'gl', name: 'G-L', route: 'lesson/gl', progress: 0, stars: 0, totalStars: 0, imgColor: require('@/assets/image/elementary/g-i.png') },
@@ -62,50 +62,50 @@ export default {
         this.updateStarsFromApi();
     },
     methods: {
-  async updateStarsFromApi() {
-    try {
-        const ABC_TOTAL_MAP = {
-            'A-F': 10,
-            'G-L': 10,
-            'M-R': 10,
-            'S-Z': 10,
-            'ABC 總復習': 25
-        };
+        async updateStarsFromApi() {
+            try {
+                const ABC_TOTAL_MAP = {
+                    'A-F': 10,
+                    'G-L': 10,
+                    'M-R': 10,
+                    'S-Z': 10,
+                    'ABC 總復習': 25
+                };
 
-        const res = await api.get('/students/test-summary/');
-        
-        //取得 "ABC啟航島" 資料 (用於 A-F, G-L 等)
-        const abcData = res.data.islands.find(i => i.island_name === "ABC啟航島");
-        
-        //取得 "ABC 總復習" 資料
-        const abcFinalData = res.data.islands.find(i => i.island_name === "ABC 總復習");
+                const res = await api.get('/students/test-summary/');
 
-        this.units = this.units.map(unit => {
-            let matched = null;
+                //取得 "ABC啟航島" 資料 (用於 A-F, G-L 等)
+                const abcData = res.data.islands.find(i => i.island_name === "ABC啟航島");
 
-            // 如果是 "ABC 總復習"，直接拿該島嶼的 total_stars
-            if (unit.name === 'ABC 總復習') {
-                if (abcFinalData) {
-                    matched = { total_stars: abcFinalData.total_stars };
-                }
-            } 
-            // 其他一般單元 (A-F, G-L...)，去 "ABC啟航島" 裡面找
-            else if (abcData) {
-                matched = abcData.units.find(u => u.unit_name === unit.name);
+                //取得 "ABC 總復習" 資料
+                const abcFinalData = res.data.islands.find(i => i.island_name === "ABC 總復習");
+
+                this.units = this.units.map(unit => {
+                    let matched = null;
+
+                    // 如果是 "ABC 總復習"，直接拿該島嶼的 total_stars
+                    if (unit.name === 'ABC 總復習') {
+                        if (abcFinalData) {
+                            matched = { total_stars: abcFinalData.total_stars };
+                        }
+                    }
+                    // 其他一般單元 (A-F, G-L...)，去 "ABC啟航島" 裡面找
+                    else if (abcData) {
+                        matched = abcData.units.find(u => u.unit_name === unit.name);
+                    }
+
+                    return {
+                        ...unit,
+                        stars: matched ? matched.total_stars : 0,
+                        totalStars: ABC_TOTAL_MAP[unit.name] || 0
+                    };
+                });
+
+            } catch (err) {
+                console.error('更新星星失敗:', err);
             }
-
-            return {
-                ...unit,
-                stars: matched ? matched.total_stars : 0,
-                totalStars: ABC_TOTAL_MAP[unit.name] || 0
-            };
-        });
-        
-    } catch (err) {
-        console.error('更新星星失敗:', err);
-    }
-},
-      enterUnit(unit) {
+        },
+        enterUnit(unit) {
             console.log('--- AbcIsland Navigation Debug ---');
             console.log('Target Unit ID:', unit.id); // 這裏應該是 af, gl, mr, sz 或 final
             console.log('Target Unit Name:', unit.name);
@@ -138,27 +138,32 @@ export default {
 }
 
 .unit-card-container {
-    width: 300px;
-    text-align: center;
-    position: relative;
-    transition: transform 0.3s ease;
-    transform: translateY(0);
-    flex-direction: column;
-    @include flex-center;
+    @include island-design;
 
-    &:hover {
-        transform: translateY(-30px);
+    &:not(.is-up) {
+        transform: translateY(-80px);
+
+        &:has(.enter-btn:hover) {
+            transform: translateY(-117px);
+
+            .enter-btn {
+                transform: translateY(37px);
+            }
+        }
+    }
+
+    &.is-up {
+        transform: translateY(-120px);
+
+        &:has(.enter-btn:hover) {
+            transform: translateY(-160px);
+
+            .enter-btn {
+                transform: translateY(40px);
+            }
+        }
     }
 }
-
-.unit-card-container.is-up {
-    transform: translateY(-80px);
-
-    &:hover {
-        transform: translateY(-60px);
-    }
-}
-
 
 .unit-title {
     @include unit-title
@@ -170,7 +175,8 @@ export default {
 
 
 .enter-btn {
-    @include enter-unit-yellow-btn
+    @include enter-unit-yellow-btn;
+    transition: transform 0.3s ease;
 }
 
 @media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {

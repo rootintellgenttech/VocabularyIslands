@@ -13,11 +13,11 @@
 
                 <div class="progress-header">
                     <div v-if="quizMode === 'listening'" class="exam-header-bar">
-            <div class="timer-area">
-                <i class="fa-regular fa-clock" style="color: #404E4E;margin-right: 6px;"></i>
-                <span class="timer-value">{{ formattedTimeLeft }}</span>
-            </div>
-        </div>
+                        <div class="timer-area">
+                            <i class="fa-regular fa-clock" style="color: #404E4E;margin-right: 6px;"></i>
+                            <span class="timer-value">{{ formattedTimeLeft }}</span>
+                        </div>
+                    </div>
                     <div class="progress-bar-wrapper">
                         <div class="progress-bar" :style="{ width: progress + '%' }"></div>
                     </div>
@@ -70,24 +70,24 @@
             </button>
         </div>
 
-     <div v-else-if="currentPhase === 'complete'" class="main-card result-mode">
-            
-           <div class="result-inner-card">
-    <div class="back-link" @click="goBack()">
-        <i class="fas fa-angle-left"></i> 返回
-    </div>
-    
-    <h2 class="result-title">{{ earnedStars > 0 ? '太棒了!' : '再接再厲' }}</h2>
-    
-    <img :src="wonderfulAvatarPath" alt="Result" class="result-avatar">
-    
-    <div v-if="earnedStars > 0" class="final-star">
-        <i v-for="n in 3" :key="n" style="color: #ffc940;" class="fas fa-star" 
-           :class="{ 'filled': n <= earnedStars }"></i>
-    </div>
-    
-    <p class="result-score">你獲得了 {{ earnedStars }} 顆星星</p>
-</div>
+        <div v-else-if="currentPhase === 'complete'" class="main-card result-mode">
+
+            <div class="result-inner-card">
+                <div class="back-link" @click="goBack()">
+                    <i class="fas fa-angle-left"></i> 返回
+                </div>
+
+                <h2 class="result-title">{{ earnedStars > 0 ? '太棒了!' : '再接再厲' }}</h2>
+
+                <img :src="wonderfulAvatarPath" alt="Result" class="result-avatar">
+
+                <div v-if="earnedStars > 0" class="final-star">
+                    <i v-for="n in 5" :key="n" style="color: #ffc940;" class="fas fa-star"
+                        :class="{ 'filled': n <= earnedStars }"></i>
+                </div>
+
+                <p class="result-score">你獲得了 {{ earnedStars }} 顆星星</p>
+            </div>
 
             <button class="result-back-btn" @click="goToResultDetail()">
                 查看解答
@@ -200,159 +200,144 @@ export default {
             this.exitDialogVisible = false;
             this.goBack();
         },
-async fetchQuestions() {
-    this.isLoading = true;
-    try {
-        // 除錯：先確認收到的參數是否正確
-        console.log('--- [QuizPage Strict Debug] ---');
-        console.log('ID:', this.unitId, '| Label:', this.stageLabel, '| Count:', this.wordCount, '| Name:', this.unitName);
+        async fetchQuestions() {
+            this.isLoading = true;
+            try {
+                console.log('--- [QuizPage Strict Debug] ---');
+                console.log('ID:', this.unitId, '| Label:', this.stageLabel, '| Name:', this.unitName);
 
-        let payload = {};
-        
-        // =========================================================
-        // 路徑 1：ABC 總複習 (最高優先級，獨立判斷)
-        // =========================================================
-        if (this.unitId === 'final') {
-            console.log('✅ 進入路徑 1: ABC 總複習');
-            const islandName = 'ABC啟航島';
+                let payload = {};
 
-            if (this.stageLabel === 'A-Z') {
-                // A-Z：只有島嶼和題數，絕對不能有單元或關卡
-                payload = {
-                    "島嶼": islandName,
-                    "題數": 26,
-                    "include_answer": true
-                };
-            } else {
-                // A-F, G-L 等：需要指定單元
-                payload = {
-                    "島嶼": islandName,
-                    "單元": this.stageLabel, // 這裡會是 "A-F" 等
-                    "題數": 26,
-                    "include_answer": true
-                };
+                // 1. 決定島嶼名稱
+                let islandName = '300字島';
+                if (this.wordCount === '800' || (this.unitId && this.unitId.includes('800'))) islandName = '800字島';
+                if (this.wordCount === '1200' || (this.unitId && this.unitId.includes('1200'))) islandName = '1200字島';
+
+                // 只要單元名稱包含「複習」，就認定為複習模式
+                const isReviewMode = this.unitName.includes('複習') || this.unitName.includes('復習') || ['06', '800-06', '1200-05'].includes(this.unitId);
+
+                // =========================================================
+                // 分流 A：複習模式 (針對 300/800/1200 複習單元內的點擊)
+                // =========================================================
+                if (isReviewMode) {
+                    console.log('✅ 進入強效複習模式分流');
+
+                    // 1. 全島/全項目抓題標籤 (不傳「單元」，不傳「關卡」)
+                    const islandOnlyLabels = [
+                        '300字島', '800字島', '1200字島', '300字複習', '800字複習', '1200字複習', '超級總複習'
+                    ];
+
+                    if (islandOnlyLabels.includes(this.stageLabel)) {
+                        // 正確格式：{"島嶼": "...", "題數": ..., "include_answer": true}
+                        payload = {
+                            "島嶼": islandName,
+                            "題數": (islandName === '300字島') ? 300 : 1200,
+                            "include_answer": true
+                        };
+                    } else {
+                        // 2. 特定單元抓題 (例如: 奇異峽谷)
+                        payload = {
+                            "島嶼": islandName,
+                            "單元": this.stageLabel,
+                            "題數": 1200,
+                            "include_answer": true
+                        };
+                    }
+                }
+                // =========================================================
+                // 分流 B：其他特殊模式 (ABC, 聽力海灣)
+                // =========================================================
+                else if (this.unitId === 'final' || this.wordCount === 'abc') {
+                    const island = 'ABC啟航島';
+                    if (this.unitId === 'final') {
+                        payload = this.stageLabel === 'A-Z' ? { "島嶼": island, "題數": 26, "include_answer": true } : { "島嶼": island, "單元": this.stageLabel, "題數": 26, "include_answer": true };
+                    } else {
+                        const mapping = { 'af': 'A-F', 'gl': 'G-L', 'mr': 'M-R', 'sz': 'S-Z' };
+                        payload = { "島嶼": island, "單元": mapping[this.unitId], "關卡": this.stageLabel, "題型": "字母", "題數": 26, "include_answer": true };
+                    }
+                }
+                else if (this.unitName.includes('聽力海灣')) {
+                    console.log('✅ 進入路徑 3: 聽力海灣模式');
+
+                    // 針對國中聽力海灣的複習關卡做特殊判定
+                    if (this.stageLabel === '800字複習') {
+                        // 800字複習專用：指向 800字島
+                        payload = {
+                            "島嶼": "800字島",
+                            "題數": 1200,
+                            "include_answer": true
+                        };
+                    } else if (this.stageLabel === '1200單字複習') {
+                        // 1200單字複習：指向 1200字島
+                        payload = {
+                            "島嶼": "1200字島",
+                            "題數": 1200,
+                            "include_answer": true
+                        };
+                    } else {
+                        // 一般單元 (霧靄之境、永恆圖書館等)
+                        payload = {
+                            "單元": this.stageLabel,
+                            "題數": 1200,
+                            "include_answer": true
+                        };
+                    }
+                }
+                // =========================================================
+                // 分流 C：一般單元 (01~05) 
+                // =========================================================
+                else {
+                    payload = {
+                        "島嶼": islandName,
+                        "單元": this.unitName,
+                        "關卡": this.stageLabel,
+                        "題數": 1200,
+                        "include_answer": true
+                    };
+                }
+
+                console.log('🚀 發送 Payload:', JSON.stringify(payload, null, 2));
+
+                const response = await api.post('/questionbank/generate/', payload);
+                let apiData = response.data;
+
+                // 題型過濾
+                if (isReviewMode) {
+                    apiData = apiData.filter(q => q.type === 'en_to_zh' || q.type === 'zh_to_en');
+                } else {
+                    apiData = apiData.filter(q => q.type !== 'cloze');
+                }
+
+                // 隨機選題
+                let targetCount = 10;
+                if (isReviewMode || this.unitName.includes('聽力海灣') || this.unitId === 'final') {
+                    targetCount = (this.unitId === 'final' || this.wordCount === 'abc') ? 26 : 20;
+                }
+
+                apiData = apiData.sort(() => Math.random() - 0.5).slice(0, targetCount);
+
+                this.questionsList = apiData.map(q => {
+                    const hasChinese = (str) => /[\u4e00-\u9fa5]/.test(str);
+                    let audioText = q.question_text;
+                    if (hasChinese(q.question_text)) audioText = q.answer;
+                    return {
+                        id: q.id, title: q.question_text, audioSrc: audioText,
+                        correctAnswer: q.answer, explanation: q.explanation || '無題解',
+                        options: (q.options || []).map(opt => ({ value: opt.id, label: opt.text, audioSrc: opt.text }))
+                    };
+                });
+
+                this.loadQuestion(0);
+                if (this.quizMode === 'listening') this.startTimer();
+
+            } catch (error) {
+                console.error('Fetch error:', error);
+                alert('無法取得題庫');
+                this.goBack();
+            } finally {
+                this.isLoading = false;
             }
-        }
-        // =========================================================
-        // 路徑 2：ABC 一般練習 (af, gl, mr, sz)
-        // =========================================================
-        else if (this.wordCount === 'abc' || ['af', 'gl', 'mr', 'sz'].includes(this.unitId)) {
-            console.log('✅ 進入路徑 2: ABC 一般練習');
-            const islandName = 'ABC啟航島';
-            const unitMapping = { 'af': 'A-F', 'gl': 'G-L', 'mr': 'M-R', 'sz': 'S-Z' };
-            
-            payload = {
-                "島嶼": islandName,
-                "單元": unitMapping[this.unitId] || 'A-F',
-                "關卡": this.stageLabel,
-                "題型": "字母",
-                "題數": 26,
-                "include_answer": true
-            };
-        }
-        // =========================================================
-        // 路徑 3：聽力海灣 (國小/國中)
-        // =========================================================
-        else if (this.unitName.includes('聽力海灣')) {
-            console.log('✅ 進入路徑 3: 聽力海灣');
-            payload = {
-                "單元": this.stageLabel, // 例如 "圖書館島"
-                "題數": 1200,
-                "include_answer": true
-            };
-        }
-        // =========================================================
-        // 路徑 4：單字島總複習 (06, 800-06, 1200-05)
-        // =========================================================
-        else if (['06', '800-06', '1200-05'].includes(this.unitId)) {
-            console.log('✅ 進入路徑 4: 單字島總複習');
-            payload = {
-                "單元": this.stageLabel,
-                "題數": 1200,
-                "include_answer": true
-            };
-        }
-        // =========================================================
-        // 路徑 5：一般單字島關卡 (最後保底)
-        // =========================================================
-        else {
-            console.log('✅ 進入路徑 5: 一般單字關卡');
-            let islandName = '300字島';
-            if (this.wordCount === '800') islandName = '800字島';
-            else if (this.wordCount === '1200') islandName = '1200字島';
-
-            payload = {
-                "島嶼": islandName,
-                "關卡": this.stageLabel,
-                "題型": "zh_to_en,en_to_zh",
-                "題數": 1200,
-                "include_answer": true
-            };
-        }
-
-        console.log(' 發送 Payload:', JSON.stringify(payload, null, 2));
-
-        const response = await api.post('/questionbank/generate/', payload);
-        
-        if (!response.data || response.data.length === 0) {
-            throw new Error('API 回傳題目為空');
-        }
-
-        // 過濾 Cloze 題型
-        let apiData = response.data.filter(q => q.type !== 'cloze');
-
-        // 設定題數：ABC 總複習與練習固定 26 題，聽力固定 20 題
-        let targetCount = 10;
-        const isListening = this.unitName.includes('聽力海灣');
-        const isReview = ['06', '800-06', '1200-05'].includes(this.unitId);
-        // 判斷是否為挑戰關卡(300字島)
-        const isChallengeStage = [
-            '啟蒙小木屋', '魔法夢幻島', '圖書館島', '大城市島', '許願星星島', '300字複習', 
-            '霧靄之境', '漂流群島', '熔岩盆地', '迴旋之塔', '鏡像平原', '800字複習',     
-            '永恆圖書館', '奇異峽谷', '靜默領域', '黎光秘境島', '300單字島', 
-            '800單字島', '1200單字島', '超級總複習', '1200字總複習',                   
-            '會考大殿堂-1', '會考大殿堂-2', '1200單字複習'
-        ].includes(this.stageLabel);
-
-        if (isListening || isReview || isChallengeStage || this.unitId === 'final') {
-            targetCount = 20;
-        }
-
-        // ABC 模式強制 26 題
-        if (this.wordCount === 'abc' || this.unitId === 'final' || ['af', 'gl', 'mr', 'sz'].includes(this.unitId)) {
-            targetCount = 26;
-        }
-
-        apiData = apiData.sort(() => Math.random() - 0.5).slice(0, targetCount);
-
-        this.questionsList = apiData.map(q => {
-            const hasChinese = (str) => /[\u4e00-\u9fa5]/.test(str);
-            let audioText = q.question_text;
-            if (hasChinese(q.question_text)) audioText = q.answer;
-
-            return {
-                id: q.id,
-                title: q.question_text,
-                audioSrc: audioText,
-                correctAnswer: q.answer,
-                explanation: q.explanation || '無題解',
-                options: (q.options || []).map(opt => ({
-                    value: opt.id, label: opt.text, audioSrc: opt.text
-                }))
-            };
-        });
-
-        this.loadQuestion(0);
-        if (this.quizMode === 'listening') this.startTimer();
-
-    } catch (error) {
-        console.error('Fetch error:', error);
-        alert('無法取得題庫');
-        this.goBack();
-    } finally {
-        this.isLoading = false;
-    }
-},
+        },
         loadQuestion(index) {
             this.selectedAnswer = null;
             this.currentQuestionIndex = index;
@@ -365,7 +350,7 @@ async fetchQuestions() {
             if (!text) return;
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'en-US';
-            utterance.rate = 0.8;
+            utterance.rate = 0.3;
             window.speechSynthesis.cancel();
             window.speechSynthesis.speak(utterance);
         },
@@ -401,7 +386,7 @@ async fetchQuestions() {
                 this.loadQuestion(this.currentQuestionIndex + 1);
             }
         },
-startTimer() {
+        startTimer() {
             if (this.timerInterval) clearInterval(this.timerInterval);
             this.timeLeftSeconds = 300; // 重設為 5 分鐘
             this.timerInterval = setInterval(() => {
@@ -412,133 +397,133 @@ startTimer() {
                 }
             }, 1000);
         },
-async submitFinalResults() {
-    // 1. 清除計時器，防止重複觸發
-    if (this.timerInterval) clearInterval(this.timerInterval);
-    
-    this.isLoading = true;
-    try {
-        // 🔥 新增邏輯：補齊未作答的題目
-        // 遍歷原本的題目列表 (questionsList)
-        // 如果 userAnswers 裡找不到該題的答案，就補上 null
-        const finalAnswers = this.questionsList.map(q => {
-            const existingAnswer = this.userAnswers.find(a => a.question_id === q.id);
-            
-            if (existingAnswer) {
-                return existingAnswer; // 有作答，回傳原本的答案
-            } else {
-                return {
-                    question_id: q.id,
-                    option_id: null // 沒作答，回傳 null
+        async submitFinalResults() {
+            // 1. 清除計時器，防止重複觸發
+            if (this.timerInterval) clearInterval(this.timerInterval);
+
+            this.isLoading = true;
+            try {
+                // 🔥 新增邏輯：補齊未作答的題目
+                // 遍歷原本的題目列表 (questionsList)
+                // 如果 userAnswers 裡找不到該題的答案，就補上 null
+                const finalAnswers = this.questionsList.map(q => {
+                    const existingAnswer = this.userAnswers.find(a => a.question_id === q.id);
+
+                    if (existingAnswer) {
+                        return existingAnswer; // 有作答，回傳原本的答案
+                    } else {
+                        return {
+                            question_id: q.id,
+                            option_id: null // 沒作答，回傳 null
+                        };
+                    }
+                });
+
+                // 預設值
+                let islandName = '300字島';
+                if (this.wordCount === '800') islandName = '800字島';
+                else if (this.wordCount === '1200') islandName = '1200字島';
+
+                let submitUnit = this.unitName;
+                let submitStage = this.stageLabel;
+
+                // ABC 判斷
+                if (['af', 'gl', 'mr', 'sz'].includes(this.unitId)) {
+                    islandName = 'ABC啟航島';
+                } else if (this.unitId === 'final') {
+                    islandName = 'ABC 總復習';
+                }
+
+                // 聽力海灣判斷
+                const isListeningBay = this.unitName.includes('聽力海灣');
+                if (isListeningBay) {
+                    islandName = this.level === 'secondary' ? '國中聽力海灣' : '國小聽力海灣';
+                    submitUnit = this.stageLabel;
+                    submitStage = this.stageLabel;
+                }
+
+                // 4. 構建 Payload
+                const payload = {
+                    "answers": finalAnswers,
+                    "island": islandName,
+                    "unit": submitUnit,
+                    "stage": submitStage
                 };
+
+                console.log('>>> Submit Check Payload:', JSON.stringify(payload, null, 2));
+
+                const response = await api.post('/questionbank/check/', payload);
+                const apiResult = response.data;
+
+                // --- 處理回傳結果 ---
+                this.earnedStars = apiResult.summary.stars;
+                this.finalScore = apiResult.summary.correct_count * 10;
+
+                // 報表顯示邏輯
+                this.reportData = apiResult.results.map((res, index) => {
+                    // 檢查字串中是否包含英文字母
+                    const hasEnglish = /[a-zA-Z]/.test(res.question_text);
+
+                    // 如果題目是英文就播題目，否則播正確答案(英文)
+                    const audioSrc = hasEnglish ? res.question_text : res.correct_answer;
+
+                    return {
+                        index: index + 1,
+                        question: res.question_text,
+                        audioSrc: audioSrc,
+                        myAnswer: res.selected_option,
+                        correctAnswer: res.correct_answer,
+                        isCorrect: res.is_correct,
+                        explanation: res.explanation
+                    };
+                });
+
+                this.currentPhase = 'complete';
+                this.isSubmitted = true;
+
+            } catch (error) {
+                console.error('Check failed:', error);
+                alert('批改失敗，請檢查網絡');
+            } finally {
+                this.isLoading = false;
             }
-        });
-        
-        // 預設值
-        let islandName = '300字島'; 
-        if (this.wordCount === '800') islandName = '800字島';
-        else if (this.wordCount === '1200') islandName = '1200字島';
-        
-        let submitUnit = this.unitName;
-        let submitStage = this.stageLabel;
+        },
+        goToResultDetail() {
+            let targetRouteName = 'LessonDetail'; // 預設回單字島單元
+            let backParams = {
+                unitId: this.unitId,
+                level: this.level,
+                wordCount: this.wordCount
+            };
 
-        // ABC 判斷
-        if (['af', 'gl', 'mr', 'sz'].includes(this.unitId)) {
-            islandName = 'ABC啟航島';
-        } else if (this.unitId === 'final') {
-            islandName = 'ABC 總復習';
-        }
-
-        // 聽力海灣判斷
-        const isListeningBay = this.unitName.includes('聽力海灣');
-        if (isListeningBay) {
-            islandName = this.level === 'secondary' ? '國中聽力海灣' : '國小聽力海灣';
-            submitUnit = this.stageLabel; 
-            submitStage = this.stageLabel;
-        }
-
-        // 4. 構建 Payload
-        const payload = {
-            "answers": finalAnswers, 
-            "island": islandName,
-            "unit": submitUnit,
-            "stage": submitStage
-        };
-
-        console.log('>>> Submit Check Payload:', JSON.stringify(payload, null, 2));
-        
-        const response = await api.post('/questionbank/check/', payload);
-        const apiResult = response.data;
-
-        // --- 處理回傳結果 ---
-        this.earnedStars = apiResult.summary.stars; 
-        this.finalScore = apiResult.summary.correct_count * 10; 
-
-        // 報表顯示邏輯
-     this.reportData = apiResult.results.map((res, index) => {
-    // 檢查字串中是否包含英文字母
-    const hasEnglish = /[a-zA-Z]/.test(res.question_text);
-    
-    // 如果題目是英文就播題目，否則播正確答案(英文)
-    const audioSrc = hasEnglish ? res.question_text : res.correct_answer;
-
-    return {
-        index: index + 1,
-        question: res.question_text,
-        audioSrc: audioSrc,
-        myAnswer: res.selected_option,
-        correctAnswer: res.correct_answer,
-        isCorrect: res.is_correct,
-        explanation: res.explanation
-    };
-});
-
-        this.currentPhase = 'complete';
-        this.isSubmitted = true; 
-
-    } catch (error) {
-        console.error('Check failed:', error);
-        alert('批改失敗，請檢查網絡');
-    } finally {
-        this.isLoading = false;
-    }
-},
-goToResultDetail() {
-    let targetRouteName = 'LessonDetail'; // 預設回單字島單元
-    let backParams = { 
-        unitId: this.unitId, 
-        level: this.level, 
-        wordCount: this.wordCount 
-    };
-
-    // 關鍵判斷：如果是聽力海灣
-    if (this.unitName.includes('聽力海灣')) {
-        // 根據 level 對應 index.js 裡的路由 name
-        targetRouteName = this.level === 'primary' ? 'PrimaryListenDetail' : 'SecondaryListenDetail';
-        backParams = { unitId: 'listen', level: this.level };
-    }
-
-    this.$router.push({
-        name: 'TrialResultDetail',
-        params: {
-            finalScore: this.earnedStars,
-            examId: this.unitId,
-            examTitle: this.stageLabel,
-            resultList: this.reportData,
-            backRoute: {
-                name: targetRouteName, 
-                params: backParams
+            // 關鍵判斷：如果是聽力海灣
+            if (this.unitName.includes('聽力海灣')) {
+                // 根據 level 對應 index.js 裡的路由 name
+                targetRouteName = this.level === 'primary' ? 'PrimaryListenDetail' : 'SecondaryListenDetail';
+                backParams = { unitId: 'listen', level: this.level };
             }
-        }
-    });
-},
-goBack() {
+
+            this.$router.push({
+                name: 'ResultDetail',
+                params: {
+                    finalScore: this.earnedStars,
+                    examId: this.unitId,
+                    examTitle: this.stageLabel,
+                    resultList: this.reportData,
+                    backRoute: {
+                        name: targetRouteName,
+                        params: backParams
+                    }
+                }
+            });
+        },
+        goBack() {
             if (this.timerInterval) clearInterval(this.timerInterval);
             this.$router.go(-1);
-     },
-    beforeDestroy() {
-        if (this.timerInterval) clearInterval(this.timerInterval);
-    }
+        },
+        beforeDestroy() {
+            if (this.timerInterval) clearInterval(this.timerInterval);
+        }
 
     }
 };
@@ -547,7 +532,7 @@ goBack() {
 <style lang="scss" scoped>
 .quiz-page {
     @include main-card-page;
-    
+
 
 }
 
@@ -591,9 +576,11 @@ i {
         }
     }
 }
-   .question-mode  .question-content .question-wrap .question-title{
-        font-size: 140px;
-    }
+
+.question-mode .question-content .question-wrap .question-title {
+    font-size: 140px;
+}
+
 .progress-header {
     @include progress-star
 }

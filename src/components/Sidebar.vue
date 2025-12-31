@@ -1,23 +1,30 @@
 <template>
-    <div :class="['sidebar', { 'is-expanded': isMenuExpanded, 'teacher-sidebar': !isStudent }]">
-
+    <div ref="sidebarRef" :class="['sidebar', { 'is-expanded': isMenuExpanded, 'teacher-sidebar': !isStudent }]">
         <div class="sidebar-header">
-            <div class="toggle-btn" @click="toggleMenu">
-                <i :class="['fas', isMenuExpanded ? 'fa-angle-double-left' : 'fa-angle-double-right']"></i>
-            </div>
-
             <div v-if="isMenuExpanded" class="user-info">
+                <div class="user-row">
+                    <template v-if="isStudent">
+                        <div class="user-name">{{ studentInfo.student_name || '載入中...' }}</div>
+                    </template>
+                    <template v-else>
+                        <div class="user-name">{{ currentRoleName }}</div>
+                    </template>
+
+                    <div class="toggle-btn" @click="toggleMenu">
+    <i :class="['fas', isMenuExpanded ? 'fa-angle-double-left' : 'fa-angle-double-right']" @click.stop="toggleMenu"></i>
+</div>
+                </div>
+
                 <template v-if="isStudent">
-                    <div class="user-name">{{ studentInfo.student_name || '載入中...' }}</div>
                     <div class="second-row">
                         <p class="user-status">{{ studentInfo.school_name }}</p>
                         <p class="class-name">{{ studentInfo.class_name }}</p>
                     </div>
                 </template>
-                <template v-else>
-                    <div class="user-name">{{ currentRoleName }}</div>
-                    <div class="user-status">管理後台</div>
-                </template>
+            </div>
+
+            <div v-else class="toggle-btn" @click="toggleMenu">
+                <i class="fas fa-angle-double-right"></i>
             </div>
         </div>
 
@@ -31,11 +38,11 @@
                         {{ isMenuExpanded ? studentInfo.total_stars + ' 顆' : studentInfo.total_stars }}
                     </span>
                 </div>
-                <div class="stat-item" :style="{ backgroundColor: 'rgba(42, 174, 160, 1)' }">
-                    <div class="stat-icon"><i class="fas fa-fire"></i></div>
+                <div class="stat-item" :style="{ backgroundColor: '#FFDB81' }">
+                    <div class="stat-icon"><i class="fas fa-calendar"></i></div>
                     <span v-if="isMenuExpanded" class="stat-label">已學習天數</span>
                     <span class="stat-value">
-                    {{ isMenuExpanded ? studentInfo.attendance_days + ' 天' : studentInfo.attendance_days }}
+                        {{ isMenuExpanded ? studentInfo.attendance_days + ' 天' : studentInfo.attendance_days }}
                     </span>
                 </div>
             </template>
@@ -49,46 +56,51 @@
             </template>
 
         </div>
-<div v-if="isMenuExpanded && isStudent" class="achievement-section" 
-     @click="handleNavigation('/achievementisland')" style="cursor: pointer;">
-    <div class="section-title">
-        <p>成就獎章</p>
-    </div>
-    <div class="achievement-badges">
-        <div v-for="(log, idx) in achievementLogs.slice(0, 3)" :key="idx" class="badge-item">
-            <i :class="getAchievementIcon(log.name)" style="color: #F56C42; font-size: 32px;"></i>
-        </div>
+        <div v-if="isMenuExpanded && isStudent" class="achievement-section"
+            @click="handleNavigation('/achievementisland')" style="cursor: pointer;">
+            <div class="section-title">
+                <p>成就獎章</p>
+            </div>
+            <div class="achievement-badges">
+                <div v-for="(log, idx) in achievementLogs.slice(0, 3)" :key="idx" class="badge-item">
+                    <i :class="getAchievementIcon(log.name)" style="color: #F56C42; font-size: 32px;"></i>
+                </div>
 
-        <div v-if="achievementLogs.length === 0" style="color: #999; font-size: 14px; margin-top: 5px;">
-            尚未獲得獎章
+                <div v-if="achievementLogs.length === 0" style="color: #999; font-size: 14px; margin-top: 5px;">
+                    尚未獲得獎章
+                </div>
+            </div>
         </div>
-    </div>
-</div>
         <div class="bottom-menu">
 
-           <div class="menu-item" @click="settingsDialogVisible = true">
-    <i class="fas fa-cog"></i>
-    <span v-if="isMenuExpanded">設定</span>
-</div>
+            <template v-if="isStudent">
+                <div class="menu-item" @click="settingsDialogVisible = true">
+                    <i class="fas fa-cog"></i>
+                    <span v-if="isMenuExpanded">設定</span>
+                </div>
 
-<el-dialog 
-    title="系統設定" 
-    :visible.sync="settingsDialogVisible" 
-    width="320px" 
-    center 
-    custom-class="settings-modal"
-    append-to-body>
-    <div class="setting-item">
-        <div class="setting-label">
-            <i class="fas fa-music"></i> 背景音樂
-        </div>
-        <el-switch 
-            v-model="isMusicEnabled" 
-            active-color="#18AC9D" 
-            @change="handleMusicToggle">
-        </el-switch>
-    </div>
-</el-dialog>
+                <audio ref="mainAudio" :src="require('@/assets/mp3/main-bg.mp3')" loop></audio>
+                <audio ref="fightAudio" :src="require('@/assets/mp3/fight-island.mp3')" loop></audio>
+
+                <el-dialog :visible.sync="settingsDialogVisible" width="400px" center custom-class="settings-modal"
+                    append-to-body>
+                    <h3 class="title">設定</h3>
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <i class="fas fa-music"></i> 背景音樂
+                        </div>
+                        <el-switch v-model="isMusicEnabled" active-color="#18AC9D" @change="handleMusicToggle">
+                        </el-switch>
+                    </div>
+                    <span slot="footer" class="dialog-footer">
+                        <el-button @click="settingsDialogVisible = false" class="btn-resume">關閉</el-button>
+                    </span>
+                </el-dialog>
+            </template>
+
+            <audio ref="mainAudio" :src="require('@/assets/mp3/main-bg.mp3')" loop></audio>
+            <audio ref="fightAudio" :src="require('@/assets/mp3/fight-island.mp3')" loop></audio>
+
             <div class="menu-item" @click="handleLogout">
                 <i class="fas fa-sign-out-alt"></i>
                 <span v-if="isMenuExpanded">登出</span>
@@ -104,8 +116,9 @@ export default {
     name: 'Sidebar',
     data() {
         return {
+            isMusicEnabled: localStorage.getItem('isMusicEnabled') === 'true',
             isMenuExpanded: false,
-            userRole: 'student',
+            userRole: '',
             currentPath: '/dashboard',
             studentInfo: {
                 student_name: '',
@@ -115,11 +128,11 @@ export default {
                 attendance_days: 0
             },
             roleTitles: {
-                school_admin: '學校管理員',
-                alliance_leader: '聯盟召集人',
-                general_leader: '總召集人',
-                moe: '教育部',
-                teacher: '老師'
+                'teacher': '老師',
+                'school_admin': '學校管理員',
+                'union_leader': '聯盟召集人',
+                'global_leader': '總召集人',
+                // 'moe': '教育部'
             },
 
 
@@ -129,19 +142,19 @@ export default {
                     title: '儀錶板',
                     icon: 'fa-tachometer-alt',
                     path: '/dashboard',
-                    roles: ['teacher', 'school_admin', 'alliance_leader', 'general_leader', 'moe']
+                    roles: ['teacher', 'school_admin', 'union_leader', 'global_leader']
                 },
                 {
                     title: '最新消息',
                     icon: 'fa-bullhorn',
                     path: '/news',
-                    roles: ['general_leader']
+                    roles: ['global_leader']
                 },
                 {
                     title: '學習總覽',
                     icon: 'fa-book-reader',
-                    path: '/overview',
-                    roles: ['teacher', 'school_admin', 'alliance_leader', 'general_leader', 'moe']
+                    path: '/learning-overview',
+                    roles: ['teacher', 'school_admin', 'union_leader', 'global_leader']
                 },
                 {
                     title: '練習進度與狀況',
@@ -153,13 +166,13 @@ export default {
                     title: '競技島分析',
                     icon: 'fa-chart-area',
                     path: '/island-analysis',
-                    roles: ['school_admin', 'alliance_leader', 'general_leader', 'moe']
+                    roles: ['school_admin', 'union_leader', 'global_leader']
                 },
                 {
                     title: '試煉殿堂考試分析',
                     icon: 'fa-clipboard-list',
                     path: '/exam-analysis',
-                    roles: ['teacher', 'school_admin', 'alliance_leader', 'general_leader', 'moe']
+                    roles: ['teacher', 'school_admin', 'union_leader', 'global_leader']
                 },
                 {
                     title: '學生列表',
@@ -167,32 +180,25 @@ export default {
                     path: '/student-list',
                     roles: ['teacher']
                 }
-          ],
-          achievementLogs: []
+            ],
+            achievementLogs: [],
+            settingsDialogVisible: false,
         };
     },
 
-    async created() {
-        // 1. 讀取身份
-        const savedRole = localStorage.getItem('userRole');
-        if (savedRole) {
-            this.userRole = savedRole;
-        }
-
-        // 2. 如果是學生，同步呼叫 API 獲取詳細資訊
-        if (this.userRole === 'student') {
-            await this.fetchStudentDashboard();
-        }
-    },
     watch: {
         '$route': {
-        handler(to) {
-            if (to.path === '/achievementisland') {
-                this.isMenuExpanded = false;
-            }
+            handler(to) {
+                if (to.path === '/achievement-island') {
+                    this.isMenuExpanded = false;
+                }
+                //如果音樂開關是開啟的，切換頁面時重新判斷音軌
+                if (this.isMusicEnabled) {
+                    this.playAppropriateMusic(to.path);
+                }
+            },
+            immediate: true
         },
-        immediate: true 
-    },
         userRole(newRole) {
             if (newRole === 'student') {
                 this.fetchStudentDashboard();
@@ -204,8 +210,11 @@ export default {
             return this.userRole === 'student';
         },
         currentRoleName() {
-            if (this.isStudent) return '小學生';
-            return this.roleTitles[this.userRole] || '系統管理員';
+            if (this.isStudent) return this.studentInfo.student_name || '小學生';
+
+            // 如果後端有回傳老師/管理員的名字，優先顯示名字；否則顯示職稱
+            const roleTitle = this.roleTitles[this.userRole] || '系統管理員';
+            return roleTitle;
         },
 
         // =自動過濾後的選單 
@@ -219,53 +228,116 @@ export default {
             });
         }
     },
-    created() {
-        // 讀取身份
-        const savedRole = localStorage.getItem('userRole');
-        if (savedRole) {
-            this.userRole = savedRole;
+    mounted() {
+        document.addEventListener('click', this.handleOutsideClick);
+
+        // 頁面加載後，如果音樂開關是開的，嘗試播放
+        if (this.isMusicEnabled) {
+            this.playAppropriateMusic(this.$route.path);
         }
+    },
+
+    beforeDestroy() {
+        document.removeEventListener('click', this.handleOutsideClick);
     },
     methods: {
-       async fetchAchievements() {
-        try {
-            const response = await api.get('/students/students/achievements/log/');
-            this.achievementLogs = response.data; // [{ name: '...', completed_at: '...' }]
-        } catch (err) {
-            console.error('[Sidebar] 成就抓取失敗:', err);
-        }
-    },
+        handleOutsideClick(event) {
+            const sidebar = this.$refs.sidebarRef;
 
-    getAchievementIcon(name) {
-        const iconMap = {
-            '踏出第一步': 'fa-solid fa-shoe-prints',
-            '初次閃耀': 'fa-solid fa-star',
-            '月度冠軍': 'fa-solid fa-trophy',
-            '學而時習之': 'fa-solid fa-calendar',
-            '勤學學霸': 'fa-solid fa-book',
-            '字母探險者': 'fa-brands fa-fort-awesome',
-            '300字霸總': 'fa-solid fa-user-tie',
-            '初階小英雄': 'fa-solid fa-shield-halved',
-            '聽力小老師': 'fa-solid fa-ear-deaf',
-            '國小里程碑': 'fa-solid fa-medal',
-            '800字勇者': 'fa-solid fa-user-ninja',
-            '1200字王者': 'fa-solid fa-chess',
-            '會考大殿堂': 'fa-solid fa-web-awesome',
-            '聽力大師': 'fa-solid fa-headphones',
-            '國中里程碑': 'fa-solid fa-ranking-star'
-        };
-        return iconMap[name] || 'fa-solid fa-medal'; // 預設圖標
-    },
+            // 如果側欄目前是打開的，且點擊的目標不包含在側欄內
+            if (this.isMenuExpanded && sidebar && !sidebar.contains(event.target)) {
+                this.isMenuExpanded = false;
+            }
+        },
+        handleMusicToggle(val) {
+            localStorage.setItem('isMusicEnabled', val); // 持久化儲存
+            if (val) {
+                const token = localStorage.getItem('accessToken');
+                if (token) {
+                    this.playAppropriateMusic(this.$route.path);
+                }
+            } else {
+                this.stopAllMusic();
+            }
+        },
 
-    async checkAndFetchData() {
-        const savedRole = localStorage.getItem('userRole');
-        const token = localStorage.getItem('accessToken');
+        playAppropriateMusic(path) {
+            if (!this.isStudent || !this.isMusicEnabled) return;
 
-        if (savedRole === 'student' && token) {
-            if (!this.studentInfo.student_name) await this.fetchStudentDashboard();
-            await this.fetchAchievements(); // 🚀 呼叫成就 API
-        }
-    },
+            this.$nextTick(() => {
+                const isCompetitionIsland = path === '/competition';
+                // 決定新頁面應該播放哪一首
+                const targetAudio = isCompetitionIsland ? this.$refs.fightAudio : this.$refs.mainAudio;
+                const otherAudio = isCompetitionIsland ? this.$refs.mainAudio : this.$refs.fightAudio;
+
+                if (targetAudio) {
+                    // 如果目標音樂已經在播放中，就不更改
+                    if (!targetAudio.paused) {
+                        return;
+                    }
+
+                    // 只有在需要更換音軌時，才停止另一首並播放這首
+                    if (otherAudio) {
+                        otherAudio.pause();
+                        otherAudio.currentTime = 0;
+                    }
+
+                    const playPromise = targetAudio.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(() => {
+                            const startPlay = () => {
+                                targetAudio.play();
+                                document.removeEventListener('click', startPlay);
+                            };
+                            document.addEventListener('click', startPlay);
+                        });
+                    }
+                }
+            });
+        },
+        stopAllMusic() {
+            if (this.$refs.mainAudio) this.$refs.mainAudio.pause();
+            if (this.$refs.fightAudio) this.$refs.fightAudio.pause();
+        },
+        async fetchAchievements() {
+            try {
+                const response = await api.get('/students/students/achievements/log/');
+                this.achievementLogs = response.data; // [{ name: '...', completed_at: '...' }]
+            } catch (err) {
+                console.error('[Sidebar] 成就抓取失敗:', err);
+            }
+        },
+
+        getAchievementIcon(name) {
+            const iconMap = {
+                '踏出第一步': 'fa-solid fa-shoe-prints',
+                '初次閃耀': 'fa-solid fa-star',
+                '月度冠軍': 'fa-solid fa-trophy',
+                '學而時習之': 'fa-solid fa-calendar',
+                '勤學學霸': 'fa-solid fa-book',
+                '字母探險者': 'fa-brands fa-fort-awesome',
+                '300字霸總': 'fa-solid fa-user-tie',
+                '初階小英雄': 'fa-solid fa-shield-halved',
+                '聽力小老師': 'fa-solid fa-ear-deaf',
+                '國小里程碑': 'fa-solid fa-medal',
+                '800字勇者': 'fa-solid fa-user-ninja',
+                '1200字王者': 'fa-solid fa-chess',
+                '會考大殿堂': 'fa-solid fa-web-awesome',
+                '聽力大師': 'fa-solid fa-headphones',
+                '國中里程碑': 'fa-solid fa-ranking-star'
+            };
+            return iconMap[name] || 'fa-solid fa-medal'; // 預設圖標
+        },
+
+        async checkAndFetchData() {
+            const savedRole = localStorage.getItem('userRole');
+            const token = localStorage.getItem('accessToken');
+
+            if (savedRole === 'student' && token) {
+                if (!this.studentInfo.student_name) await this.fetchStudentDashboard();
+                await this.fetchAchievements(); //  呼叫成就 API
+            }
+        },
         async fetchStudentDashboard() {
             try {
                 const response = await api.get('students/dashboard/student/');
@@ -284,31 +356,43 @@ export default {
             }
         },
         handleLogout() {
-            // 1. 清除所有身份驗證相關的 Token
+            this.stopAllMusic(); // 停止音樂
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
-
-            // 2. 清除介面判斷的角色資訊
             localStorage.removeItem('userRole');
-
-            // 3. 清除舊的測試 Token，確保乾淨
-            localStorage.removeItem('authToken');
-
-            // 4. 重設 Vue 組件中的狀態
             this.userRole = 'student';
-
-            // 5. 導航到登入頁面
             this.$router.push('/login');
         }
 
     },
-    created() {
-        this.checkAndFetchData();
-    }
+    async created() {
+        const savedRole = localStorage.getItem('userRole');
+
+        if (savedRole) {
+            this.userRole = savedRole;
+            // 確保身份更新後才根據身份執行對應邏輯
+            await this.checkAndFetchData();
+        } else {
+            // 若無身份，導回登入
+            this.$router.push('/login');
+        }
+    },
 };
 </script>
 
 <style lang="scss" scoped>
+.el-dialog {
+    .setting-item {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 16px;
+
+        .setting-label {
+            font-size: 16px;
+        }
+    }
+}
+
 .sidebar {
     background-color: transparent;
     width: 90px;
@@ -328,28 +412,39 @@ export default {
     .sidebar-header {
         display: flex;
         padding: 5px 16px;
-    }
 
-   .achievement-badges {
-  @include flex-center;
-    gap: 10px;
-    margin-top: 10px;
+        .user-info {
+            width: 100%;
 
-    .badge-item {
-        width: 100%;
-    height: 80px;
-       background: linear-gradient(135deg, rgba(245, 108, 66, 0.2) 0%, rgba(22, 162, 73, 0.2) 100%);
-       border: 1px solid #F56C424D;
-        border-radius: 24px;
-       @include flex-center;
-        justify-content: center;
-        
-        i {
-            font-size: 16px;
-            margin-bottom: 0; 
+            .user-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+            }
         }
     }
-}
+
+    .achievement-badges {
+        @include flex-center;
+        gap: 10px;
+        margin-top: 10px;
+
+        .badge-item {
+            width: 100%;
+            height: 80px;
+            background: linear-gradient(135deg, rgba(245, 108, 66, 0.2) 0%, rgba(22, 162, 73, 0.2) 100%);
+            border: 1px solid #F56C424D;
+            border-radius: 24px;
+            @include flex-center;
+            justify-content: center;
+
+            i {
+                font-size: 16px;
+                margin-bottom: 0;
+            }
+        }
+    }
 
     .toggle-btn {
         width: 30px;
@@ -361,10 +456,11 @@ export default {
         border-radius: 50%;
         transition: transform 0.3s ease, background-color 0.2s;
         margin-right: 5px;
-        i{
-            cursor: pointer;
+        cursor: pointer;
+        i {
+        pointer-events: none;
     }
-}
+    }
 
     .user-info {
         white-space: nowrap;
@@ -412,11 +508,10 @@ export default {
             font-size: 14px;
             margin-bottom: 2px;
             color: white;
+        }
 
-            &.calendar-icon i {
-                color: rgba(71, 71, 0, 1);
-            }
-
+        .fa-calendar {
+            color: #474700;
         }
 
         .stat-label,
@@ -505,7 +600,10 @@ export default {
 
         .sidebar-header {
             justify-content: space-between;
-            flex-direction: row-reverse;
+        }
+
+        .toggle-btn {
+            margin-right: 0;
         }
 
         .menu-section {
@@ -582,6 +680,10 @@ export default {
                 i {
                     font-size: 16px;
                 }
+            }
+
+            .fa-calendar {
+                color: black;
             }
 
             .stat-value {

@@ -1,123 +1,122 @@
 <template>
   <div class="login-page">
-    <vue-custom-scrollbar :settings="scrollSettings">
-      <el-row class="login-container" :gutter="40">
-        <el-col :sm='24' :xl="13">
-          <div class="announcement-card">
-            <h2 class="card-title"><i class="fa-solid fa-bullhorn"></i>最新公告</h2>
-            <div class="announcement-list">
+    <el-row class="login-container" :gutter="40">
+      <el-col :sm='24' :xl="13">
+        <div class="announcement-card mobile-scroll-box">
+          <h2 class="card-title"><i class="fa-solid fa-bullhorn"></i>最新公告</h2>
+          <div class="announcement-list">
 
-              <vue-custom-scrollbar :settings="scrollSettings">
-                <div class="announcement-item">
-                  <div class="item-header">
-                    <div class="news-title">
-                      <i class="fa-solid fa-star" style="color: #FFD43B;"></i>新島嶼開放
-                    </div>
-                    <div class="news-tag">
-                      <span class="tag new">新</span>
-                    </div>
-
+            <vue-custom-scrollbar :settings="scrollSettings">
+              <div class="announcement-item">
+                <div class="item-header">
+                  <div class="news-title">
+                    <i class="fa-solid fa-star" style="color: #FFD43B;"></i>新島嶼開放
                   </div>
-                  <p class="item-content">1200字節點島嶼已開放，歡迎九年級以上同學挑戰！</p>
-                  <span class="item-date">2024-01-15</span>
-                </div>
-
-                <div class="announcement-item">
-                  <div class="item-header">
-                    <div class="news-title">
-                      <i class="fa-solid fa-pen" style="color: #d56039;"></i>單字測驗通知
-                    </div>
-                    <div class="news-tag">
-                      <span class="tag active">活動</span>
-                    </div>
-
+                  <div class="news-tag">
+                    <span class="tag new">新</span>
                   </div>
-                  <p class="item-content">本月單字學測將於11月25日舉行，請同學們準備。</p>
-                  <span class="item-date">2024-01-10</span>
+
                 </div>
+                <p class="item-content">1200字節點島嶼已開放，歡迎九年級以上同學挑戰！</p>
+                <span class="item-date">2024-01-15</span>
+              </div>
 
-                <div class="announcement-item">
-                  <div class="item-header">
-                    <div class="news-title">
-                      <i class="fa-solid fa-rocket" style="color: #63E6BE;"></i>新功能上線
-                    </div>
-                    <div class="news-tag">
-                      <span class="tag update">更新</span>
-                    </div>
-
+              <div class="announcement-item">
+                <div class="item-header">
+                  <div class="news-title">
+                    <i class="fa-solid fa-pen" style="color: #d56039;"></i>單字測驗通知
                   </div>
-                  <p class="item-content">全新語音輸入功能現已推出！讓學習更有效率。</p>
-                  <span class="item-date">2024-01-20</span>
-                </div>
-
-                <div class="announcement-item">
-                  <div class="item-header">
-                    <div class="news-title">
-                      <i class="fa-solid fa-triangle-exclamation" style="color: #e12323;"></i>伺服器維護
-                    </div>
-                    <div class="news-tag">
-                      <span class="tag maintain">維護</span>
-                    </div>
-
+                  <div class="news-tag">
+                    <span class="tag active">活動</span>
                   </div>
-                  <p class="item-content">系統將於明日凌晨2點進行維護，屆時服務將暫停約30分鐘。</p>
-                  <span class="item-date">2024-01-19</span>
+
                 </div>
+                <p class="item-content">本月單字學測將於11月25日舉行，請同學們準備。</p>
+                <span class="item-date">2024-01-10</span>
+              </div>
 
-                <div class="announcement-item">
-                  <div class="item-header">
-                    <div class="news-title">
-                      <i class="fa-solid fa-wrench" style="color: #74C0FC;"></i>系統更新
-                    </div>
-                    <div class="news-tag">
-                      <span class="tag update">更新</span>
-                    </div>
-
+              <div class="announcement-item">
+                <div class="item-header">
+                  <div class="news-title">
+                    <i class="fa-solid fa-rocket" style="color: #63E6BE;"></i>新功能上線
                   </div>
-                  <p class="item-content">新增多項成就徽章，完成任務即可獲得專屬獎勵！</p>
-                  <span class="item-date">2024-01-05</span>
-                </div>
-              </vue-custom-scrollbar>
+                  <div class="news-tag">
+                    <span class="tag update">更新</span>
+                  </div>
 
-            </div>
+                </div>
+                <p class="item-content">全新語音輸入功能現已推出！讓學習更有效率。</p>
+                <span class="item-date">2024-01-20</span>
+              </div>
+
+              <div class="announcement-item">
+                <div class="item-header">
+                  <div class="news-title">
+                    <i class="fa-solid fa-triangle-exclamation" style="color: #e12323;"></i>伺服器維護
+                  </div>
+                  <div class="news-tag">
+                    <span class="tag maintain">維護</span>
+                  </div>
+
+                </div>
+                <p class="item-content">系統將於明日凌晨2點進行維護，屆時服務將暫停約30分鐘。</p>
+                <span class="item-date">2024-01-19</span>
+              </div>
+
+              <div class="announcement-item">
+                <div class="item-header">
+                  <div class="news-title">
+                    <i class="fa-solid fa-wrench" style="color: #74C0FC;"></i>系統更新
+                  </div>
+                  <div class="news-tag">
+                    <span class="tag update">更新</span>
+                  </div>
+
+                </div>
+                <p class="item-content">新增多項成就徽章，完成任務即可獲得專屬獎勵！</p>
+                <span class="item-date">2024-01-05</span>
+              </div>
+            </vue-custom-scrollbar>
+
           </div>
-        </el-col>
-        <el-col :sm='24' :xl="11">
-          <div class="login-card">
-            <h2 class="card-title">登入系統</h2>
-            <p class="card-subtitle">選擇身分並登入您的帳號</p>
+        </div>
+      </el-col>
+      <el-col :sm='24' :xl="11">
+        <div class="login-card mobile-scroll-box">
+          <h2 class="card-title">登入系統</h2>
+          <p class="card-subtitle">選擇身分並登入您的帳號</p>
 
-            <div class="role-switch">
-              <button :class="['role-btn', { active: currentRole === 'student' }]" @click="currentRole = 'student'">
-                學生
-              </button>
-              <button :class="['role-btn', { active: currentRole === 'teacher' }]" @click="currentRole = 'teacher'">
-                老師
-              </button>
+          <div class="role-switch">
+            <button :class="['role-btn', { active: currentRole === 'student' }]" @click="currentRole = 'student'">
+              學生
+            </button>
+            <button :class="['role-btn', { active: currentRole === 'teacher' }]" @click="currentRole = 'teacher'">
+              老師
+            </button>
+          </div>
+
+          <div class="login-form-container">
+            <div class="input-group">
+              <label class="input-label">帳號</label>
+              <el-input id="user" type="text" class="custom-input" v-model="loginForm.account"
+                :placeholder="rolePlaceholder.account"></el-input>
             </div>
 
-            <div class="login-form-container">
-              <div class="input-group">
-                <label class="input-label">帳號</label>
-                <el-input id="user" type="text" class="custom-input" v-model="loginForm.account"
-                  :placeholder="rolePlaceholder.account"></el-input>
-              </div>
-
-              <div class="input-group">
-                <label class="input-label">密碼</label>
-                <el-input id="pw" type="password" class="custom-input" show-password v-model="loginForm.password"
-                  :placeholder="rolePlaceholder.password"></el-input>
-              </div>
-
-              <button class="login-submit-btn" @click="handleLogin">
-                {{ submitButtonText }}
-              </button>
-
-              <p class="forgot-password-link" @click="openForgetPassModal">忘記密碼</p>
+            <div class="input-group">
+              <label class="input-label">密碼</label>
+              <el-input id="pw" type="password" class="custom-input" show-password v-model="loginForm.password"
+                :placeholder="rolePlaceholder.password"></el-input>
             </div>
 
-            <!-- 快速身份登錄 -->
-            <!-- <div class="dev-test-zone">
+            <button class="login-submit-btn" @click="handleLogin">
+              {{ submitButtonText }}
+            </button>
+
+            <p class="forgot-password-link" @click="openForgetPassModal">忘記密碼</p>
+          </div>
+
+          <!-- 快速身份登錄 -->
+       <div class="dev-test-zone">
               <p class="dev-title">🛠️ 開發測試快速通道 (點擊直接登入)</p>
               <div class="dev-btn-grid">
                 <button v-for="(role, index) in testRoles" :key="index" class="dev-role-btn" :class="role.class"
@@ -125,97 +124,102 @@
                   {{ role.name }}
                 </button>
               </div>
-            </div> -->
+            </div> 
 
-          </div>
-        </el-col>
-      </el-row>
-    </vue-custom-scrollbar>
-<el-dialog custom-class="confirm-pw-modal" :visible.sync="showFirstLoginDialog" width="600px" center :close-on-click-modal="false" :show-close="false">
-    <div class="dialog-content">
+        </div>
+      </el-col>
+    </el-row>
+    <el-dialog custom-class="confirm-pw-modal" :visible.sync="showFirstLoginDialog" width="600px" center
+      :close-on-click-modal="false" :show-close="false">
+      <div class="dialog-content">
         <h3 class="title">
-            <i class="fas fa-key"></i> 安全提示：首次登錄建議修改密碼
+          <i class="fas fa-key"></i> 安全提示：首次登錄建議修改密碼
         </h3>
         <p class="description">為了保障您的帳戶安全，系統建議您修改初始密碼。若您現在不方便修改，可以選擇「沿用舊密碼」進入系統，但下次登錄時仍會出現此提示。</p>
-        
+
         <p class="description pw-checklist-title">修改密碼建議：</p>
         <ul class="pw-checklist">
-            <li>密碼長度至少 6 位</li>
-            <li>包含英文字母與數字</li>
-            <li>請勿使用過於簡單的組合</li>
+          <li>密碼長度至少 6 位</li>
+          <li>包含英文字母與數字</li>
+          <li>請勿使用過於簡單的組合</li>
         </ul>
         <p class="description ask-confirm-pw">您是否要現在前往修改？</p>
-    </div>
-    <span slot="footer" class="dialog-footer">
+      </div>
+      <span slot="footer" class="dialog-footer">
         <el-button @click="handleKeepOldPassword">沿用舊密碼</el-button>
         <el-button type="primary" @click="openChangePassDialog">前往修改</el-button>
-    </span>
-</el-dialog>
+      </span>
+    </el-dialog>
 
-<el-dialog custom-class="confirm-change-pw-modal" :visible.sync="showChangePassDialog" width="450px" center :close-on-click-modal="false" :show-close="false">
-    <div class="dialog-content">
+    <el-dialog custom-class="confirm-change-pw-modal" :visible.sync="showChangePassDialog" width="450px" center
+      :close-on-click-modal="false" :show-close="false">
+      <div class="dialog-content">
         <h3 class="title">
-            <i class="fas fa-edit"></i> 設定新密碼
+          <i class="fas fa-edit"></i> 設定新密碼
         </h3>
-        
-            <el-form class="input-pw-area" :model="passForm" :rules="passRules" ref="passForm" label-position="top">
-                <el-form-item label="請輸入新密碼 (至少 6 位)" prop="new_password">
-                    <el-input v-model="passForm.new_password" type="password" show-password placeholder="請輸入新密碼"></el-input>
-                </el-form-item>
-            </el-form>
+
+        <el-form class="input-pw-area" :model="passForm" :rules="passRules" ref="passForm" label-position="top">
+          <el-form-item label="請輸入新密碼 (至少 6 位)" prop="new_password">
+            <el-input v-model="passForm.new_password" type="password" show-password placeholder="請輸入新密碼"></el-input>
+          </el-form-item>
+        </el-form>
 
         <p class="description">修改成功後，系統將引導您使用新密碼重新登錄。</p>
-    </div>
-    <span slot="footer" class="dialog-footer">
+      </div>
+      <span slot="footer" class="dialog-footer">
         <el-button @click="closeChangePassDialog">取 消</el-button>
         <el-button type="primary" @click="submitNewPassword">確認修改</el-button>
-    </span>
-</el-dialog>
+      </span>
+    </el-dialog>
 
-<el-dialog custom-class="challenge-confirm-modal" :visible.sync="showForgetPassDialog" width="550px" center :close-on-click-modal="false" :show-close="false">
-    <div class="dialog-content">
+    <el-dialog custom-class="challenge-confirm-modal" :visible.sync="showForgetPassDialog" width="550px" center
+      :close-on-click-modal="false" :show-close="false">
+      <div class="dialog-content">
         <h3 class="title">
-            <i class="fas fa-question-circle"></i> 找回密碼
+          <i class="fas fa-question-circle"></i> 找回密碼
         </h3>
-        
+
         <p class="description">請輸入帳號與綁定的 Email，系統將驗證身分。</p>
 
         <div style="margin: 20px 0; width: 80%;">
-            <el-form :model="forgetForm" :rules="forgetRules" ref="forgetForm" label-position="top">
-                <el-form-item label="用戶帳號" prop="username">
-                    <el-input v-model="forgetForm.username" placeholder="請輸入帳號"></el-input>
-                </el-form-item>
-                <el-form-item label="電子郵件" prop="email">
-                    <el-input v-model="forgetForm.email" placeholder="請輸入 Email"></el-input>
-                </el-form-item>
-            </el-form>
+          <el-form :model="forgetForm" :rules="forgetRules" ref="forgetForm" label-position="top">
+            <el-form-item label="用戶帳號" prop="username">
+              <el-input v-model="forgetForm.username" placeholder="請輸入帳號"></el-input>
+            </el-form-item>
+            <el-form-item label="電子郵件" prop="email">
+              <el-input v-model="forgetForm.email" placeholder="請輸入 Email"></el-input>
+            </el-form-item>
+          </el-form>
         </div>
 
-    </div>
-    <span slot="footer" class="dialog-footer">
+      </div>
+      <span slot="footer" class="dialog-footer">
         <el-button @click="showForgetPassDialog = false">取 消</el-button>
         <el-button type="primary" @click="handleForgetPassword">提 交</el-button>
-    </span>
-</el-dialog>
+      </span>
+    </el-dialog>
 
-<el-dialog custom-class="confirm-change-pw-modal" :visible.sync="showResetPassDialog" width="450px" center :close-on-click-modal="false" :show-close="false">
-    <div class="dialog-content">
+    <el-dialog custom-class="confirm-change-pw-modal" :visible.sync="showResetPassDialog" width="450px" center
+      :close-on-click-modal="false" :show-close="false">
+      <div class="dialog-content">
         <h3 class="title">
-            <i class="fas fa-lock-open"></i> 重設您的新密碼
+          <i class="fas fa-lock-open"></i> 重設您的新密碼
         </h3>
         <p class="description">驗證成功！請在下方輸入您想設定的新密碼。</p>
-        
-        <el-form class="input-pw-area" :model="resetPassForm" :rules="passRules" ref="resetPassForm" label-position="top">
-            <el-form-item label="新密碼 (至少 6 位)" prop="new_password">
-                <el-input v-model="resetPassForm.new_password" type="password" show-password placeholder="請輸入新密碼"></el-input>
-            </el-form-item>
+
+        <el-form class="input-pw-area" :model="resetPassForm" :rules="passRules" ref="resetPassForm"
+          label-position="top">
+          <el-form-item label="新密碼 (至少 6 位)" prop="new_password">
+            <el-input v-model="resetPassForm.new_password" type="password" show-password
+              placeholder="請輸入新密碼"></el-input>
+          </el-form-item>
         </el-form>
-    </div>
-    <span slot="footer" class="dialog-footer">
+      </div>
+      <span slot="footer" class="dialog-footer">
         <el-button @click="showResetPassDialog = false">取 消</el-button>
         <el-button type="primary" @click="handleResetPasswordSubmit">確認重設</el-button>
-    </span>
-</el-dialog>
+      </span>
+    </el-dialog>
 
   </div>
 </template>
@@ -271,42 +275,42 @@ export default {
           { min: 6, message: '密碼長度至少為 6 個單位', trigger: 'blur' }
         ]
       },
-   showForgetPassDialog: false,
-    forgetForm: {
-      username: '',
-      email: ''
-    },
-    forgetRules: {
-      username: [{ required: true, message: '請輸入帳號', trigger: 'blur' }],
-      email: [
-        { required: true, message: '請輸入 Email', trigger: 'blur' },
-        { type: 'email', message: '請輸入正確的 Email 格式', trigger: 'blur' }
-      ]
-    },
-    showResetPassDialog: false,
-    resetPassToken: '', // 用於存儲網址帶來的 token
-    resetPassForm: {
-      new_password: ''
+      showForgetPassDialog: false,
+      forgetForm: {
+        username: '',
+        email: ''
+      },
+      forgetRules: {
+        username: [{ required: true, message: '請輸入帳號', trigger: 'blur' }],
+        email: [
+          { required: true, message: '請輸入 Email', trigger: 'blur' },
+          { type: 'email', message: '請輸入正確的 Email 格式', trigger: 'blur' }
+        ]
+      },
+      showResetPassDialog: false,
+      resetPassToken: '', // 用於存儲網址帶來的 token
+      resetPassForm: {
+        new_password: ''
+      }
+
+    };
+  },
+  mounted() {
+    const fullPath = window.location.href;
+    // 尋找 login 字樣後的內容
+    if (fullPath.includes('/login/')) {
+      let rawToken = fullPath.split('/login/')[1];
+
+      // 徹底移除結尾的斜槓與任何 Query String
+      const token = rawToken.split('?')[0].replace(/\/+$/, "");
+
+      if (token && token.length > 50) {
+        console.log('[系統] 成功解析 Token:', token);
+        this.resetPassToken = token;
+        this.showResetPassDialog = true;
+      }
     }
-  
-  };
-},
-mounted() {
-  const fullPath = window.location.href;
-  // 尋找 login 字樣後的內容
-  if (fullPath.includes('/login/')) {
-    let rawToken = fullPath.split('/login/')[1];
-    
-    // 徹底移除結尾的斜槓與任何 Query String
-    const token = rawToken.split('?')[0].replace(/\/+$/, "");
-    
-    if (token && token.length > 50) {
-      console.log('[系統] 成功解析 Token:', token);
-      this.resetPassToken = token;
-      this.showResetPassDialog = true;
-    }
-  }
-},
+  },
   computed: {
     rolePlaceholder() {
       return this.currentRole === 'student'
@@ -317,7 +321,7 @@ mounted() {
       return this.currentRole === 'teacher' ? '老師登入' : '學生登入';
     }
   },
-methods: {
+  methods: {
     // 1. 觸發忘記密碼彈窗
     openForgetPassModal() {
       this.showForgetPassDialog = true;
@@ -351,24 +355,34 @@ methods: {
         return;
       }
 
-      const roleKey = this.currentRole === 'student' ? 'student' : 'teacher';
-      const path = roleKey === 'student' ? '/home' : '/dashboard';
-      const endpoint = roleKey === 'student' ? 'students/login/' : 'teachers/login/';
+      // 根據切換按鈕決定請求路徑（學生/老師/行政）
+      const endpoint = this.currentRole === 'student' ? 'students/login/' : 'teachers/login/';
 
       try {
         const response = await api.post(endpoint, {
           username: this.loginForm.account,
           password: this.loginForm.password,
         });
-        const loginResponseData = { ...response.data, role: roleKey };
+
+        // 優先使用後端回傳的真實 role (如 school_admin, union_leader 等)
+        // 如果後端沒給， fallback 到目前的按鈕身分
+        const realRole = response.data.role || (this.currentRole === 'student' ? 'student' : 'teacher');
+
+        const loginResponseData = { ...response.data, role: realRole };
+
+        // 決定跳轉路徑
+        let targetPath = '/home'; // 預設學生首頁
+        if (realRole !== 'student') {
+          targetPath = '/dashboard'; // 老師與所有行政管理員統一去後台
+        }
 
         // 學生首次登入攔截
-        if (roleKey === 'student' && loginResponseData.first_login) {
+        if (realRole === 'student' && loginResponseData.first_login) {
           this.tempLoginData = loginResponseData;
-          this.tempPath = path;
+          this.tempPath = targetPath;
           this.showFirstLoginDialog = true;
         } else {
-          this.performLogin(loginResponseData, path);
+          this.performLogin(loginResponseData, targetPath);
         }
       } catch (error) {
         alert(error.response?.data?.detail || '登入失敗');
@@ -379,8 +393,8 @@ methods: {
     async handleKeepOldPassword() {
       this.performLogin(this.tempLoginData, null); // 需先存 Token
       try {
-        await api.post('students/first-change-password/', { 
-          skip_change: true 
+        await api.post('students/first-change-password/', {
+          skip_change: true
         });
         this.showFirstLoginDialog = false;
         this.$router.push(this.tempPath);
@@ -395,66 +409,65 @@ methods: {
       this.showChangePassDialog = true;
     },
 
-  closeChangePassDialog() {
-    this.showChangePassDialog = false;
-    
-    // 做法 1：手動清空數據
-    this.passForm.new_password = '';
-    
-    // 做法 2：重置 Element UI 表單校驗狀態與數值（推薦）
-    if (this.$refs.passForm) {
-      this.$refs.passForm.resetFields();
-    }
-  },
+    closeChangePassDialog() {
+      this.showChangePassDialog = false;
 
-  async submitNewPassword() {
-    this.$refs.passForm.validate(async (valid) => {
-      if (!valid) return;
-      this.performLogin(this.tempLoginData, null);
-      try {
-        await api.post('students/first-change-password/', {
-          new_password: this.passForm.new_password
-        });
-        alert('密碼修改成功，請使用新密碼重新登入');
-        
-        // 成功後清理
-        this.closeChangePassDialog(); 
-        this.logoutAndReset();
-      } catch (err) {
-        alert('修改失敗，請稍後再試');
+      // 做法 1：手動清空數據
+      this.passForm.new_password = '';
+
+      // 做法 2：重置 Element UI 表單校驗狀態與數值（推薦）
+      if (this.$refs.passForm) {
+        this.$refs.passForm.resetFields();
       }
-    });
-  },
-  
-  logoutAndReset() {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('userRole');
-    if (window.tokenTimer) clearInterval(window.tokenTimer);
-    
-    this.loginForm.password = ''; // 清空登入頁的密碼
-  }
-,
+    },
 
- async performLogin(loginData, path) {
+    async submitNewPassword() {
+      this.$refs.passForm.validate(async (valid) => {
+        if (!valid) return;
+        this.performLogin(this.tempLoginData, null);
+        try {
+          await api.post('students/first-change-password/', {
+            new_password: this.passForm.new_password
+          });
+          alert('密碼修改成功，請使用新密碼重新登入');
+
+          // 成功後清理
+          this.closeChangePassDialog();
+          this.logoutAndReset();
+        } catch (err) {
+          alert('修改失敗，請稍後再試');
+        }
+      });
+    },
+
+    logoutAndReset() {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('userRole');
+      if (window.tokenTimer) clearInterval(window.tokenTimer);
+
+      this.loginForm.password = '';
+    }
+    ,
+
+    async performLogin(loginData, path) {
       const token = loginData.token || loginData.access;
       const refresh = loginData.refresh;
       const role = loginData.role;
 
       localStorage.setItem('userRole', role);
-      localStorage.setItem('accessToken', token); 
+      localStorage.setItem('accessToken', token);
       localStorage.setItem('refreshToken', refresh);
-      
+
       this.startTokenRefreshTimer();
 
+      // 只有真正的學生才執行簽到
       if (role === 'student') {
         try {
-          const res = await api.post('students/attendance/');
-          console.log('[系統] 簽到成功:', res.data.message);
+          await api.post('students/attendance/');
         } catch (err) {
-          console.warn('[系統] 簽到提示:', err.response?.data?.message || '今日已完成簽到');
+          console.warn('[系統] 簽到提示');
         }
-
       }
 
       if (path) {
@@ -469,15 +482,15 @@ methods: {
     },
 
     // 10. Token 刷新計時器
-  async startTokenRefreshTimer() {
-  if (this.refreshTimer) return;
+    async startTokenRefreshTimer() {
+      if (this.refreshTimer) return;
 
-  this.refreshTimer = setInterval(async () => {
-    const refreshToken = localStorage.getItem('refreshToken');
-    if (!refreshToken) {
-      this.stopTokenRefreshTimer();
-      return;
-    }
+      this.refreshTimer = setInterval(async () => {
+        const refreshToken = localStorage.getItem('refreshToken');
+        if (!refreshToken) {
+          this.stopTokenRefreshTimer();
+          return;
+        }
         try {
           const response = await api.post('students/refresh/', { refresh: refreshToken });
           const { token: newAccessToken, refresh: newRefreshToken } = response.data;
@@ -488,29 +501,29 @@ methods: {
         }
       }, 25 * 60 * 1000);
     },
-   // 提交重設密碼 
-  async handleResetPasswordSubmit() {
-  this.$refs.resetPassForm.validate(async (valid) => {
-    if (!valid) return;
-    try {
-      // 根據你的 API 需求，傳入 token 與新密碼
-      await api.post('students/reset-password/', {
-        token: this.resetPassToken,
-        new_password: this.resetPassForm.new_password
+    // 提交重設密碼 
+    async handleResetPasswordSubmit() {
+      this.$refs.resetPassForm.validate(async (valid) => {
+        if (!valid) return;
+        try {
+          // 根據你的 API 需求，傳入 token 與新密碼
+          await api.post('students/reset-password/', {
+            token: this.resetPassToken,
+            new_password: this.resetPassForm.new_password
+          });
+
+          alert('密碼重設成功！');
+          this.showResetPassDialog = false;
+          this.resetPassForm.new_password = '';
+
+          // 清理網址，回到乾淨的 /login
+          this.$router.replace('/login');
+        } catch (error) {
+          alert(error.response?.data?.detail || '重設失敗，連結可能過期');
+        }
       });
-      
-      alert('密碼重設成功！');
-      this.showResetPassDialog = false;
-      this.resetPassForm.new_password = '';
-      
-      // 清理網址，回到乾淨的 /login
-      this.$router.replace('/login');
-    } catch (error) {
-      alert(error.response?.data?.detail || '重設失敗，連結可能過期');
     }
-  });
-}
- },
+  },
 
 
 }
@@ -534,39 +547,44 @@ $bg-path: "~@/assets/image/login-bg.jpg";
     margin-right: 4px;
   }
 }
-.el-dialog .title{
-      margin-bottom: 10px;
-}
-   .confirm-pw-modal {
 
-        .description,
-        .pw-checklist {
-            display: inline;
-            align-self: flex-start;
-            margin: 4px 0;
-            text-align: left !important;
-        }
-
-        .pw-checklist {
-            font-weight: 600;
-            padding-left: 3%;
-        }
-
-        .ask-confirm-pw {
-            margin-top: 16px;
-        }
-        .el-dialog__footer button{
-          width: 120px
-        }
-    }
-    .confirm-change-pw-modal{
-.description{
-  text-align: center;
+.el-dialog .title {
+  margin-bottom: 10px;
 }
-.input-pw-area{
-  margin-top: 24px;
+
+.confirm-pw-modal {
+
+  .description,
+  .pw-checklist {
+    display: inline;
+    align-self: flex-start;
+    margin: 4px 0;
+    text-align: left !important;
+  }
+
+  .pw-checklist {
+    font-weight: 600;
+    padding-left: 3%;
+  }
+
+  .ask-confirm-pw {
+    margin-top: 16px;
+  }
+
+  .el-dialog__footer button {
+    width: 120px
+  }
 }
-    }
+
+.confirm-change-pw-modal {
+  .description {
+    text-align: center;
+  }
+
+  .input-pw-area {
+    margin-top: 24px;
+  }
+}
 
 .login-container {
   @include flex-center;
@@ -784,6 +802,7 @@ $bg-path: "~@/assets/image/login-bg.jpg";
   margin-top: 30px;
   padding-top: 20px;
   border-top: 2px dashed #eee;
+
   .dev-title {
     font-size: 14px;
     color: #999;
@@ -853,6 +872,28 @@ $bg-path: "~@/assets/image/login-bg.jpg";
   .login-container {
     display: flex;
     flex-direction: column;
+  }
+
+  .mobile-scroll-box {
+    max-height: 100vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 20px;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 10px;
+    }
+  }
+
+  .login-page {
+    padding: 5%;
+    height: auto;
+    overflow-y: auto;
   }
 
 }

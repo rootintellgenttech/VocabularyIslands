@@ -14,12 +14,12 @@
                 <div v-for="(item, index) in units" :key="item.id"
                     :class="['unit-card-container', { 'is-up': index % 2 !== 0 }]">
                     <div class="island-card">
-                    <img :src="item.imgColor" :alt="item.name" :class="{ 'is-bw': item.stars === 0 }" />
+                        <img :src="item.imgColor" :alt="item.name" :class="{ 'is-bw': item.stars === 0 }" />
                     </div>
                     <div class="stats-row">
                         <div class="stat-group">
                             <img src="../../assets/image/elementary/star.png" alt="⭐">
-                           <span>{{ item.stars }}/{{ item.totalStars }}</span>
+                            <span>{{ item.stars }}/{{ item.totalStars }}</span>
                         </div>
                     </div>
                     <div class="unit-title">{{ item.name }}</div>
@@ -63,11 +63,11 @@ export default {
     mounted() {
         this.loadIslandData();
     },
- methods: {
+    methods: {
         getBackIslandImage() {
             return this.level === 'primary' ? this.imgBackPrimary : this.imgBackSecondary;
         },
-        
+
         loadIslandData() {
             const dataMap = {
                 'primary-abc': {
@@ -123,39 +123,41 @@ export default {
             }
             this.$nextTick(() => { this.updateStarsFromApi(); });
         },
-async updateStarsFromApi() {
-    try {
-        const res = await api.get('/students/test-summary/');
-        const islandData = res.data.islands.find(i => i.island_name === this.islandTitle);
-        if (!islandData) return;
+        async updateStarsFromApi() {
+            try {
+                const res = await api.get('/students/test-summary/');
+                const islandData = res.data.islands.find(i => i.island_name === this.islandTitle);
+                if (!islandData) return;
 
-        this.units = this.units.map(unit => {
-            const matchedUnit = islandData.units.find(u => u.unit_name === unit.name);
-            const configLength = this.getStageLabelsByUnitId(unit.id);
-            
-            // --- 國中/國小通用邏輯 ---
-            // 判斷是否為總複習單元 (Final Mode)
-            // 國小 300 是 '06', 國中 800 是 '06', 國中 1200 是 '05', ABC 是 'final'
-            const isFinalUnit = ['final', '06', '05'].includes(unit.id);
+     this.units = this.units.map(unit => {
+    const matchedUnit = islandData.units.find(u => u.unit_name === unit.name);
+     const configLength = this.getStageLabelsByUnitId(unit.id);
 
-            let totalChallengeStages = configLength;
-            if (!isFinalUnit) {
-                // 非複習單元，第一個標籤是「學習」，所以要減 1
-                totalChallengeStages = configLength > 0 ? configLength - 1 : 0;
-            }
+    // 判斷是否為「總複習」單元
+    const isReviewUnit = unit.name.includes('複習') || unit.name.includes('復習') || unit.id === 'final';
 
-            return {
-                ...unit,
-                stars: matchedUnit ? matchedUnit.total_stars : 0,
-                totalStars: totalChallengeStages * 5 
-            };
-        });
-    } catch (err) { console.error(err); }
-},
+    let totalChallengeStages = configLength;
+    
+    if (!isReviewUnit) {
+        // 一般單元 (如 01~05): 扣除第一個「學習」標籤
+        totalChallengeStages = configLength > 0 ? configLength - 1 : 0;
+    } else {
+        // 總複習單元 (如 06 300字複習): 全部標籤都是挑戰，不扣除
+        totalChallengeStages = configLength;
+    }
 
-getStageLabelsByUnitId(id) {
-    const options300 = { '01': 7, '02': 7, '03': 7, '04': 7, '05': 7, '06': 5 };
-    const options800 = { '01': 11, '02': 11, '03': 11, '04': 11, '05': 11, '06': 5 };
+    return {
+        ...unit,
+        stars: matchedUnit ? matchedUnit.total_stars : 0,
+        totalStars: totalChallengeStages * 5 
+    };
+});
+            } catch (err) { console.error(err); }
+        },
+
+       getStageLabelsByUnitId(id) {
+    const options300 = { '01': 7, '02': 7, '03': 7, '04': 7, '05': 7, '06': 6 }; 
+    const options800 = { '01': 11, '02': 11, '03': 11, '04': 11, '05': 11, '06': 5 }; 
     const options1200 = { '01': 11, '02': 11, '03': 11, '04': 11, '05': 8 };
     const optionsABC = { 'af': 3, 'gl': 3, 'mr': 3, 'sz': 3, 'final': 5 };
 
@@ -165,7 +167,7 @@ getStageLabelsByUnitId(id) {
     else if (this.wordCount === '800') count = options800[id];
     else if (this.wordCount === '1200') count = options1200[id];
 
-    return count || 0; 
+    return count || 0;
 },
 
         enterUnit(unit) {
@@ -198,17 +200,30 @@ getStageLabelsByUnitId(id) {
 
 
 .unit-card-container {
-@include island-design
-}
+    @include island-design;
+    &:not(.is-up) {
+        transform: translateY(-80px);
 
-.unit-card-container.is-up {
-    transform: translateY(-120px);
+        &:has(.enter-btn:hover) {
+            transform: translateY(-117px); 
+            .enter-btn {
+                transform: translateY(37px); 
+            }
+        }
+    }
 
-    &:hover {
-        transform: translateY(-60px);
+ &.is-up {
+        transform: translateY(-70px); 
+        
+        &:has(.enter-btn:hover) {
+            transform: translateY(-110px); 
+            
+            .enter-btn {
+                transform: translateY(40px); 
+            }
+        }
     }
 }
-
 
 .unit-title {
     @include unit-title
@@ -220,21 +235,24 @@ getStageLabelsByUnitId(id) {
 
 
 .enter-btn {
-    @include enter-unit-yellow-btn
+    @include enter-unit-yellow-btn;
+    transition: transform 0.3s ease;
 }
+
+
 
 @media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
     .abc-page {
         .island-map-container {
             margin-top: 18%;
+
             .island-card img {
                 width: 150px;
             }
 
             .unit-card-container {
-                flex-shrink: 0; 
+                flex-shrink: 0;
                 width: 150px;
-                padding-top: 18px;
 
                 .back-to-island .return-btn {
                     padding: 8px 16px;

@@ -6,9 +6,15 @@
         </div>
 
         <div v-else-if="currentPhase === 'quiz'" class="quiz-container-wide">
-            <el-row type="flex" justify="center" align="middle" :gutter="40" style="width: 100%; max-width: 1200px;">
+            <el-row type="flex" justify="center" align="middle" :gutter="80" style="width: 100%; max-width: 1200px;">
                 <el-col :xs="24" :md="10" class="left-image-col">
                     <img :src="tempAvatar" alt="Role" class="side-role-img desktop-img">
+
+                    <div class="timer-bar-wrap" style="width: 80%; margin: 20px auto 0;">
+                        <el-progress :text-inside="true" :stroke-width="26" :percentage="timerPercentage"
+                            :format="formatTimerText" status="exception" class="timer-progress">
+                        </el-progress>
+                    </div>
                 </el-col>
 
                 <el-col :xs="24" :md="14">
@@ -90,7 +96,7 @@
                 <img :src="wonderfulAvatarPath" alt="Result" class="result-avatar">
 
                 <div v-if="earnedStars > 0" class="final-star">
-                    <i v-for="n in 3" :key="n" style="color: #ffc940;" class="fas fa-star"
+                    <i v-for="n in 5" :key="n" style="color: #ffc940;" class="fas fa-star"
                         :class="{ 'filled': n <= earnedStars }"></i>
                 </div>
 
@@ -133,7 +139,7 @@ export default {
             wonderfulAvatarPath: require('@/assets/image/wonderful-avatar.png'),
             tempAvatar: require('@/assets/image/15sec.gif'),
             maxQuestions: 20,
-            questionTimeLeft: 15, 
+            questionTimeLeft: 15,
             questionTimer: null,
             timeLimitMinutes: 5,
             currentQuestionIndex: 0,
@@ -151,6 +157,11 @@ export default {
         };
     },
     computed: {
+        timerPercentage() {
+            // (當前秒數 / 總秒數) * 100
+            const p = (this.questionTimeLeft / 15) * 100;
+            return Math.max(0, Math.min(100, p));
+        },
         formattedTimeLeft() {
             const minutes = Math.floor(this.timeLeftSeconds / 60);
             const seconds = this.timeLeftSeconds % 60;
@@ -161,33 +172,64 @@ export default {
         this.fetchQuestions();
     },
     methods: {
+        formatTimerText() {
+            return `${this.questionTimeLeft}s`;
+        },
         async fetchQuestions() {
             this.isLoading = true;
             try {
-                const payload = {
-                    "單元": this.stageName,
-                    "題型": "克漏字",
-                    "題數": 1200,
-                    "include_answer": true
-                };
+                let payload = {};
+
+                //定義需要「全島抓題」的特殊標籤清單
+                const fullIslandLabels = ['800字複習', '1200字總複習', '會考大殿堂-1', '會考大殿堂-2'];
+
+                // 判斷當前標籤是否在清單內
+                if (fullIslandLabels.includes(this.stageName)) {
+                    console.log(`✅ 進入會考大殿堂特殊複習模式: ${this.stageName}`);
+                    payload = {
+                        "島嶼": "1200字島",   // 強制指定 1200字島 (包含所有國中題)
+                        "題型": "克漏字",      // 固定題型
+                        "題數": 1200,
+                        "include_answer": true
+                    };
+                } else {
+                    //  一般關卡 (霧靄之境、永恆圖書館等) 維持原有邏輯
+                    console.log(`✅ 進入會考大殿堂一般單元模式: ${this.stageName}`);
+                    payload = {
+                        "單元": this.stageName,
+                        "題型": "克漏字",
+                        "題數": 1200,
+                        "include_answer": true
+                    };
+                }
+
+                console.log('>>> Hero API Payload:', JSON.stringify(payload, null, 2));
 
                 const res = await api.post('/questionbank/generate/', payload);
                 let apiData = res.data;
 
+                // 既然 API 已經指定克漏字，且後端會直接回傳正確數據，我們直接處理
+                // 隨機抽 20 題
                 const targetCount = 20;
                 apiData = apiData.sort(() => Math.random() - 0.5).slice(0, targetCount);
 
                 this.maxQuestions = apiData.length;
                 this.questionsList = apiData.map(q => ({
                     id: q.id,
+                    // 處理克漏字空格切割邏輯
                     questionParts: q.question_text.split(/(_______)/g),
                     correctAnswer: q.answer,
-                    explanation: q.explanation,
-                    options: q.options.map(opt => ({ value: opt.id, label: opt.text }))
+                    explanation: q.explanation || '無題解',
+                    options: q.options.map(opt => ({
+                        value: opt.id,
+                        label: opt.text
+                    }))
                 }));
+
                 this.isLoading = false;
             } catch (err) {
-                console.error(err);
+                console.error('Hero Fetch Error:', err);
+                alert('無法取得英雄挑戰題庫');
                 this.goBack();
             }
         },
@@ -195,10 +237,10 @@ export default {
             if (this.questionsList.length === 0) return;
             this.currentPhase = 'quiz';
             this.userAnswers = [];
-            
+
             this.timeLeftSeconds = this.timeLimitMinutes * 60;
             this.startGlobalTimer(); // 啟動總計時 (可選)
-            
+
             // 載入第一題
             this.loadQuestion(0);
         },
@@ -222,7 +264,7 @@ export default {
             this.questionTimeLeft = 15; // 重置為 15 秒
             this.questionTimer = setInterval(() => {
                 this.questionTimeLeft--;
-                
+
                 // 時間到
                 if (this.questionTimeLeft <= 0) {
                     this.handleQuestionTimeout();
@@ -239,7 +281,7 @@ export default {
             // 記錄為 "未填寫"
             this.userAnswers.push({
                 question_id: this.currentQuestion.id,
-                option_id: "未填寫" 
+                option_id: "未填寫"
             });
 
             // 自動前往下一題 (延遲一下讓使用者意識到切換，或直接切換)
@@ -255,7 +297,7 @@ export default {
 
         selectAnswer(option) {
             if (this.isProcessing) return;
-            
+
             // 玩家作答後，立刻停止該題倒數
             clearInterval(this.questionTimer);
 
@@ -288,8 +330,8 @@ export default {
             }, 1000);
         },
         async submitFinalResults() {
-        clearInterval(this.timerInterval);
-            clearInterval(this.questionTimer); 
+            clearInterval(this.timerInterval);
+            clearInterval(this.questionTimer);
             this.isLoading = true;
             try {
                 const islandName = this.level === 'primary' ? '小英雄大本營' : '會考大殿堂';
@@ -298,7 +340,7 @@ export default {
                 const payload = {
                     "answers": this.userAnswers,
                     "island": islandName,
-                    "unit": this.stageName,  // 改為 stageName
+                    "unit": this.stageName,
                     "stage": this.stageName
                 };
 
@@ -332,7 +374,7 @@ export default {
             const targetRouteName = this.level === 'primary' ? 'PrimaryHeroDetail' : 'SecondaryHeroDetail';
 
             this.$router.push({
-                name: 'TrialResultDetail',
+                name: 'ResultDetail',
                 params: {
                     finalScore: this.earnedStars,
                     examId: this.stageId,
@@ -359,11 +401,11 @@ export default {
         goBack() { this.$router.go(-1); },
         retryQuiz() { this.fetchQuestions().then(() => this.startQuiz()); }
     },
-beforeDestroy() {
+    beforeDestroy() {
         if (this.timerInterval) clearInterval(this.timerInterval);
-        if (this.questionTimer) clearInterval(this.questionTimer); 
+        if (this.questionTimer) clearInterval(this.questionTimer);
     }
-    };
+};
 </script>
 
 <style lang="scss" scoped>
@@ -390,6 +432,7 @@ beforeDestroy() {
         display: none;
     }
 }
+
 
 .main-card {
     @include main-card;
@@ -593,6 +636,24 @@ beforeDestroy() {
 }
 
 @media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
+    .quiz-container-wide .el-row--flex.is-align-middle {
+        justify-self: center;
+    }
+
+    .router-view-content {
+        padding: 5%;
+    }
+
+    .main-card {
+        min-width: 500px !important;
+        width: 100% !important;
+    }
+
+    .timer-bar-wrap {
+        width: 100% !important;
+        margin: 10px 0 !important;
+    }
+
     .left-image-col {
         display: none;
     }
@@ -604,8 +665,8 @@ beforeDestroy() {
 
         &.mobile-img {
             display: block;
-            width: 100px;
-            margin: 0 auto 20px;
+            width: 170px;
+            margin: auto;
             align-self: center;
         }
     }

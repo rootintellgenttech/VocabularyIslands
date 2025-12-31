@@ -5,7 +5,10 @@ import Login from '../page/Front/Login.vue';
 Vue.use(VueRouter);
 
 const routes = [
-  // 直接將根路徑 '/' 指向 Login 元件
+  {
+    path: '/',
+    redirect: '/login'
+  },
   {
     path: '/login/:token?',
     name: 'Login',
@@ -16,6 +19,31 @@ const routes = [
     path: '/dashboard',
     name: 'TeacherDashboard',
     component: () => import('../page/Back/TeacherDashboard.vue')
+  },
+  {
+    path: '/learning-overview',
+    name: 'LearningOverview',
+    component: () => import('../page/Back/LearningOverview.vue')
+  },
+  {
+    path: '/island-analysis',
+    name: 'IslandAnalysis',
+    component: () => import('../page/Back/IslandAnalysis.vue')
+  },
+  {
+    path: '/exam-analysis',
+    name: 'ExamAnalysis',
+    component: () => import('../page/Back/ExamAnalysis.vue')
+  },
+  {
+    path: '/exam-detail',
+    name: 'ExamDetail',
+    component: () => import('../page/Back/ExamDetail.vue')
+  },
+  {
+    path: '/news',
+    name: 'NewsManagement',
+    component: () => import('../page/Back/NewsManagement.vue')
   },
   {
     path: '/home',
@@ -32,7 +60,7 @@ const routes = [
     name: 'SecondaryIsland',
     component: () => import('../page/Front/SecondaryIsland.vue')
   },
-   {
+  {
     path: '/achievementisland',
     name: 'AchievementIsland',
     component: () => import('../page/Front/AchievementIsland.vue')
@@ -138,15 +166,15 @@ const routes = [
     props: true
   },
   {
-    path: '/trial-result-detail/:finalScore',
-    name: 'TrialResultDetail',
-    component: () => import('../page/Front/TrialResultDetail.vue'),
+    path: '/result-detail/:finalScore',
+    name: 'ResultDetail',
+    component: () => import('../page/Front/ResultDetail.vue'),
     props: true
   },
   // 增加 404 頁面處理，確保在任何情況下都能回到登入畫面
   {
     path: '*',
-    redirect: '/'
+    redirect: '/login'
   }
 ];
 

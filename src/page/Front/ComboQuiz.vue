@@ -1,257 +1,258 @@
 <template>
     <div class="quiz-page">
-
-        <div v-if="isGameActive || isFinished" :class="['main-card', { 'is-finished-mode': isFinished }]">
+        <div v-if="isGameActive || isFinished || isExitConfirmed"
+            :class="['main-card', { 'is-finished-mode': isFinished || isExitConfirmed }]">
 
             <template v-if="isGameActive && !isFinished && !isExitConfirmed">
                 <div class="header-wrap">
                     <div class="top-link" @click="handleBackClick">
                         <i class="fas fa-angle-left"></i> 返回
                     </div>
+                    <div class="game-status-display">
+                        <span class="turns-display">進度: {{ questionCount }} / 50</span>
+                    </div>
                 </div>
 
                 <div class="question-content">
                     <div class="question-wrap">
-                        <div v-if="gameType === 'listening'" class="audio-trigger big-icon" @click="playAudio">
+                        <div class="audio-trigger big-icon" @click="playAudio(currentQuestionText)">
                             <i class="fas fa-volume-up"></i>
                         </div>
-
-                        <h1 v-else-if="gameType === 'reading'" class="question-word-title">
-                            {{ currentQuestion.title }}
-                        </h1>
                     </div>
 
-                    <p class="instruction-text">
-                        {{ gameType === 'listening' ? '請選擇聽到的文字' : '請選擇對應的中文' }}
-                    </p>
+                    <p class="instruction-text">請選擇聽到的中文意思</p>
 
                     <div class="options-grid">
-                        <button v-for="(option, index) in currentQuestion.options" :key="index"
-                            :class="['option-btn', { 'is-selected': selectedAnswer === option.value }]"
-                            @click="selectAnswerAndSubmit(option.value)">
-                            {{ option.label }}
+                        <button v-for="(option, index) in currentOptions" :key="index"
+                            :class="['option-btn', { 'is-selected': tempSelectedAnswer === option.id }]"
+                            @click="handleOptionClick(option)">
+                            {{ option.text }}
                         </button>
                     </div>
+
+
+                    <el-button class="submit-btn" :disabled="!tempSelectedAnswer" @click="handleQuestionSubmit">
+                        提交
+                    </el-button>
                 </div>
             </template>
 
             <template v-else-if="isFinished || isExitConfirmed">
                 <div class="game-result-card final-result">
                     <img :src="wonderfulAvatarPath" alt="太棒了!" class="result-avatar">
-                    <h2 class="result-title">太棒了!</h2>
-                    <p class="result-score">你獲得了 {{ finalScore }} 積分</p>
+                    <h2 class="result-title">{{ isExitConfirmed ? '挑戰中止' : '挑戰完成!' }}</h2>
+                    <p class="result-score">獲得了 {{ finalScore }} 積分</p>
+                    <p style="color: #666; margin-top: 10px;">答對題數：{{ correctCount }} / 50</p>
                 </div>
                 <button class="result-back-btn" @click="goBack">返回</button>
             </template>
         </div>
 
-
         <el-dialog custom-class="start-modal" :visible.sync="dialogVisible" width="400px" center
-            :close-on-click-modal="false" :show-close="false" :before-close="handleGameStartClose">
-
+            :close-on-click-modal="false" :show-close="false">
             <div class="dialog-content">
-                <img :src="heroAvatarPath" alt="英雄吉祥物" class="dialog-avatar">
-
-                <h3 class="title">小英雄，你準備好開始遊戲了嗎？</h3>
-                <p class="description">快速回答完 50 題抽選！</p>
+                <img :src="heroAvatarPath" alt="吉祥物" class="dialog-avatar">
+                <h3 class="title">準備好開始挑戰了嗎？</h3>
+                <p class="description">快速回答完 50 題「英翻中」聽力挑戰！</p>
             </div>
-
             <span slot="footer" class="dialog-footer">
                 <el-button @click="handleGameStartClose">取 消</el-button>
-                <el-button @click="startGame">開始遊戲</el-button>
+                <el-button type="primary" @click="startGame">開始遊戲</el-button>
             </span>
         </el-dialog>
 
-        <el-dialog custom-class="exit-confirm-modal" :visible.sync="exitDialogVisible" width="350px" center
-            :close-on-click-modal="false" :show-close="false">
-
-            <div class="dialog-content game-result-style">
-                <img :src="quizAvatarPath" alt="Quiz Avatar" class="result-avatar dialog-img">
-
-                <h3 class="title">確定要結束遊戲嗎</h3>
-
-                <p class="description">分數將立即結算<br>您將失去今天的挑戰機會!</p>
-
-                <p class="current-score-preview">
-                    當前得分: <span>{{ currentScore * 100 }}</span> 積分
+        <el-dialog custom-class="challenge-confirm-modal" :visible.sync="exitDialogVisible" width="550px" center
+            :close-on-click-modal="false" :show-close="false" append-to-body>
+            <div class="dialog-content">
+                <h3 class="title exam-warning-title"><i class="fas fa-exclamation-circle"></i> 確定要離開嗎？</h3>
+                <p class="description" style="color: #e74c3c; font-weight: bold;">
+                    ⚠️ 注意：中途離開將會自動將剩餘題目視為「未填寫」並直接結算，這將導致您失去今天的挑戰機會。
                 </p>
             </div>
-
-            <span slot="footer" class="dialog-footer two-btns">
-                <el-button @click="resumeGame" class="btn-resume">繼續遊戲</el-button>
-                <el-button type="danger" @click="confirmExit" class="btn-end">結束遊戲</el-button>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="exitDialogVisible = false">繼續作答</el-button>
+                <el-button type="danger" @click="confirmExit">確定離開</el-button>
             </span>
         </el-dialog>
     </div>
 </template>
 
 <script>
+import api from '@/config/api';
+
 export default {
     name: 'ComboQuiz',
-    props: {
-        gameId: { type: String, required: true },
-        gameTitle: { type: String, default: '完美連擊' },
-        gameLevel: { type: String, required: true },
-        gameType: { type: String, default: 'listening' }
-    },
+    props: ['gameId', 'gameTitle', 'gameLevel', 'gameType'],
     data() {
         return {
-            dialogVisible: true,        // 開始遊戲 Dialog
-            exitDialogVisible: false,   // 退出確認 Dialog 
+            dialogVisible: true,
+            exitDialogVisible: false,
             isGameActive: false,
             isFinished: false,
-            isExitConfirmed: false,     // 退出確認狀態
+            isExitConfirmed: false,
 
-
-            quizAvatarPath: require('@/assets/image/quiz-avatar.png'),
-            heroAvatarPath: require('@/assets/image/hero-avatar.png'),
-            wonderfulAvatarPath: require('@/assets/image/wonderful-avatar.png'),
-
-            currentScore: 0,
-            currentCombo: 0,            // 連擊數
-            maxQuestions: 50,           // 最大題目數 
-            questionCount: 0,           //已回答題目數 
+            questionsList: [],
+            userAnswers: [],
+            questionCount: 1, // 當前回合
+            tempSelectedAnswer: null,
+            correctCount: 0,
             finalScore: 0,
 
-            // 模擬題目
-            currentQuestion: {
-                title: '',
-                options: [],
-                correctValue: ''
-            },
-            selectedAnswer: null,
+            wonderfulAvatarPath: require('@/assets/image/wonderful-avatar.png'),
+            quizAvatarPath: require('@/assets/image/quiz-avatar.png'),
+            heroAvatarPath: require('@/assets/image/hero-avatar.png'),
         };
     },
+    computed: {
+        currentQuestion() {
+            return this.questionsList[this.questionCount - 1] || null;
+        },
+        currentQuestionText() {
+            return this.currentQuestion ? this.currentQuestion.question_text : '';
+        },
+        currentOptions() {
+            return this.currentQuestion ? this.currentQuestion.options : [];
+        }
+    },
     methods: {
-        goBack() {
-            this.$router.push('/competition');
-        },
-        handleGameStartClose() {
-            this.dialogVisible = false;
-            this.goBack();
-        },
-        handleBackClick() {
-            if (this.isFinished || this.isExitConfirmed) {
+        async startGame() {
+            const loading = this.$loading({ lock: true, text: '正在獲取 50 道挑戰題目...', background: 'rgba(0, 0, 0, 0.7)' });
+            try {
+                const island = this.gameLevel === 'primary' ? '300字島' : '1200字島';
+
+                const response = await api.post('/questionbank/generate/', {
+                    "島嶼": island,
+                    "題數": 50,
+                    "題型": "英翻中",
+                    "include_answer": true
+                });
+
+                this.questionsList = response.data;
+                this.dialogVisible = false;
+                this.isGameActive = true;
+                this.$nextTick(() => this.playAudio(this.currentQuestionText));
+            } catch (err) {
+                this.$message.error('獲取題目失敗');
                 this.goBack();
-                return;
+            } finally {
+                loading.close();
             }
-            if (this.questionCount === 1 && !this.selectedAnswer) {
-                this.goBack();
-                return;
+        },
+        handleOptionClick(option) {
+            this.tempSelectedAnswer = option.id;
+        },
+        async handleQuestionSubmit() {
+            if (!this.tempSelectedAnswer) return;
+
+            const loading = this.$loading({ lock: true, text: '校對中...', background: 'rgba(0, 0, 0, 0.3)' });
+
+            try {
+                // 即時將「當前這一題」送去校對
+                const currentAnswer = {
+                    question_id: this.currentQuestion.id,
+                    option_id: this.tempSelectedAnswer
+                };
+
+                const checkRes = await api.post('/questionbank/check/', {
+                    answers: [currentAnswer], // 只送一題
+                    island: this.gameLevel === 'primary' ? '300字島' : '1200字島',
+                    unit: "競技場挑戰",
+                    stage: "完美連擊"
+                });
+
+                const result = checkRes.data.results[0]; // 取得這一題的結果
+
+                if (result.is_correct) {
+                    // 答對了：存入總答案清單，增加計數，繼續下一題
+                    this.userAnswers.push(currentAnswer);
+                    this.correctCount++;
+
+                    if (this.questionCount < 50) {
+                        this.questionCount++;
+                        this.tempSelectedAnswer = null;
+                        loading.close();
+                        this.$nextTick(() => this.playAudio(this.currentQuestionText));
+                    } else {
+                        // 滿分 50 題達成
+                        loading.close();
+                        await this.processFinalSubmit();
+                    }
+                } else {
+                    // 答錯了：連擊中斷，立即補齊剩餘題目並結束
+                    loading.close();
+                    this.userAnswers.push(currentAnswer); // 加入這一題錯題
+                    await this.confirmExit(); // 呼叫補齊並結算的邏輯
+                }
+
+            } catch (err) {
+                loading.close();
+                this.$message.error('校對失敗，請檢查網路');
             }
-            this.exitDialogVisible = true;
         },
 
-        playAudio() {
-            if (this.gameType !== 'listening') return;
+        async processFinalSubmit() {
+            const loading = this.$loading({ lock: true, text: '結算總分...', background: 'rgba(0, 0, 0, 0.7)' });
+            try {
+                // 計算總分 (每題 10 分)
+                this.finalScore = this.correctCount * 10;
 
-            console.log('播放音檔: ' + this.currentQuestion.title);
-            // 語音合成測試
-            const utterance = new SpeechSynthesisUtterance(this.currentQuestion.title);
+                await api.post('/students/competition-score/', {
+                    score: this.finalScore
+                });
+
+                //  鎖定今日挑戰機會
+                localStorage.setItem('dailyChallengeCompletionDate', new Date().toDateString());
+
+                this.isGameActive = false;
+                this.isFinished = true;
+            } catch (err) {
+                this.$message.error('積分上傳失敗');
+            } finally {
+                loading.close();
+            }
+        },
+
+        async confirmExit() {
+            this.exitDialogVisible = false;
+
+            // 找出剩下還沒做到的題目，全部塞 null
+            const answeredCount = this.userAnswers.length; // 包含剛才做錯的那題
+            if (answeredCount < 50) {
+                for (let i = answeredCount; i < 50; i++) {
+                    this.userAnswers.push({
+                        question_id: this.questionsList[i].id,
+                        option_id: null
+                    });
+                }
+
+                await api.post('/questionbank/check/', {
+                    answers: this.userAnswers,
+                    island: this.gameLevel === 'primary' ? '300字島' : '1200字島',
+                    unit: "競技場挑戰",
+                    stage: "完美連擊"
+                });
+            }
+
+            this.isExitConfirmed = true; // 觸發結束畫面
+            await this.processFinalSubmit();
+        },
+        playAudio(text) {
+            if (!text) return;
+            const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'en-US';
+            utterance.rate = 0.3;
             window.speechSynthesis.cancel();
             window.speechSynthesis.speak(utterance);
         },
-
-        startGame() {
-            this.dialogVisible = false;
-            this.isGameActive = true;
-            this.isFinished = false;
-            this.isExitConfirmed = false;
-            this.currentScore = 0;
-            this.currentCombo = 0;
-            this.questionCount = 0;
-            this.loadQuestion();
-        },
-
-        loadQuestion() {
-            if (this.questionCount >= this.maxQuestions) {
-                this.endGame();
-                return;
-            }
-            this.questionCount++;
-            this.selectedAnswer = null;
-
-            // 根據類型產生模擬題目
-            if (this.gameType === 'reading') {
-                // --- 閱讀模式 (題英文 -> 選中文) ---
-                this.currentQuestion = {
-                    title: 'Banana', // 顯示的大字
-                    correctValue: 'banana',
-                    options: [
-                        { value: 'banana', label: '香蕉' },
-                        { value: 'apple', label: '蘋果' },
-                        { value: 'cat', label: '貓咪' },
-                        { value: 'dog', label: '狗狗' },
-                    ]
-                };
+        handleBackClick() {
+            if (this.userAnswers.length === 0) {
+                this.goBack();
             } else {
-                // --- 聽力模式 (題音檔 -> 選英文) ---
-                this.currentQuestion = {
-                    title: 'apple', // 唸出來的字
-                    correctValue: 'apple',
-                    options: [
-                        { value: 'apple', label: 'Apple' },
-                        { value: 'ten', label: 'Ten' },
-                        { value: 'pen', label: 'Pen' },
-                        { value: 'puppy', label: 'Puppy' },
-                    ]
-                };
-
-                // 聽力題自動播放
-                this.$nextTick(() => {
-                    this.playAudio();
-                });
+                this.exitDialogVisible = true;
             }
         },
-
-        selectAnswerAndSubmit(value) {
-            this.selectedAnswer = value;
-            this.submitAnswer();
-        },
-
-        submitAnswer() {
-            if (this.selectedAnswer === this.currentQuestion.correctValue) {
-                this.currentScore++;
-                this.currentCombo++;
-                console.log('回答正確！');
-            } else {
-                console.log('回答錯誤！連擊繼續。');
-            }
-
-            // 稍微延遲讓用戶看到點擊效果
-            setTimeout(() => {
-                this.selectedAnswer = null;
-                this.loadQuestion();
-            }, 300);
-        },
-
-        endGame() {
-            this.isGameActive = false;
-            this.finalScore = this.currentScore * 100;
-
-            const today = new Date().toDateString();
-            localStorage.setItem('dailyChallengeCompletionDate', today);
-
-            this.isFinished = true;
-            if (this.questionCount < this.maxQuestions) {
-                this.isExitConfirmed = true; // 如果沒答完就是中途退出
-            } else {
-                this.isExitConfirmed = false;
-            }
-            console.log(`遊戲結束！總分: ${this.finalScore}`);
-        },
-
-        confirmExit() {
-            this.exitDialogVisible = false;
-            this.isGameActive = false;
-            this.isExitConfirmed = true;
-            this.endGame();
-        },
-
-        resumeGame() {
-            this.exitDialogVisible = false;
-        }
+        goBack() { this.$router.push('/competition'); },
+        handleGameStartClose() { this.goBack(); }
     }
 };
 </script>
@@ -319,24 +320,21 @@ export default {
     }
 }
 
+.submit-btn {
+    padding: 20px 0;
+    @include qa-submit-continue-btn;
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+}
 
 
 .question-content {
-    text-align: center;
-    width: 100%;
-    padding: 20px 0;
+    @include main-card-content;
+    margin-top: 4%;
 
-    .audio-trigger {
+    .audio-trigger i {
         font-size: 10rem;
-        margin-bottom: 30px;
-        color: $main-quiz-blue;
-    }
-
-
-    .question-word-title {
-        color: $main-quiz-blue;
-        font-size: 9rem;
-        margin-bottom: 24px;
+        margin-bottom: 16px;
     }
 }
 
@@ -349,34 +347,7 @@ export default {
 
 .options-grid {
     @include option-grid;
-    width: 90%;
-    margin: 0 auto 30px;
-
-    .option-btn {
-        background-color: #F5FFFF;
-        border: 2px solid #C7D3D1;
-        color: $main-quiz-blue;
-        padding: 15px 10px;
-        border-radius: 15px;
-        font-size: 24px;
-        box-shadow: 0px 4px 4px 0px #00000040;
-
-        &.is-selected {
-            background-color: #26C9B9;
-            border-color: #26C9B9;
-            color: white;
-        }
-    }
-}
-
-.submit-btn {
-    width: calc(100% + 80px);
-    margin: 0 -40px;
-    padding: 20px 0;
-    background-color: #FAE162;
-    border-top: none;
-    font-size: 24px;
-    font-weight: bold;
+    margin-top: 8%;
 }
 
 
