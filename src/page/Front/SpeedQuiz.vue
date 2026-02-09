@@ -44,7 +44,7 @@
                     <img :src="wonderfulAvatarPath" alt="太棒了!" class="result-avatar">
                     <h2 class="result-title">{{ isExitConfirmed ? '挑戰中止' : '挑戰完成!' }}</h2>
                     <p class="result-score">你獲得了 {{ finalScore }} 積分</p>
-                    <p style="color: #666; margin-top: 10px;">總計答對 {{ correctCount }} 題</p>
+                    <p class="correct-quiz-count">總計答對 {{ correctCount }} 題</p>
                 </div>
                 <button class="result-back-btn" @click="goBack">返回</button>
             </template>
@@ -196,7 +196,7 @@ export default {
             if (!text) return;
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'en-US';
-            utterance.rate = 0.3;
+            utterance.rate = 0.4;
             window.speechSynthesis.cancel();
             window.speechSynthesis.speak(utterance);
         },

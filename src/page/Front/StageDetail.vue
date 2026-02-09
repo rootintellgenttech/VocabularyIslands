@@ -10,7 +10,7 @@
                 <img :src="avatarPath" alt="Avatar" class="avatar-img">
                 <div class="header-info">
                     <h2 class="lesson-title">{{ lessonData.name }}</h2>
-                   <p v-html="formattedDescription" class="lesson-description"></p>
+                    <p v-html="formattedDescription" class="lesson-description"></p>
                 </div>
             </div>
             <vue-custom-scrollbar class="level-scroll-container" :settings="scrollSettings">
@@ -67,10 +67,10 @@ export default {
         };
     },
     computed: {
-  formattedDescription() {
-    return this.lessonData.description ? this.lessonData.description.replace(/\n/g, '<br>') : '';
-  }
-},
+        formattedDescription() {
+            return this.lessonData.description ? this.lessonData.description.replace(/\n/g, '<br>') : '';
+        }
+    },
     watch: {
         unitId: { immediate: true, handler() { this.loadData(); } },
         level: { immediate: true, handler() { this.loadData(); } }
@@ -87,9 +87,8 @@ export default {
                         name: '小英雄大本營',
                         description: '和沃特老師一起完成關卡，獲得星星吧！<br>共 20 題 | 限時 5 分鐘，每一題 15 秒作答',
                         options: [
-                            // type: 'hero-quiz' -> 會導向 HeroQuizPage (有圖片分欄的介面)
-                            { type: 'hero-quiz', id: '01', label: '啟蒙小木屋', stars: 3, isReview: false },
-                            { type: 'hero-quiz', id: '02', label: '魔法夢幻島', stars: 2, isReview: false },
+                            { type: 'hero-quiz', id: '01', label: '啟蒙小木屋', stars: 0, isReview: false },
+                            { type: 'hero-quiz', id: '02', label: '魔法夢幻島', stars: 0, isReview: false },
                             { type: 'hero-quiz', id: '03', label: '圖書館島', stars: 0, isReview: false },
                             { type: 'hero-quiz', id: '04', label: '大城市島', stars: 0, isReview: false },
                             { type: 'hero-quiz', id: '05', label: '許願星星島', stars: 0, isReview: false },
@@ -99,10 +98,9 @@ export default {
                     'listen': {
                         name: '國小聽力海灣',
                         description: '和沃特老師一起完成關卡，獲得星星吧！<br>共 20 題 | 限時 5 分鐘，每一題 15 秒作答',
-                         options: [
-                            // type: 'listening' -> 會導向 QuizPage (有喇叭按鈕的介面)
-                            { type: 'listening', id: '01', label: '啟蒙小木屋', stars: 2, isReview: false },
-                            { type: 'listening', id: '02', label: '魔法夢幻島', stars: 2, isReview: false },
+                        options: [
+                            { type: 'listening', id: '01', label: '啟蒙小木屋', stars: 0, isReview: false },
+                            { type: 'listening', id: '02', label: '魔法夢幻島', stars: 0, isReview: false },
                             { type: 'listening', id: '03', label: '圖書館島', stars: 0, isReview: false },
                             { type: 'listening', id: '04', label: '大城市島', stars: 0, isReview: false },
                             { type: 'listening', id: '05', label: '許願星星島', stars: 0, isReview: false },
@@ -117,7 +115,7 @@ export default {
                         name: '會考大殿堂',
                         description: '和沃特老師一起戰鬥依序完成關卡，挑戰會考題型！',
                         options: [
-                            { type: 'hero-quiz', id: 'ms-h-01', label: '霧靄之境', stars: 5, isReview: false },
+                            { type: 'hero-quiz', id: 'ms-h-01', label: '霧靄之境', stars: 0, isReview: false },
                             { type: 'hero-quiz', id: 'ms-h-02', label: '漂流群島', stars: 0, isReview: false },
                             { type: 'hero-quiz', id: 'ms-h-03', label: '熔岩盆地', stars: 0, isReview: false },
                             { type: 'hero-quiz', id: 'ms-h-04', label: '迴旋之塔', stars: 0, isReview: false },
@@ -135,17 +133,17 @@ export default {
                     'listen': {
                         name: '國中聽力海灣', description: '和沃特老師一起依序完成關卡，提升聽力能力!',
                         options: [
-                            { type: 'listening', id: 'ms-l-01', label: '霧靄之境', stars: 3, isReview: false },
-                            { type: 'listening', id: 'ms-l-02', label: '漂流群島', stars: 4, isReview: false },
-                            { type: 'listening', id: 'ms-l-03', label: '熔岩盆地', stars: 4, isReview: false },
+                            { type: 'listening', id: 'ms-l-01', label: '霧靄之境', stars: 0, isReview: false },
+                            { type: 'listening', id: 'ms-l-02', label: '漂流群島', stars: 0, isReview: false },
+                            { type: 'listening', id: 'ms-l-03', label: '熔岩盆地', stars: 0, isReview: false },
                             { type: 'listening', id: 'ms-l-04', label: '迴旋之塔', stars: 0, isReview: false },
-                            { type: 'listening', id: 'ms-l-05', label: '鏡像平原', stars: 3, isReview: true },
+                            { type: 'listening', id: 'ms-l-05', label: '鏡像平原', stars: 0, isReview: true },
                             { type: 'listening', id: 'ms-l-06', label: '800字複習', stars: 0, isReview: true },
                             { type: 'listening', id: 'ms-l-07', label: '永恆圖書館', stars: 0, isReview: false },
                             { type: 'listening', id: 'ms-l-08', label: '奇異峽谷', stars: 0, isReview: false },
                             { type: 'listening', id: 'ms-l-09', label: '靜默領域', stars: 0, isReview: true },
                             { type: 'listening', id: 'ms-l-10', label: '黎光秘境島', stars: 0, isReview: false },
-                            { type: 'listening', id: 'ms-l-11', label: '1200單字複習', stars: 0, isReview: true },
+                            { type: 'listening', id: 'ms-l-11', label: '1200字複習', stars: 0, isReview: true },
                         ]
                     },
                 }
@@ -191,45 +189,45 @@ export default {
                 });
             }
         },
-async fetchUserStars() {
-    try {
-        const res = await api.get('/students/test-summary/');
-        
-        // 【關鍵】嚴格比對島嶼名稱。
-        // 例如：你在「會考大殿堂」，this.lessonData.name 就是「會考大殿堂」。
-        // API 必須剛好有名稱為「會考大殿堂」的 island_name 才會進入。
-        const islandData = res.data.islands.find(i => i.island_name === this.lessonData.name);
+        async fetchUserStars() {
+            try {
+                const res = await api.get('/students/test-summary/');
 
-        if (islandData && islandData.units) {
-            this.lessonData.options = this.lessonData.options.map(opt => {
-                // 在會考/聽力模式中，API 的 unit_name 對應我們前端的 opt.label (例如：霧靄之境)
-                const matchedUnit = islandData.units.find(u => u.unit_name === opt.label);
-                
-                return {
-                    ...opt,
-                    // 只拿該島嶼下的該單元星星，不會抓到 800字島的
-                    stars: matchedUnit ? matchedUnit.total_stars : 0 
-                };
-            });
+                // 嚴格比對島嶼名稱。
+                // 例如：在「會考大殿堂」，this.lessonData.name 就是「會考大殿堂」。
+                // API 必須剛好有名稱為「會考大殿堂」的 island_name 才會進入。
+                const islandData = res.data.islands.find(i => i.island_name === this.lessonData.name);
+
+                if (islandData && islandData.units) {
+                    this.lessonData.options = this.lessonData.options.map(opt => {
+                        // 在會考/聽力模式中，API 的 unit_name 對應前端的 opt.label (例如：霧靄之境)
+                        const matchedUnit = islandData.units.find(u => u.unit_name === opt.label);
+
+                        return {
+                            ...opt,
+                            // 只拿該島嶼下的該單元星星，不會抓到 800字島的
+                            stars: matchedUnit ? matchedUnit.total_stars : 0
+                        };
+                    });
+                }
+                console.log(`[${this.lessonData.name}] 星星更新成功`);
+            } catch (err) {
+                console.error('StageDetail 星星獲取失敗:', err);
+            }
         }
-        console.log(`[${this.lessonData.name}] 星星更新成功`);
-    } catch (err) {
-        console.error('StageDetail 星星獲取失敗:', err);
-    }
-}
-},
-watch: {
-    unitId: {
-        immediate: true,
-        handler() {
-            this.loadData();
-            // 使用 nextTick 確保 DOM 和數據初始化後再呼叫 API
-            this.$nextTick(() => { 
-                this.fetchUserStars(); 
-            });
+    },
+    watch: {
+        unitId: {
+            immediate: true,
+            handler() {
+                this.loadData();
+                // 使用 nextTick 確保 DOM 和數據初始化後再呼叫 API
+                this.$nextTick(() => {
+                    this.fetchUserStars();
+                });
+            }
         }
     }
-}
 
 };
 </script>

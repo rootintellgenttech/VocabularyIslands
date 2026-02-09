@@ -2,8 +2,8 @@
     <div class="dashboard-container">
         <h2 class="page-title">儀錶板</h2>
 
-        <!-- <el-row :gutter="20" class="stat-cards-row">
-            <el-col :xs="12" :sm="12" :md="6" v-for="(item, index) in statsData" :key="index">
+        <el-row :gutter="20" class="stat-cards-row">
+            <el-col :span="12" v-for="(item, index) in statsData" :key="index">
                 <div class="stat-card">
                     <div class="stat-label">{{ item.label }}</div>
                     <div class="stat-value">{{ item.value }}</div>
@@ -13,32 +13,33 @@
                     </div>
                 </div>
             </el-col>
-        </el-row> -->
+        </el-row>
 
         <div class="dashboard-section">
             <div class="section-header">
                 <div class="header-title">
                     <i class="fas fa-chart-line"></i> 學習成效比較
                 </div>
-                     <div class="header-actions">
-         <button class="action-btn export-btn" @click="exportFullTable('export-learn')">
-        <i class="fas fa-download"></i> 匯出報表
-    </button>
-        </div>
+                <div class="header-actions">
+                    <button class="action-btn" @click="exportFullTable('export-learn')">
+                        <i class="fas fa-download"></i> 匯出報表
+                    </button>
+                </div>
             </div>
             <div id="export-learn">
-            <el-table  height="300" :data="learningData" style="width: 100%" class="custom-table">
-                <el-table-column prop="alliance" label="聯盟名稱" :filters="allianceFilters" :filter-method="filterHandler" min-width="150"></el-table-column>
-                <el-table-column prop="schoolCount" label="學校名稱" align="center"></el-table-column>
-                <el-table-column prop="studentCount" label="學生總數" align="center"></el-table-column>
-                <el-table-column label="登入率" align="center">
-                    <template slot-scope="scope">
-                        <span class="status-pill green">{{ scope.row.loginRate }}</span>
-                    </template>
-                </el-table-column>
-                <!-- <el-table-column prop="completionRate" label="練習完成率" align="center"></el-table-column> -->
-            </el-table>
-        </div>
+                <el-table height="300" :data="learningData" style="width: 100%" class="custom-table">
+                    <el-table-column prop="alliance" label="聯盟名稱" :filters="allianceFilters"
+                        :filter-method="filterHandler" min-width="150"></el-table-column>
+                    <el-table-column prop="schoolCount" label="已有注冊學校 / 應有注冊學校" align="center"></el-table-column>
+                    <el-table-column prop="studentCount" label="學生總數" align="center"></el-table-column>
+                    <el-table-column label="當天簽到率" align="center">
+                        <template slot-scope="scope">
+                            <span class="status-pill green">{{ scope.row.loginRate }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="completionRate" label="平均達成率" align="center"></el-table-column>
+                </el-table>
+            </div>
         </div>
 
         <div class="dashboard-section">
@@ -46,20 +47,20 @@
                 <div class="header-title">
                     <i class="fas fa-chart-bar"></i> 試煉殿堂考試概況
                 </div>
-                      <div class="header-actions">
-         <button class="action-btn export-btn" @click="exportFullTable('export-status')">
-        <i class="fas fa-download"></i> 匯出報表
-    </button>
-        </div>
+                <div class="header-actions">
+                    <button class="action-btn" @click="exportFullTable('export-status')">
+                        <i class="fas fa-download"></i> 匯出報表
+                    </button>
+                </div>
             </div>
-                  <div id="export-staus">
-            <el-table  height="300" :data="examData" style="width: 100%" class="custom-table">
-                <el-table-column prop="school" label="各校" min-width="150"></el-table-column>
-                <el-table-column prop="schoolCount" label="學校名稱" align="center"></el-table-column>
-                <el-table-column prop="studentCount" label="學生總數" align="center"></el-table-column>
-                <el-table-column prop="examCompleteCount" label="考試完成人數" align="center"></el-table-column>
-            </el-table>
-        </div>
+            <div id="export-staus">
+                <el-table height="300" :data="examData" style="width: 100%" class="custom-table">
+                    <el-table-column prop="school" label="各校" min-width="150"></el-table-column>
+                    <el-table-column prop="schoolCount" label="已有注冊學校 / 應有注冊學校" align="center"></el-table-column>
+                    <el-table-column prop="studentCount" label="學生總數" align="center"></el-table-column>
+                    <el-table-column prop="examCompleteCount" label="考試完成人數" align="center"></el-table-column>
+                </el-table>
+            </div>
         </div>
 
         <div class="dashboard-section">
@@ -72,31 +73,27 @@
                 <apexchart type="line" height="350" :options="lineChartOptions" :series="lineSeries"></apexchart>
             </div>
         </div>
-<div v-if="userRole === 'teacher'" class="dashboard-section">
-    <div class="section-header">
-        <div class="header-title">
-            <i class="fas fa-chart-bar"></i> 測驗練習 (計算各單元的完成星級數去計算)
-        </div>
-        <div class="header-actions">
-            <el-select v-model="filterSubject" placeholder="主題篩選" class="custom-select teal-select small">
-                <el-option label="全部主題" value="all"></el-option>
-                <el-option label="單字島嶼" value="islands"></el-option>
-                <el-option label="聽力海灣" value="listening"></el-option>
-            </el-select>
-        </div>
-    </div>
+        <div v-if="userRole === 'teacher'" class="dashboard-section">
+            <div class="section-header">
+                <div class="header-title">
+                    <i class="fas fa-chart-bar"></i> 測驗練習 (計算各單元的完成星級數去計算)
+                </div>
+                <div class="header-actions">
+                    <el-select v-model="filterSubject" placeholder="主題篩選" class="custom-select teal-select small">
+                        <el-option label="全部主題" value="all"></el-option>
+                        <el-option label="單字島嶼" value="islands"></el-option>
+                        <el-option label="聽力海灣" value="listening"></el-option>
+                    </el-select>
+                </div>
+            </div>
 
-    <div id="export-teacher-practice" class="chart-container-white">
-        <div class="chart-wrapper">
-            <apexchart 
-                type="bar" 
-                height="350" 
-                :options="practiceBarOptions" 
-                :series="practiceBarSeries"
-            ></apexchart>
+            <div id="export-teacher-practice" class="chart-container-white">
+                <div class="chart-wrapper">
+                    <apexchart type="bar" height="350" :options="practiceBarOptions" :series="practiceBarSeries">
+                    </apexchart>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
         <div class="dashboard-section">
             <div class="section-header">
                 <div class="header-title">
@@ -117,47 +114,45 @@ export default {
     data() {
         return {
             userRole: localStorage.getItem('userRole') || 'teacher',
-        filterSubject: 'all',
-        // --- 老師專用：測驗練習堆疊圖數據 ---
-        practiceBarSeries: [
-            { name: '班級 A', data: [32, 45, 38, 25, 42, 35, 10, 5] },
-            { name: '班級 B', data: [25, 30, 20, 18, 25, 28, 0, 0] }
-        ],
-        practiceBarOptions: {
-            chart: { 
-                type: 'bar', 
-                stacked: true, 
-                toolbar: { show: true } 
-            },
-            colors: ['#2A9D8F', '#E76F51'], 
-            plotOptions: {
-                bar: {
-                    horizontal: false,
-                    columnWidth: '40%',
-                    borderRadius: 4
-                }
-            },
-            dataLabels: { enabled: false },
-            xaxis: {
-                categories: ['acb島嶼', '300字島', '小英雄大本營', '國小聽力海灣', '800字島', '1200字島', '會考大殿堂', '國中聽力海灣'],
-                labels: { rotate: -45, style: { fontSize: '12px' } }
-            },
-            yaxis: {
-                labels: {
-                    formatter: (val) => val + "%"
+            filterSubject: 'all',
+            // --- 老師專用：測驗練習堆疊圖數據 ---
+            practiceBarSeries: [
+                { name: '班級 A', data: [32, 45, 38, 25, 42, 35, 10, 5] },
+                { name: '班級 B', data: [25, 30, 20, 18, 25, 28, 0, 0] }
+            ],
+            practiceBarOptions: {
+                chart: {
+                    type: 'bar',
+                    stacked: true,
+                    toolbar: { show: true }
                 },
-                min: 0,
-                max: 100
+                colors: ['#2A9D8F', '#E76F51'],
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        columnWidth: '40%',
+                        borderRadius: 4
+                    }
+                },
+                dataLabels: { enabled: false },
+                xaxis: {
+                    categories: ['acb島嶼', '300字島', '小英雄大本營', '國小聽力海灣', '800字島', '1200字島', '會考大殿堂', '國中聽力海灣'],
+                    labels: { rotate: -45, style: { fontSize: '12px' } }
+                },
+                yaxis: {
+                    labels: {
+                        formatter: (val) => val + "%"
+                    },
+                    min: 0,
+                    max: 100
+                },
+                legend: { position: 'bottom' },
+                tooltip: { y: { formatter: (val) => val + "%" } }
             },
-            legend: { position: 'bottom' },
-            tooltip: { y: { formatter: (val) => val + "%" } }
-        },
 
-        
+
             statsData: [
-                { label: '總班級數', value: '4', percentage: '+6%', isIncrease: true },
                 { label: '學校總數', value: '28', percentage: '+2%', isIncrease: true },
-                { label: '教師總數', value: '156', percentage: '+8%', isIncrease: true },
                 { label: '學生總數', value: '3,247', percentage: '-12%', isIncrease: false },
             ],
 
@@ -186,7 +181,7 @@ export default {
             lineChartOptions: {
                 chart: { type: 'line', toolbar: { show: true } },
                 stroke: { curve: 'smooth', width: [3, 3, 2], dashArray: [0, 0, 5] },
-                colors: ['#2A9D8F', '#E76F51', '#264653'], 
+                colors: ['#2A9D8F', '#E76F51', '#264653'],
                 xaxis: { categories: ['1/1', '1/2', '1/3', '1/4', '1/5', '1/6', '1/7'] },
                 legend: { position: 'bottom' },
                 grid: { borderColor: '#f1f1f1' }
@@ -209,99 +204,92 @@ export default {
             }
         }
     },
-computed: {
-    allianceFilters() {
-      const alliances = this.learningData.map(item => item.alliance);
-      return [...new Set(alliances)].map(name => ({
-        text: name,
-        value: name
-      }));
-    }
-  },
-  
-  methods: {
-    filterHandler(value, row, column) {
-      const property = column['property'];
-      return row[property] === value;
-    },
-  async exportFullTable(containerId) {
-        const target = document.getElementById(containerId);
-        if (!target) return;
-
-        const tableEl = target.querySelector('.el-table');
-        const tableBody = target.querySelector('.el-table__body-wrapper');
-
-        const loading = this.$loading({
-            lock: true,
-            text: '正在生成完整截圖...',
-            spinner: 'el-icon-loading',
-            background: 'rgba(0, 0, 0, 0.7)'
-        });
-
-        try {
-            const originalTableHeight = tableEl.style.height;
-            const originalBodyHeight = tableBody.style.height;
-            const originalOverflow = tableBody.style.overflow;
-
-            tableEl.style.height = 'auto';
-            tableBody.style.height = 'auto';
-            tableBody.style.overflow = 'visible';
-
-            await this.$nextTick();
-
-            const canvas = await this.$html2canvas(target, {
-                backgroundColor: 'white',
-                useCORS: true,
-                scale: 2, 
-                scrollY: 0,
-                scrollX: 0,
-                x: 0,
-                y: 0,
-                height: target.scrollHeight,
-                windowHeight: target.scrollHeight
-            });
-
-            tableEl.style.height = originalTableHeight;
-            tableBody.style.height = originalBodyHeight;
-            tableBody.style.overflow = originalOverflow;
-
-            const link = document.createElement('a');
-            link.href = canvas.toDataURL('image/png');
-            link.download = `報表匯出_${new Date().getTime()}.png`;
-            link.click();
-
-        } catch (error) {
-            console.error('匯出失敗', error);
-            this.$message.error('匯出失敗，請重試');
-        } finally {
-            loading.close();
+    computed: {
+        allianceFilters() {
+            const alliances = this.learningData.map(item => item.alliance);
+            return [...new Set(alliances)].map(name => ({
+                text: name,
+                value: name
+            }));
         }
     },
-  }
+
+    methods: {
+        filterHandler(value, row, column) {
+            const property = column['property'];
+            return row[property] === value;
+        },
+        async exportFullTable(containerId) {
+            const target = document.getElementById(containerId);
+            if (!target) return;
+
+            const tableEl = target.querySelector('.el-table');
+            const tableBody = target.querySelector('.el-table__body-wrapper');
+
+            const loading = this.$loading({
+                lock: true,
+                text: '正在生成完整截圖...',
+                spinner: 'el-icon-loading',
+                background: 'rgba(0, 0, 0, 0.7)'
+            });
+
+            try {
+                const originalTableHeight = tableEl.style.height;
+                const originalBodyHeight = tableBody.style.height;
+                const originalOverflow = tableBody.style.overflow;
+
+                tableEl.style.height = 'auto';
+                tableBody.style.height = 'auto';
+                tableBody.style.overflow = 'visible';
+
+                await this.$nextTick();
+
+                const canvas = await this.$html2canvas(target, {
+                    backgroundColor: 'white',
+                    useCORS: true,
+                    scale: 2,
+                    scrollY: 0,
+                    scrollX: 0,
+                    x: 0,
+                    y: 0,
+                    height: target.scrollHeight,
+                    windowHeight: target.scrollHeight
+                });
+
+                tableEl.style.height = originalTableHeight;
+                tableBody.style.height = originalBodyHeight;
+                tableBody.style.overflow = originalOverflow;
+
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png');
+                link.download = `報表匯出_${new Date().getTime()}.png`;
+                link.click();
+
+            } catch (error) {
+                console.error('匯出失敗', error);
+                this.$message.error('匯出失敗，請重試');
+            } finally {
+                loading.close();
+            }
+        },
+    }
 };
 </script>
 
 <style lang="scss" scoped>
-$card-bg: #FFFFFF;
-$primary-green: #2A9D8F;
-$trend-green: #2ECC71;
-$trend-red: #E74C3C;
-
 .dashboard-container {
     padding: 24px;
     background-color: #F5F7FA;
     min-height: 100vh;
     margin-left: 90px;
-    transition: margin-left 0.3s ease;
-
+    text-align: left;
 }
 
 .page-title {
-    font-size: 24px;
+    font-size: 32px;
     font-weight: bold;
-    color: $primary-green;
-    margin-bottom: 24px;
-    text-align: left;
+    color: $main-back-blue-text;
+    margin-bottom: 30px;
 }
 
 .stat-cards-row {
@@ -309,16 +297,15 @@ $trend-red: #E74C3C;
 }
 
 .stat-card {
-    background: $card-bg;
+    background: #FFFFFF;
     border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    @include main-box-shadow;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     height: 120px;
-    position: relative;
-    transition: transform 0.2s;
+    transition: transform 0.2s ease;
 
     &:hover {
         transform: translateY(-2px);
@@ -328,43 +315,39 @@ $trend-red: #E74C3C;
         font-size: 16px;
         color: $main-grey-text;
         font-weight: 500;
-        text-align: left;
     }
 
     .stat-value {
         font-size: 32px;
         font-weight: bold;
         color: $main-black-text;
-      margin-bottom: 8px;
-        text-align: left;
+        margin-bottom: 4px;
     }
+
 
     .stat-trend {
         font-size: 16px;
         font-weight: 600;
         margin-top: auto;
-        text-align: left;
+        @include flex-center;
+        gap: 2px;
 
         &.trend-up {
-            color: $trend-green;
+            color: #2ECC71;
         }
 
         &.trend-down {
-            color: $trend-red;
-        }
-
-        i {
-            margin-right: 2px;
+            color: #E74C3C;
         }
     }
 }
 
 .dashboard-section {
-    background: $card-bg;
+    background: #FFFFFF;
     border-radius: 12px;
     padding: 24px;
     margin-bottom: 24px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    @include main-box-shadow;
 
     .section-header {
         @include flex-center;
@@ -374,15 +357,14 @@ $trend-red: #E74C3C;
         .header-title {
             font-size: 18px;
             font-weight: bold;
-            color: #333;
-               display: flex;
-      align-items: baseline;
+            color: $main-black-text;
+            @include flex-center;
             gap: 10px;
 
             i {
-                font-size: 16px;
                 color: #999;
             }
+
         }
 
         .header-actions {
@@ -393,37 +375,21 @@ $trend-red: #E74C3C;
 }
 
 .action-btn {
-    border: none;
-    border-radius: 6px;
-    padding: 8px 16px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: opacity 0.2s;
-    font-weight: 500;
-    @include flex-center;
-    gap: 6px;
-
-    &.export-btn {
-        background-color: $primary-green;
-        color: white;
-
-        &:hover {
-            opacity: 0.9;
-        }
-    }
-
+@include back-system-action-btn
 }
 
 .custom-table {
-    ::v-deep th {
-        background-color: transparent !important;
-        border-bottom: 1px solid #EBEEF5;
-        font-weight: bold;
-        color: #333;
-    }
+    ::v-deep {
+        th {
+            background-color: transparent !important;
+            border-bottom: 1px solid #EBEEF5;
+            font-weight: bold;
+            color: $main-black-text;
+        }
 
-    ::v-deep td {
-        padding: 12px 0;
+        td {
+            padding: 12px 0;
+        }
     }
 }
 
@@ -434,36 +400,34 @@ $trend-red: #E74C3C;
     font-weight: bold;
 
     &.green {
-        background-color: rgba($primary-green, 0.1);
-        color: $primary-green;
+        background-color: rgba(42, 157, 143, 0.1);
+        color: $main-green;
     }
 }
 
 .teal-select.small {
     width: 150px;
-    margin-right: 10px;
+
     ::v-deep .el-input__inner {
-        background-color: $primary-green;
+        background-color: $main-green;
         color: white;
         border: none;
+        border-radius: 8px;
     }
+
     ::v-deep .el-input__icon {
         color: white;
     }
 }
 
 @media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
-
     .dashboard-container {
         margin-left: 0;
-        padding: 16px;
     }
 
     .stat-card {
         height: auto;
         margin-bottom: 12px;
     }
-
-
 }
 </style>

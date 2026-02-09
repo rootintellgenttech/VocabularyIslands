@@ -1,5 +1,6 @@
 <template>
     <div ref="sidebarRef" :class="['sidebar', { 'is-expanded': isMenuExpanded, 'teacher-sidebar': !isStudent }]">
+     <div class="top-section">
         <div class="sidebar-header">
             <div v-if="isMenuExpanded" class="user-info">
                 <div class="user-row">
@@ -11,8 +12,9 @@
                     </template>
 
                     <div class="toggle-btn" @click="toggleMenu">
-    <i :class="['fas', isMenuExpanded ? 'fa-angle-double-left' : 'fa-angle-double-right']" @click.stop="toggleMenu"></i>
-</div>
+                        <i :class="['fas', isMenuExpanded ? 'fa-angle-double-left' : 'fa-angle-double-right']"
+                            @click.stop="toggleMenu"></i>
+                    </div>
                 </div>
 
                 <template v-if="isStudent">
@@ -71,7 +73,51 @@
                 </div>
             </div>
         </div>
+     </div>
+        
+
         <div class="bottom-menu">
+            <div class="menu-item" @click="contactDialogVisible = true">
+                <i class="fa-solid fa-envelope"></i>
+                <span v-if="isMenuExpanded">聯絡我們</span>
+            </div>
+
+            <el-dialog :visible.sync="contactDialogVisible" width="600px" center custom-class="mails-modal"
+                append-to-body>
+                <h3 class="title">聯絡我們</h3>
+
+                <div class="mail-info">
+                    <div class="mail-label">
+                        <i class="fa-solid fa-envelope"></i>
+                        聯絡信箱
+                    </div>
+                    <div class="mail-content">
+                        <i class="fa-solid fa-copy copy-icon" @click="copyEmail" title="複製信箱"></i>
+                        <a href="mailto:rootintellgenttech@gmail.com?subject=【系統聯絡】使用者來信" class="contact-email">
+                            rootintellgenttech@gmail.com
+                        </a>
+                    </div>
+                </div>
+
+
+                <div class="reply-info">
+                    <div class="reply-label">
+                        <i class="fa-solid fa-clock"></i>
+                        回覆時間
+                    </div>
+                    <div class="reply-time">
+                        週一至週五 08:00～17:00<br />
+                        <span class='work-time-note'>非上班時間將於下一個工作日回覆</span>
+                    </div>
+                </div>
+
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="contactDialogVisible = false">
+                        關閉
+                    </el-button>
+                </span>
+            </el-dialog>
+
 
             <template v-if="isStudent">
                 <div class="menu-item" @click="settingsDialogVisible = true">
@@ -183,6 +229,7 @@ export default {
             ],
             achievementLogs: [],
             settingsDialogVisible: false,
+            contactDialogVisible: false,
         };
     },
 
@@ -192,10 +239,15 @@ export default {
                 if (to.path === '/achievement-island') {
                     this.isMenuExpanded = false;
                 }
-                //如果音樂開關是開啟的，切換頁面時重新判斷音軌
-                if (this.isMusicEnabled) {
-                    this.playAppropriateMusic(to.path);
+
+                // 無論音樂是否開啟，如果進入作答區，先確保音樂停止
+                if (!this.isMusicEnabled) {
+                    this.stopAllMusic();
+                    return;
                 }
+
+                // 執行音樂判定邏輯
+                this.playAppropriateMusic(to.path);
             },
             immediate: true
         },
@@ -241,6 +293,33 @@ export default {
         document.removeEventListener('click', this.handleOutsideClick);
     },
     methods: {
+
+        copyEmail() {
+            const email = 'rootintellgenttech@gmail.com';
+
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(email).then(() => {
+                    this.$message.success('信箱已複製');
+                }).catch(() => {
+                    this.fallbackCopy(email);
+                });
+            } else {
+                this.fallbackCopy(email);
+            }
+        },
+
+        fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+
+            this.$message.success('信箱已複製');
+        },
         handleOutsideClick(event) {
             const sidebar = this.$refs.sidebarRef;
 
@@ -265,18 +344,34 @@ export default {
             if (!this.isStudent || !this.isMusicEnabled) return;
 
             this.$nextTick(() => {
+                // 1. 定義「完全靜音」的路由名單 (包含所有作答、學習、考試、遊戲內部)
+                const silentPaths = [
+                    '/learn',        // 學習模式
+                    '/quiz',         // 練習測驗/聽力
+                    '/hero-quiz',    // 英雄試煉作答
+                    '/trial-quiz',   // 試煉殿堂正式考試
+                    '/competition/', // 競技島遊戲內部 (假設路徑如 /competition/math-game)
+                ];
+
+                // 檢查當前路徑是否包含在靜音名單中
+                const isSilentMode = silentPaths.some(p => path.includes(p));
+
+                if (isSilentMode) {
+                    console.log('[BGM] 進入作答或遊戲區域，暫停背景音樂');
+                    this.stopAllMusic();
+                    return; // 直接中斷，不執行後續播放邏輯
+                }
+
+                // 2. 正常播放邏輯
                 const isCompetitionIsland = path === '/competition';
-                // 決定新頁面應該播放哪一首
                 const targetAudio = isCompetitionIsland ? this.$refs.fightAudio : this.$refs.mainAudio;
                 const otherAudio = isCompetitionIsland ? this.$refs.mainAudio : this.$refs.fightAudio;
 
                 if (targetAudio) {
-                    // 如果目標音樂已經在播放中，就不更改
-                    if (!targetAudio.paused) {
-                        return;
-                    }
+                    // 如果目標音樂已經在播放中，且音軌正確，就不重複執行
+                    if (!targetAudio.paused) return;
 
-                    // 只有在需要更換音軌時，才停止另一首並播放這首
+                    // 切換音軌時，停止另一首
                     if (otherAudio) {
                         otherAudio.pause();
                         otherAudio.currentTime = 0;
@@ -285,6 +380,7 @@ export default {
                     const playPromise = targetAudio.play();
                     if (playPromise !== undefined) {
                         playPromise.catch(() => {
+                            // 處理瀏覽器自動播放限制
                             const startPlay = () => {
                                 targetAudio.play();
                                 document.removeEventListener('click', startPlay);
@@ -382,22 +478,39 @@ export default {
 
 <style lang="scss" scoped>
 .el-dialog {
-    .setting-item {
+
+    .setting-item,
+    .mail-info,
+    .reply-info {
         display: flex;
         justify-content: space-between;
         margin-top: 16px;
+        font-size: 16px;
+    }
+.copy-icon{
+    cursor: pointer;
+}
+    a {
+        text-decoration: none;
+        color: $main-dark-blue;
+        font-weight: 600;
+    }
 
-        .setting-label {
-            font-size: 16px;
+    .reply-time {
+        text-align: right;
+
+        .work-time-note {
+            font-weight: 600;
         }
     }
 }
 
 .sidebar {
+    justify-content: space-between;
     background-color: transparent;
     width: 90px;
     color: $main-black-text;
-    padding: 10px 0;
+   padding-top: 16px;
     transition: width 0.3s ease-in-out, background-color 0.3s ease;
     display: flex;
     flex-direction: column;
@@ -411,8 +524,6 @@ export default {
 
     .sidebar-header {
         display: flex;
-        padding: 5px 16px;
-
         .user-info {
             width: 100%;
 
@@ -425,26 +536,40 @@ export default {
         }
     }
 
-    .achievement-badges {
-        @include flex-center;
-        gap: 10px;
-        margin-top: 10px;
+    .achievement-section {
+        padding: 24px 16px 16px;
 
-        .badge-item {
-            width: 100%;
-            height: 80px;
-            background: linear-gradient(135deg, rgba(245, 108, 66, 0.2) 0%, rgba(22, 162, 73, 0.2) 100%);
-            border: 1px solid #F56C424D;
-            border-radius: 24px;
-            @include flex-center;
-            justify-content: center;
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: $main-black-text;
+            white-space: nowrap;
+        }
 
-            i {
-                font-size: 16px;
-                margin-bottom: 0;
+        .achievement-badges {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(1, 1fr);
+            grid-column-gap: 12px;
+            margin-top: 10px;
+
+            .badge-item {
+                width: 100%;
+                height: 80px;
+                background: linear-gradient(135deg, rgba(245, 108, 66, 0.2) 0%, rgba(22, 162, 73, 0.2) 100%);
+                border: 1px solid #F56C424D;
+                border-radius: 24px;
+                @include flex-center;
+                justify-content: center;
+
+                i {
+                    font-size: 16px;
+                    margin-bottom: 0;
+                }
             }
         }
     }
+
 
     .toggle-btn {
         width: 30px;
@@ -457,21 +582,19 @@ export default {
         transition: transform 0.3s ease, background-color 0.2s;
         margin-right: 5px;
         cursor: pointer;
+
         i {
-        pointer-events: none;
-    }
+            pointer-events: none;
+        }
     }
 
     .user-info {
         white-space: nowrap;
         overflow: hidden;
-        width: 100%;
-
         .second-row {
             @include flex-center;
             justify-content: space-between;
             margin-top: 8px;
-
         }
 
         .user-name {
@@ -482,10 +605,9 @@ export default {
     }
 
     .menu-section {
-        padding: 10px 0;
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 16px;
     }
 
     .stat-item {
@@ -534,39 +656,11 @@ export default {
         }
     }
 
-    .achievement-section {
-        padding: 24px 16px 16px;
-
-        .section-title {
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: $main-black-text;
-            white-space: nowrap;
-        }
-
-        .achievement-badges {
-            display: flex;
-            gap: 10px;
-
-            .badge-item {
-                font-size: 24px;
-                cursor: pointer;
-                transition: transform 0.2s;
-
-                &:hover {
-                    transform: scale(1.1);
-                }
-            }
-        }
-    }
-
     .bottom-menu {
-        margin-top: auto;
-        padding: 16px 0;
-
+        padding-bottom: 38px;
         .menu-item {
             @include flex-center;
-            padding: 10px 16px;
+            padding:0 16px;
             cursor: pointer;
             transition: background-color 0.2s, color 0.2s;
             color: $main-black-text;
@@ -593,6 +687,10 @@ export default {
         width: 300px;
         background-color: #F0FAFFBF;
         box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1);
+
+        .user-info{
+            padding: 0 16px;
+        }
 
         .toggle-btn i {
             font-size: 18px;
@@ -643,8 +741,7 @@ export default {
 
         .sidebar-header {
             justify-content: center;
-            padding: 10px 0;
-            margin-bottom: 10px;
+            margin-bottom: 16px;
         }
 
         .toggle-btn {
@@ -669,7 +766,7 @@ export default {
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            margin: 5px auto;
+            margin: 0 auto;
 
             .stat-icon {
                 margin-right: 0;
@@ -701,9 +798,7 @@ export default {
             border-top: none;
             @include flex-center;
             flex-direction: column;
-            gap: 10px;
-            padding-bottom: 20px;
-
+            gap: 16px;
             .menu-item {
                 background-color: #F0FAFFBF;
                 border: #DAE2E7 2px solid;
@@ -743,9 +838,9 @@ export default {
         }
 
         &.active {
-            background-color: #e6f7f5; // 選中背景
-            color: #2aaea0; // 選中文字色
-            border-right: 3px solid #2aaea0; // 右側高亮條
+            background-color: #e6f7f5; 
+            color: #2aaea0;
+            border-right: 3px solid #2aaea0; 
         }
 
         .menu-icon {
@@ -753,7 +848,7 @@ export default {
             text-align: center;
             font-size: 18px;
             margin-right: 10px;
-            flex-shrink: 0; // 防止 icon 被壓縮
+            flex-shrink: 0;
         }
 
         .menu-label {
@@ -767,14 +862,14 @@ export default {
             color: #999;
             margin-left: 5px;
             display: block;
-            transform: scale(0.9); // 稍微縮小
+            transform: scale(0.9);
         }
     }
 
     /* 收合狀態下的老師選單微調 */
     &:not(.is-expanded) {
         .teacher-menu-item {
-            padding: 15px 0; // 調整間距
+            padding: 15px 0;
             justify-content: center;
 
             .menu-icon {
@@ -801,14 +896,15 @@ export default {
 
 @media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
     .sidebar {
-        width: 0;
+        width: 90px;
         padding: 0;
-        background-color: #F0FAFF;
+        background-color: unset;
         box-shadow: none;
         overflow-y: scroll;
 
         .sidebar-header {
             .toggle-btn {
+                visibility: visible !important;
                 position: fixed;
                 left: 10px;
                 top: 10px;
@@ -831,6 +927,10 @@ export default {
                 margin: 0;
             }
         }
+
+        .achievement-section .achievement-badges .badge-item {
+            width: 100px;
+        }
     }
 
     .sidebar.is-expanded {
@@ -842,6 +942,10 @@ export default {
         background-color: #F0FAFF;
         box-shadow: 2px 0 6px rgba(0, 0, 0, 0.3);
         position: fixed;
+
+        .bottom-menu{
+            padding-bottom: 0;
+        }
 
         .sidebar-header {
             .toggle-btn {

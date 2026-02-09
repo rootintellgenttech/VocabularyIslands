@@ -129,46 +129,46 @@ export default {
                 const islandData = res.data.islands.find(i => i.island_name === this.islandTitle);
                 if (!islandData) return;
 
-     this.units = this.units.map(unit => {
-    const matchedUnit = islandData.units.find(u => u.unit_name === unit.name);
-     const configLength = this.getStageLabelsByUnitId(unit.id);
+                this.units = this.units.map(unit => {
+                    const matchedUnit = islandData.units.find(u => u.unit_name === unit.name);
+                    const configLength = this.getStageLabelsByUnitId(unit.id);
 
-    // 判斷是否為「總複習」單元
-    const isReviewUnit = unit.name.includes('複習') || unit.name.includes('復習') || unit.id === 'final';
+                    // 判斷是否為「總複習」單元
+                    const isReviewUnit = unit.name.includes('複習') || unit.name.includes('復習') || unit.id === 'final';
 
-    let totalChallengeStages = configLength;
-    
-    if (!isReviewUnit) {
-        // 一般單元 (如 01~05): 扣除第一個「學習」標籤
-        totalChallengeStages = configLength > 0 ? configLength - 1 : 0;
-    } else {
-        // 總複習單元 (如 06 300字複習): 全部標籤都是挑戰，不扣除
-        totalChallengeStages = configLength;
-    }
+                    let totalChallengeStages = configLength;
 
-    return {
-        ...unit,
-        stars: matchedUnit ? matchedUnit.total_stars : 0,
-        totalStars: totalChallengeStages * 5 
-    };
-});
+                    if (!isReviewUnit) {
+                        // 一般單元 (如 01~05): 扣除第一個「學習」標籤
+                        totalChallengeStages = configLength > 0 ? configLength - 1 : 0;
+                    } else {
+                        // 總複習單元 (如 06 300字複習): 全部標籤都是挑戰，不扣除
+                        totalChallengeStages = configLength;
+                    }
+
+                    return {
+                        ...unit,
+                        stars: matchedUnit ? matchedUnit.total_stars : 0,
+                        totalStars: totalChallengeStages * 5
+                    };
+                });
             } catch (err) { console.error(err); }
         },
 
-       getStageLabelsByUnitId(id) {
-    const options300 = { '01': 7, '02': 7, '03': 7, '04': 7, '05': 7, '06': 6 }; 
-    const options800 = { '01': 11, '02': 11, '03': 11, '04': 11, '05': 11, '06': 5 }; 
-    const options1200 = { '01': 11, '02': 11, '03': 11, '04': 11, '05': 8 };
-    const optionsABC = { 'af': 3, 'gl': 3, 'mr': 3, 'sz': 3, 'final': 5 };
+        getStageLabelsByUnitId(id) {
+            const options300 = { '01': 7, '02': 7, '03': 7, '04': 7, '05': 7, '06': 6 };
+            const options800 = { '01': 11, '02': 11, '03': 11, '04': 11, '05': 11, '06': 5 };
+            const options1200 = { '01': 11, '02': 11, '03': 11, '04': 11, '05': 8 };
+            const optionsABC = { 'af': 3, 'gl': 3, 'mr': 3, 'sz': 3, 'final': 5 };
 
-    let count = 0;
-    if (this.wordCount === 'abc') count = optionsABC[id];
-    else if (this.wordCount === '300') count = options300[id];
-    else if (this.wordCount === '800') count = options800[id];
-    else if (this.wordCount === '1200') count = options1200[id];
+            let count = 0;
+            if (this.wordCount === 'abc') count = optionsABC[id];
+            else if (this.wordCount === '300') count = options300[id];
+            else if (this.wordCount === '800') count = options800[id];
+            else if (this.wordCount === '1200') count = options1200[id];
 
-    return count || 0;
-},
+            return count || 0;
+        },
 
         enterUnit(unit) {
             this.$router.push({
@@ -201,28 +201,43 @@ export default {
 
 .unit-card-container {
     @include island-design;
+    .island-card{
+        flex-shrink: 0;
+                width: 300px;
+                height: auto; 
+                
+                img {
+                    width: 100%; 
+                    height: auto;
+                    display: block;
+                }
+            
+    }
+
     &:not(.is-up) {
         transform: translateY(-80px);
 
         &:has(.enter-btn:hover) {
-            transform: translateY(-117px); 
+            transform: translateY(-117px);
+
             .enter-btn {
-                transform: translateY(37px); 
+                transform: translateY(37px);
             }
         }
     }
 
- &.is-up {
-        transform: translateY(-70px); 
-        
+    &.is-up {
+        transform: translateY(-34px);
+
         &:has(.enter-btn:hover) {
-            transform: translateY(-110px); 
-            
+            transform: translateY(-74px);
+
             .enter-btn {
-                transform: translateY(40px); 
+                transform: translateY(40px);
             }
         }
     }
+
 }
 
 .unit-title {
@@ -239,14 +254,18 @@ export default {
     transition: transform 0.3s ease;
 }
 
-
+@media (orientation: landscape) and (max-height: 1199.98px) and (pointer: coarse) {
+       .island-card{
+                width: 150px;
+            }
+}
 
 @media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
     .abc-page {
         .island-map-container {
             margin-top: 18%;
 
-            .island-card img {
+            .island-card{
                 width: 150px;
             }
 

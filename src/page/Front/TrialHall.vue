@@ -3,7 +3,7 @@
         <div class="return-last-page" @click="goBack">
             <i class="fas fa-angle-left"></i> 返回
         </div>
-        <div v-if="isDevelopment" class="god-mode-selection">
+        <!-- <div v-if="isDevelopment" class="god-mode-selection">
             <p style="color: #666; font-size: 14px; margin-bottom: 10px;">🛠️ God Mode: 直接選擇試卷測試串接</p>
             <div class="god-btns" style="display: flex; gap: 10px; flex-wrap: wrap;">
                 <el-button v-for="target in examTargets" :key="target.id" type="info" plain size="small"
@@ -11,90 +11,99 @@
                     {{ target.name }} ({{ target.id }})
                 </el-button>
             </div>
-        </div>
+        </div> -->
         <h1 class="page-title">試煉殿堂</h1>
         <div class="main-card">
 
             <div class="card-header-content">
-                <el-col :sm='24' :xl="8" class="left-section">
-                    <img :src="hallAvatar" alt="試煉殿堂吉祥物" class="hall-avatar">
-                </el-col>
-                <el-col :sm='24' :xl="15" class="right-section">
-                    <div class="description-area">
-                        <div class="text-group">
-                            <h2 class="card-title">試煉殿堂</h2>
-                            <p class="card-desc">準備好後就接受挑戰，證明你的實力！</p>
-                        </div>
-                    </div>
-
-                    <div class="tabs-control">
-                        <button :class="['tab-btn', { 'is-active': activeTab === 'challenge' }]"
-                            @click="activeTab = 'challenge'">
-                            <i class="fas fa-book-open"></i> 試煉挑戰
-                        </button>
-                        <button :class="['tab-btn', { 'is-active': activeTab === 'history' }]"
-                            @click="activeTab = 'history'">
-                            <i class="fas fa-history"></i> 歷史記錄
-                        </button>
-                    </div>
-                    <div class="card-body-content">
-                        <div v-if="activeTab === 'challenge'" class="challenge-area">
-                            <div class="exam-info-box">
-                                <div class="exam-info">
-                                    <h3 class="exam-title">{{ formatExamName(nextAvailableExam.name) }}</h3>
-                                    <div class="exam-details">
-                                        <p class="detail-item">
-                                            <i class="far fa-clock"></i>
-                                            檢測期程: 即日起 ~ 2025-12-31
-                                        </p>
-                                        <p class="detail-item">
-                                            <i class="fas fa-hourglass-half"></i>
-                                            考試時長: 35分鐘
-                                        </p>
-                                        <p class="detail-item">
-                                            <i class="fas fa-list-ol"></i>
-                                            測驗部分: {{ nextAvailableExam.parts.length }} 個單元
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <button class="start-exam-btn" @click="showStartExamDialog(nextAvailableExam)">
-                                    開始考試
-                                </button>
+                <el-row :gutter="48">
+                    <el-col :sm='24' :md="24" :xl="8" class="left-section">
+                        <img :src="hallAvatar" alt="試煉殿堂吉祥物" class="hall-avatar">
+                    </el-col>
+                    <el-col :sm='24' :md="24" :xl="16" class="right-section">
+                        <div class="description-area">
+                            <div class="text-group">
+                                <h2 class="card-title">試煉殿堂</h2>
+                                <p class="card-desc">準備好後就接受挑戰，證明你的實力！</p>
                             </div>
                         </div>
-                        <vue-custom-scrollbar v-else class="history-area" :settings="scrollSettings"
-                            v-loading="isLoadingHistory">
-                            <div v-if="historyList.length === 0 && !isLoadingHistory" class="no-data-info">
-                                <i class="fas fa-folder-open"></i>
-                                <p>目前尚無任何考試紀錄</p>
-                            </div>
 
-                            <div v-for="(record, idx) in historyList" :key="idx" class="score-info-box"
-                                style="cursor: pointer;" @click="goToHistoryDetail(record)">
-                                <div class="exam-info">
-                                    <h3 class="exam-title">{{ formatExamName(record.exam_name) }}</h3>
-                                    <div class="exam-details">
-                                        <p class="detail-item">
-                                            <i class="far fa-calendar-check"></i>
-                                            作答時間：{{ formatHistoryTime(record.answer_time) }}
-                                        </p>
-                                        <p class="detail-summary">
-                                            總題數: {{ record.summary.total }} | 答對: <span style="color: #27ae60;">{{
-                                                record.summary.correct }}</span> | 答錯: <span style="color: #e74c3c;">{{
-                                                    record.summary.wrong }}</span>
-                                        </p>
+                        <div class="tabs-control">
+                            <button :class="['tab-btn', { 'is-active': activeTab === 'challenge' }]"
+                                @click="activeTab = 'challenge'">
+                                <i class="fas fa-book-open"></i> 試煉挑戰
+                            </button>
+                            <button :class="['tab-btn', { 'is-active': activeTab === 'history' }]"
+                                @click="activeTab = 'history'">
+                                <i class="fas fa-history"></i> 歷史記錄
+                            </button>
+                        </div>
+                        <div class="card-body-content">
+                            <div v-if="activeTab === 'challenge'" class="challenge-area">
+                                <div class="exam-info-box">
+                                    <div class="exam-info">
+                                        <h3 class="exam-title">{{ formatExamName(nextAvailableExam.name) }}</h3>
+                                        <div class="exam-details">
+                                            <p class="detail-item">
+                                                <i class="far fa-clock"></i>
+                                                檢測期程: 即日起 ~ 2025-12-31
+                                            </p>
+
+                                            <p class="detail-item">
+                                                <i class="fas fa-hourglass-half"></i>
+                                                考試時長: {{ totalExamTime }} 分鐘
+                                            </p>
+
+                                            <p class="detail-item">
+                                                <i class="fas fa-list-ol"></i>
+                                                測驗部分: {{ nextAvailableExam.parts.length }} 個單元
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <button :class="['start-exam-btn', { 'is-completed-btn': isExamCompleted }]"
+                                        :disabled="isExamCompleted" @click="showStartExamDialog(nextAvailableExam)">
+                                        <template v-if="isExamCompleted">
+                                            考試完畢
+                                        </template>
+                                        <template v-else>
+                                            {{ hasLocalProgress ? '繼續作答' : '開始作答' }}
+                                        </template>
+                                    </button>
+                                </div>
+                            </div>
+                            <vue-custom-scrollbar v-else class="history-area" :settings="scrollSettings"
+                                v-loading="isLoadingHistory">
+                                <div v-if="historyList.length === 0 && !isLoadingHistory" class="no-data-info">
+                                    <i class="fas fa-folder-open"></i>
+                                    <p>目前尚無有任何考試紀錄</p>
+                                </div>
+
+                                <div v-for="(record, idx) in historyList" :key="idx" class="score-info-box"
+                                    style="cursor: pointer;" @click="goToHistoryDetail(record)">
+                                    <div class="exam-info">
+                                        <h3 class="exam-title">{{ formatExamName(record.exam_name) }}</h3>
+                                        <div class="exam-details">
+                                            <p class="detail-item">
+                                                <i class="far fa-calendar-check"></i>
+                                                作答時間：{{ formatHistoryTime(record.answer_time) }}
+                                            </p>
+                                            <p class="detail-summary">
+                                                總題數: {{ record.summary.total }} | 答對: <span style="color: #27ae60;">{{
+                                                    record.summary.correct }}</span> | 答錯: <span
+                                                    style="color: #e74c3c;">{{
+                                                        record.summary.wrong }}</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="display-final-score">
+                                        <p class="final-score">{{ record.score }}</p>
+                                        <p>分數</p>
                                     </div>
                                 </div>
-                                <div class="display-final-score">
-                                    <p class="final-score">{{ record.score }}</p>
-                                    <p>分數</p>
-                                </div>
-                            </div>
-                        </vue-custom-scrollbar>
-                    </div>
-                </el-col>
-
+                            </vue-custom-scrollbar>
+                        </div>
+                    </el-col>
+                </el-row>
             </div>
 
 
@@ -104,13 +113,10 @@
 
             <div class="dialog-content">
                 <h3 class="title exam-warning-title">
-                    <i class="fas fa-exclamation-circle"></i> 注意：本次考試只有一次作答機會！
+                    <i class="fas fa-exclamation-circle"></i> 注意
                 </h3>
 
                 <p class="description">請確認您已準備好再開始作答。</p>
-                <p class="description">
-                    作答途中系統不會保留作答紀錄，若因網路不穩或退出作答頁面，將會被迫重新從頭作答。
-                </p>
 
                 <p class="description exam-checklist-title">為避免影響您的測驗結果，請務必確認：</p>
                 <ul class="exam-checklist">
@@ -123,23 +129,35 @@
             </div>
 
             <span slot="footer" class="dialog-footer">
-                <el-button @click="examDialogVisible = false">取 消</el-button>
                 <el-button class="start-exam-btn" @click="confirmStartExam">開始考試</el-button>
             </span>
         </el-dialog>
-        <!-- <div v-if="isDevelopment" class="god-mode-panel">
-            <h3>🛠️ 開發者 God Mode (數據產生器)</h3>
-            <p>點擊下方按鈕將一次性獲取 6 個考卷的所有 Part 題目 (API: generate)</p>
-            <el-button type="warning" :loading="isGenerating" @click="generateAllExamData">
-                開始獲取全 6 卷數據 (JSON)
-            </el-button>
-            <div v-if="genProgress" class="gen-log">{{ genProgress }}</div>
-        </div> -->
+
     </div>
 </template>
 
 <script>
 import api from '@/config/api';
+
+const EXAM_MASTER_SETTINGS = {
+    'ps-2': {
+        'EngToChi': { time: 15 },
+        'ChiToEng': { time: 15 },
+        'Listening': { time: 5 }
+    },
+    'ms7-2': {
+        'EngToChi': { time: 10 },
+        'ChiToEng': { time: 10 },
+        'Listening': { time: 5 },
+        'ContextFill': { time: 15 }
+    },
+    'ms8-2': {
+        'EngToChi': { time: 10 },
+        'ChiToEng': { time: 10 },
+        'Listening': { time: 5 },
+        'ContextFill': { time: 15 }
+    }
+};
 
 export default {
     name: 'TrialHall',
@@ -160,7 +178,7 @@ export default {
             genProgress: '',
             examTargets: [
                 { stage: 2, id: 'ps-2', name: '國小英語單字檢測-2', level: 'primary', words: 300, parts: ['EngToChi', 'ChiToEng', 'Listening'] },
-                { stage: 2, id: 'ms7-2', name: '7年級英語單字檢測-2', level: 'secondary-7', words: 800, parts: ['EngToChi', 'ChiToEng', 'Listening'] },
+                { stage: 2, id: 'ms7-2', name: '7年級英語單字檢測-2', level: 'secondary-7', words: 800, parts: ['EngToChi', 'ChiToEng', 'Listening', 'ContextFill'] },
                 { stage: 2, id: 'ms8-2', name: '8年級英語單字檢測-2', level: 'secondary-8', words: 1200, parts: ['EngToChi', 'ChiToEng', 'Listening', 'ContextFill'] }
             ],
             historyList: [],
@@ -176,53 +194,67 @@ export default {
         }
     },
     computed: {
-        // 測試-自動尋找下一個可挑戰的試卷
+        // 檢查「目前這份試卷」是否有進度
+        hasLocalProgress() {
+            if (!this.nextAvailableExam) return false;
+            const key = `exam_progress_${this.nextAvailableExam.id}`;
+            return localStorage.getItem(key) !== null;
+        },
+        totalExamTime() {
+            const examId = this.nextAvailableExam.id;
+            const settings = EXAM_MASTER_SETTINGS[examId];
+
+            if (!settings) return 0;
+
+            // 將所有單元的 time 加總
+            return Object.values(settings).reduce((acc, part) => {
+                return acc + (part.time || 0);
+            }, 0);
+        },
         nextAvailableExam() {
             if (!this.historyList || this.historyList.length === 0) {
-                return this.examTargets[0]; // 若無紀錄，預設顯示第一個
+                return this.examTargets[0];
             }
-
-            // 取得所有已完成試卷的 code
             const completedCodes = this.historyList.map(h => h.code);
-
-            // 從目標清單中過濾出「不在已完成清單」中的第一個
             const next = this.examTargets.find(target => !completedCodes.includes(target.id));
 
-            return next || this.examTargets[0]; // 如果全做完了，就顯示第一個
+            // 如果找不到未完成的，就回傳最後一個或第一個，
+            return next || this.examTargets[this.examTargets.length - 1];
+        },
+
+        // 判斷當前顯示的這份試卷是否已經考過
+        isExamCompleted() {
+            if (!this.historyList || this.historyList.length === 0) return false;
+            const completedCodes = this.historyList.map(h => h.code);
+            return completedCodes.includes(this.nextAvailableExam.id);
         }
     },
     methods: {
         async fetchAllHistory() {
             this.isLoadingHistory = true;
-            this.historyList = []; // 先清空舊資料
-
+            this.historyList = [];
             const validRecords = [];
 
-            // 使用 for...of 循環，或是個別處理 Promise，確保不會因為一個報錯就全部掛掉
             for (const target of this.examTargets) {
                 try {
                     const res = await api.get('/students/exam-papers/history/', {
                         params: { code: target.id }
                     });
 
-                    // 如果成功拿到資料，且資料包含 questions
                     if (res.data && res.data.questions) {
                         validRecords.push(res.data);
                     }
                 } catch (err) {
-                    // 如果後端回傳 "尚未作答此試卷"，我們就安靜地跳過，不報錯
-                    console.log(`試卷 ${target.id} 尚未有紀錄，跳過。`);
+                    console.log(`試卷 ${target.id} 尚未有紀錄。`);
                 }
             }
 
-            // 依照作答時間排序 (由新到舊)
             this.historyList = validRecords.sort((a, b) =>
                 new Date(b.answer_time) - new Date(a.answer_time)
             );
 
             this.isLoadingHistory = false;
         },
-
         formatHistoryTime(timeStr) {
             if (!timeStr) return '';
             const date = new Date(timeStr);
@@ -250,9 +282,62 @@ export default {
             this.examDialogVisible = false;
             if (!this.selectedExamTarget) return;
 
-            this.selectExamFromGodMode(this.selectedExamTarget);
-        },
+            this.isGenerating = true;
+            try {
+                const response = await api.get('/students/exam-papers/', { params: { code: this.selectedExamTarget.id } });
+                let examData = response.data;
 
+                const storageKey = `exam_progress_${this.selectedExamTarget.id}`;
+                const savedData = localStorage.getItem(storageKey);
+
+                let targetPartId = '';
+                let accumulatedAnswers = [];
+
+                if (savedData) {
+                    // 恢復進度：使用存檔資料
+                    const progress = JSON.parse(savedData);
+                    targetPartId = progress.currentExamId;
+                    accumulatedAnswers = progress.userAnswers || [];
+                    if (progress.fullExamData) {
+                        examData = progress.fullExamData;
+                    }
+                    console.log(`[系統] 偵測到斷點，恢復進度`);
+                } else {
+                    // 全新考試：只負責洗牌，不負責存檔
+                    if (examData && examData.parts) {
+                        Object.keys(examData.parts).forEach(pKey => {
+                            examData.parts[pKey] = examData.parts[pKey].sort(() => Math.random() - 0.5);
+                            examData.parts[pKey].forEach(q => {
+                                if (q.options) q.options = q.options.sort(() => Math.random() - 0.5);
+                            });
+                        });
+                    }
+                    // 定義單元的標準優先級
+                    const partPriority = ['EngToChi', 'ChiToEng', 'Listening', 'ContextFill'];
+                    // 從優先級中找到這份試卷包含的第一個單元
+                    const firstAvailableKey = partPriority.find(key => examData.parts[key] && examData.parts[key].length > 0) || Object.keys(examData.parts)[0];
+                    targetPartId = this.getPartIdByApiMode(firstAvailableKey);
+                    console.log('起始單元:', targetPartId)
+                }
+
+                this.$router.push({
+                    name: 'TrialQuizPage',
+                    params: {
+                        level: this.selectedExamTarget.level,
+                        examId: targetPartId,
+                        examData: examData,
+                        examCode: this.selectedExamTarget.id,
+                        accumulatedAnswers: accumulatedAnswers
+                    }
+                });
+
+            } catch (err) {
+                console.error('[系統] 啟動考試失敗:', err);
+                this.$message.error('無法載入考試資料');
+            } finally {
+                this.isGenerating = false;
+            }
+        },
         // God Mode 專用選擇函式
         async selectExamFromGodMode(target) {
             this.isGenerating = true;
@@ -428,7 +513,10 @@ export default {
                 }
             });
         }
-    }
+    },
+    mounted() {
+        this.fetchAllHistory();
+    },
 
 };
 </script>
@@ -436,15 +524,6 @@ export default {
 <style lang="scss" scoped>
 .trial-hall-page {
     padding-left: 100px;
-
-
-    .left-section {
-        min-width: 350px;
-    }
-
-    .right-section {
-        min-width: 500px;
-    }
 
     .challenge-confirm-modal {
 
@@ -476,17 +555,15 @@ export default {
 
 .main-card {
     @include main-card;
-    min-width: unset;
-    width: fit-content !important;
+    min-width: 900px;
     padding: 4% 50px;
-    height: 100%;
 
     .history-area {
-        height: 250px;
+        height: 200px;
+        flex-grow: 1;
         display: flex;
         flex-direction: column;
         gap: 16px 0;
-        margin: 4px;
 
         .no-data-info {
             color: $main-grey-text;
@@ -497,11 +574,15 @@ export default {
 
     .card-header-content {
         @include flex-center;
-        justify-content: space-between;
-        gap: 0 48px;
+
+        .right-section {
+            min-width: 600px;
+        }
+
 
         img {
-            width: 350px;
+            width: 100%;
+            min-width: 250px;
         }
 
         .description-area {
@@ -526,6 +607,7 @@ export default {
 
                 .card-desc {
                     font-size: 20px;
+                    margin: 0;
                     color: $main-grey-text;
                 }
             }
@@ -564,13 +646,27 @@ export default {
 
     }
 
+    .card-body-content {
+        padding: 4px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
     .challenge-area {
         @include flex-center;
+        flex-grow: 1;
+        justify-content: center;
         width: 100%;
+
+        .exam-info-box {
+            width: 100%;
+        }
     }
 
     .exam-info-box .exam-info {
         justify-content: center;
+        padding: 24px 0;
     }
 
     .score-info-box .exam-info {
@@ -579,8 +675,6 @@ export default {
 
     .exam-info-box,
     .score-info-box {
-        width: 650px;
-        min-height: 200px;
         display: flex;
         justify-content: space-between;
         align-items: stretch;
@@ -598,6 +692,8 @@ export default {
             .exam-title {
                 font-size: 40px;
                 font-weight: bold;
+                margin: 0;
+                text-align: left;
                 color: $main-black-text;
             }
 
@@ -606,10 +702,12 @@ export default {
                 flex-direction: column;
                 align-items: start;
                 font-size: 16px;
+                gap: 8px 0;
                 color: $main-grey-text;
 
                 .detail-item {
                     color: $main-grey-text;
+                    margin: 0;
 
                     i {
                         margin-right: 8px;
@@ -633,16 +731,32 @@ export default {
             font-size: 20px;
             transition: background-color 0.2s;
         }
+
+        .is-completed-btn {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+            opacity: 0.8;
+
+            &:hover {
+                background-color: #bdc3c7;
+            }
+        }
     }
 
     .score-info-box {
-        padding: 16px 32px;
+        margin: 4px;
+        padding: 16px 24px;
 
         .display-final-score {
             @include flex-center;
             flex-direction: column;
             font-size: 18px;
             color: $main-blue-text;
+
+            p {
+                margin: 0;
+            }
+
 
             .final-score {
                 font-size: 32px;
@@ -659,14 +773,12 @@ export default {
 @media (min-width: 768px) and (pointer: coarse) {
     .trial-hall-page {
         padding: 6%;
-
         .main-card {
-            padding: 25px 5%;
+            padding: 5%;
         }
 
         .exam-info-box,
         .score-info-box {
-            width: 400px;
 
             .start-exam-btn {
                 text-wrap: nowrap;
@@ -684,9 +796,18 @@ export default {
             }
         }
 
-        .card-header-content img {
-            width: 150px;
+          .card-header-content {
+            padding: 8px;
+
+            img {
+                width: 150px;
+            }
+
+            .right-section {
+                min-width: unset;
+            }
         }
+
     }
 }
 
@@ -700,10 +821,14 @@ export default {
     }
 
     .main-card {
+        .history-area {
+            .score-info-box {
+                margin: 0;
+            }
+        }
 
         .exam-info-box .exam-info,
         .score-info-box .exam-info {
-            padding-right: 16px;
 
             .exam-title {
                 font-size: 24px;
@@ -720,19 +845,17 @@ export default {
         }
 
         .card-header-content {
-            display: unset;
-            width: 100%;
+            padding: 8px;
 
             img {
                 width: 200px;
             }
 
+            .right-section {
+                min-width: unset;
+            }
         }
-
-
     }
-
-
 
 }
 </style>

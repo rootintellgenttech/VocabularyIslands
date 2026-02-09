@@ -42,7 +42,7 @@
                     <img :src="wonderfulAvatarPath" alt="太棒了!" class="result-avatar">
                     <h2 class="result-title">{{ isExitConfirmed ? '挑戰中止' : '挑戰完成!' }}</h2>
                     <p class="result-score">獲得了 {{ finalScore }} 積分</p>
-                    <p style="color: #666; margin-top: 10px;">答對題數：{{ correctCount }} / 50</p>
+                    <p class="correct-quiz-count">總計答對：{{ correctCount }} / 50</p>
                 </div>
                 <button class="result-back-btn" @click="goBack">返回</button>
             </template>
@@ -93,7 +93,7 @@ export default {
 
             questionsList: [],
             userAnswers: [],
-            questionCount: 1, // 當前回合
+            questionCount: 1,
             tempSelectedAnswer: null,
             correctCount: 0,
             finalScore: 0,
@@ -130,7 +130,11 @@ export default {
                 this.questionsList = response.data;
                 this.dialogVisible = false;
                 this.isGameActive = true;
-                this.$nextTick(() => this.playAudio(this.currentQuestionText));
+                this.$nextTick(() => {
+                    if (this.currentQuestionText) {
+                        this.playAudio(this.currentQuestionText);
+                    }
+                });
             } catch (err) {
                 this.$message.error('獲取題目失敗');
                 this.goBack();
@@ -171,7 +175,6 @@ export default {
                         this.questionCount++;
                         this.tempSelectedAnswer = null;
                         loading.close();
-                        this.$nextTick(() => this.playAudio(this.currentQuestionText));
                     } else {
                         // 滿分 50 題達成
                         loading.close();
@@ -240,7 +243,7 @@ export default {
             if (!text) return;
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'en-US';
-            utterance.rate = 0.3;
+            utterance.rate = 0.4;
             window.speechSynthesis.cancel();
             window.speechSynthesis.speak(utterance);
         },
@@ -253,7 +256,16 @@ export default {
         },
         goBack() { this.$router.push('/competition'); },
         handleGameStartClose() { this.goBack(); }
-    }
+    },
+    watch: {
+        questionCount(newVal) {
+            if (this.isGameActive && !this.isFinished) {
+                this.$nextTick(() => {
+                    this.playAudio(this.currentQuestionText);
+                });
+            }
+        }
+    },
 };
 </script>
 

@@ -27,7 +27,7 @@
                     <i class="fas fa-chart-line"></i> 學習成效比較
                 </div>
                 <div class="header-actions">
-                    <button class="action-btn export-btn" @click="exportFullTable('export-overview')">
+                    <button class="action-btn" @click="exportFullTable('export-overview')">
                         <i class="fas fa-download"></i> 匯出報表
                     </button>
                 </div>
@@ -168,43 +168,39 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-$primary-teal: #2A9D8F;
-$card-bg: #FFFFFF;
-
 .overview-container {
     padding: 24px;
     background-color: #F5F7FA;
     min-height: 100vh;
     margin-left: 90px;
-    transition: margin-left 0.3s ease;
+    text-align: left;
 }
 
 .page-title {
     font-size: 32px;
     font-weight: bold;
-    color: #00332D;
+    color: $main-back-blue-text;
     margin-bottom: 30px;
-    text-align: left;
 }
 
 .stat-cards-row {
     margin-bottom: 30px;
 }
 
+
 .overview-card {
-    background: $card-bg;
+    background: #FFFFFF;
     border-radius: 16px;
     padding: 24px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    display: flex;
+    @include main-box-shadow;
+    @include flex-center;
     justify-content: space-between;
-    align-items: center;
     border: 1px solid #EBEEF5;
 
     .stat-label {
         font-size: 16px;
         font-weight: bold;
-        color: #333;
+        color: $main-black-text;
         margin-bottom: 12px;
     }
 
@@ -216,7 +212,7 @@ $card-bg: #FFFFFF;
 
     .stat-subtext {
         font-size: 14px;
-        color: #999;
+        color: $main-grey-text;
     }
 
     .icon-circle {
@@ -225,11 +221,12 @@ $card-bg: #FFFFFF;
     }
 }
 
+
 .overview-section {
-    background: $card-bg;
+    background: #FFFFFF;
     border-radius: 16px;
     padding: 24px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    @include main-box-shadow;
 
     .section-header {
         @include flex-center;
@@ -239,9 +236,8 @@ $card-bg: #FFFFFF;
         .header-title {
             font-size: 20px;
             font-weight: bold;
-            color: #333;
-            display: flex;
-            align-items: baseline;
+            color: $main-black-text;
+            @include flex-center;
             gap: 10px;
 
             i {
@@ -252,24 +248,9 @@ $card-bg: #FFFFFF;
     }
 }
 
+
 .action-btn {
-    border: none;
-    border-radius: 8px;
-    padding: 10px 18px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    @include flex-center;
-    gap: 8px;
-
-    &.export-btn {
-        background-color: $primary-teal;
-        color: white;
-
-        &:hover {
-            opacity: 0.9;
-        }
-    }
+@include back-system-action-btn
 }
 
 .custom-table {
@@ -277,7 +258,7 @@ $card-bg: #FFFFFF;
         background-color: transparent !important;
         border-bottom: 1.5px solid #F0F2F5;
         font-weight: bold;
-        color: #333;
+        color: $main-black-text;
         font-size: 15px;
     }
 }
@@ -290,14 +271,14 @@ $card-bg: #FFFFFF;
 
     &.green {
         background-color: #E6F4F1;
-        color: $primary-teal;
+        color: $main-green;
     }
 }
+
 
 @media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
     .overview-container {
         margin-left: 0;
-        padding: 16px;
     }
 
     .overview-card {

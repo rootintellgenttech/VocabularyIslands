@@ -19,7 +19,7 @@
                     <i class="fas fa-table"></i> 參與人數與總積分
                 </div>
                 <div class="header-actions">
-                    <button class="action-btn export-btn" @click="exportFullTable('export-island-analysis')">
+                    <button class="action-btn" @click="exportFullTable('export-island-analysis')">
                         <i class="fas fa-download"></i> 匯出報表
                     </button>
                 </div>
@@ -199,31 +199,27 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-$primary-teal: #2A9D8F;
-$section-bg: #FFFFFF;
-
 .analysis-container {
     padding: 24px;
     background-color: #F5F7FA;
     min-height: 100vh;
     margin-left: 90px;
-    transition: margin-left 0.3s ease;
+    text-align: left;
 }
 
 .page-title {
     font-size: 32px;
     font-weight: bold;
-    color: #00332D;
+    color: $main-back-blue-text;
     margin-bottom: 30px;
-    text-align: left;
 }
 
 .analysis-section {
-    background: $section-bg;
+    background: #FFFFFF;
     border-radius: 16px;
     padding: 24px;
     margin-bottom: 24px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    @include main-box-shadow;
 
     .section-header {
         @include flex-center;
@@ -233,13 +229,12 @@ $section-bg: #FFFFFF;
         .header-title {
             font-size: 18px;
             font-weight: bold;
-            color: #333;
-            display: flex;
-            align-items: baseline;
+            color: $main-black-text;
+            @include flex-center;
             gap: 10px;
 
             i {
-                color: #999;
+                color: $main-green;
             }
         }
 
@@ -250,29 +245,18 @@ $section-bg: #FFFFFF;
     }
 }
 
+
 .action-btn {
-    border: none;
-    border-radius: 8px;
-    padding: 8px 16px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    @include flex-center;
-    gap: 6px;
-
-    &.export-btn {
-        background-color: $primary-teal;
-        color: white;
-
-        &:hover {
-            opacity: 0.9;
-        }
-    }
+@include back-system-action-btn
 }
 
+
+.header-select-box,
 .teal-select {
+    width: 160px;
+
     ::v-deep .el-input__inner {
-        background-color: $primary-teal;
+        background-color: $main-green;
         color: white;
         border-radius: 8px;
         border: none;
@@ -287,48 +271,6 @@ $section-bg: #FFFFFF;
     }
 }
 
-
-
-.header-select-box {
-    width: 160px;
-}
-
-.full-width-select {
-    ::v-deep .el-input__inner {
-        background-color: $primary-teal;
-        border-radius: 10px;
-        border: 1px solid rgba($primary-teal, 0.2);
-        color: white;
-
-        &::placeholder {
-            color: white;
-            opacity: 1;
-        }
-
-        &::-webkit-input-placeholder {
-            color: white;
-        }
-
-        &::-moz-placeholder {
-            color: white;
-        }
-
-        &:-ms-input-placeholder {
-            color: white;
-        }
-    }
-
-    ::v-deep .el-input__icon {
-        color: white;
-    }
-}
-
-
-.score-text {
-    font-weight: bold;
-    font-family: 'Courier New', Courier, monospace;
-}
-
 .status-pill {
     padding: 4px 12px;
     border-radius: 20px;
@@ -337,21 +279,27 @@ $section-bg: #FFFFFF;
 
     &.green {
         background-color: #E6F4F1;
-        color: $primary-teal;
+        color: $main-green;
     }
+}
+
+.score-text {
+    font-weight: bold;
+    font-family: 'Courier New', Courier, monospace;
+    color: $main-black-text;
 }
 
 .custom-table {
     ::v-deep th {
         background-color: transparent !important;
         font-weight: bold;
-        color: #333;
+        color: $main-black-text;
         border-bottom: 2px solid #F0F2F5;
     }
 }
 
 @media (max-width: 1200px) {
-    .section-header {
+    .analysis-section .section-header {
         flex-direction: column;
         align-items: flex-start !important;
         gap: 15px;
@@ -361,5 +309,11 @@ $section-bg: #FFFFFF;
             flex-wrap: wrap;
         }
     }
+}
+
+@media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
+.analysis-container{
+  margin-left: 0;
+}
 }
 </style>

@@ -94,9 +94,9 @@ export default {
             default: '300'
         },
         scrollSettings: {
-            suppressScrollY: true,  // 關閉直向
-            suppressScrollX: false, // 開啟橫向
-            wheelPropagation: false // 防止滾動冒泡
+            suppressScrollY: true,
+            suppressScrollX: false,
+            wheelPropagation: false
         }
     },
     data() {
@@ -129,7 +129,7 @@ export default {
             const book = this.bookPath;
             const fire = this.firePath;
 
-            // 輔助函式：創建一般單元 (01~05) - 第一個是「學習」，之後是挑戰
+            // 創建一般單元 (01~05) - 第一個是「學習」，之後是挑戰
             const createQuizOptions = (labels, icon, type = 'quiz') => {
                 const options = [{ type: 'learn', label: labels[0], iconPath: book, stars: 0 }];
                 for (let i = 1; i < labels.length; i++) {
@@ -138,7 +138,7 @@ export default {
                 return options;
             };
 
-            //  輔助函式：針對「複習單元」- 排除第一個元素(標題)，其餘全部是挑戰
+            // 針對「複習單元」- 排除第一個元素(標題)，其餘全部是挑戰
             const createFinalOptions = (labels, icon) => {
                 return labels.slice(1).map(label => ({
                     type: 'quiz',
@@ -320,7 +320,7 @@ export default {
             }
         },
         goBack() {
-            // 1. 判斷是否為 ABC 島嶼的單元 (af, gl, mr, sz, final)
+            // 判斷是否為 ABC 島嶼的單元 (af, gl, mr, sz, final)
             const isAbcUnit = ['af', 'gl', 'mr', 'sz', 'final'].includes(this.unitId);
 
             if (isAbcUnit) {
@@ -328,8 +328,7 @@ export default {
                 this.$router.push('/abc-island');
             }
             else {
-                // 2. 處理單字島 (300/800/1200)
-                // 回到 WordIslandDetail，並帶上 level 和 wordCount 參數
+                //  處理單字島 (300/800/1200)
                 this.$router.push({
                     name: 'WordIslandDetail',
                     params: {
@@ -342,7 +341,7 @@ export default {
         startActivity(actionType, option) {
             console.log(`觸發活動: ${actionType}，關卡: ${option.label}`);
 
-            // 1. 學習模式
+            // 學習模式
             if (actionType === 'learn') {
                 const isTotalReview = (option.type === 'learn') || (option.label === this.lessonData.name);
                 this.$router.push({
@@ -357,7 +356,7 @@ export default {
                     }
                 });
             }
-            // 2. 測驗模式 (QuizPage / HeroQuizPage)
+            // 測驗模式 (QuizPage / HeroQuizPage)
             else if (actionType === 'quiz') {
                 const isHero = option.type === 'hero-quiz';
 
@@ -399,6 +398,15 @@ export default {
 
 
 .main-card {
-    @include lesson-detail-boxs-two-row
+    @include lesson-detail-boxs-two-row;
+    .header-info{
+        .lesson-title,.lesson-description{
+        margin: 0;
+    }
+.lesson-description{
+    font-size: 28px;
+}  
+    }
+  
 }
 </style>

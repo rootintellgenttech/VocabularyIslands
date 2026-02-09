@@ -4,6 +4,7 @@ $main-blue-text: #325362;
 $main-dark-blue: #097C70;
 $main-grey-text: #67777E;
 $main-quiz-blue: #194BAE;
+$main-back-blue-text: #00332D;
 
 
 @mixin second-green-bg {
@@ -34,7 +35,6 @@ $main-quiz-blue: #194BAE;
     align-items: center;
     justify-content: center;
     flex-direction: column;
-
 }
 
 @mixin island-design {
@@ -205,13 +205,16 @@ $main-quiz-blue: #194BAE;
             @include main-box-shadow;
             transition: background-color 0.2s;
 
-            .action-text,.challenge-label{
-            cursor: pointer;
-            &:hover{
-  color: #7c95af;
-                filter: unset
+            .action-text,
+            .challenge-label {
+                cursor: pointer;
+
+                &:hover {
+                    color: #7c95af;
+                    filter: unset
+                }
             }
-            }
+
             &:hover {
                 transform: translateY(-2px);
                 box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
@@ -348,10 +351,11 @@ $main-quiz-blue: #194BAE;
                 font-weight: bold;
                 cursor: pointer;
                 color: $main-black-text;
-                  &:hover{
-                color: #7c95af;
-                filter: unset
-            }
+
+                &:hover {
+                    color: #7c95af;
+                    filter: unset
+                }
             }
 
             .item-top {
@@ -389,7 +393,7 @@ $main-quiz-blue: #194BAE;
             .single-right,
             .bottom-right {
                 .star-rating {
-                 @include flex-center;
+                    @include flex-center;
                     gap: 5px;
 
                     i {
@@ -491,11 +495,11 @@ $main-quiz-blue: #194BAE;
     justify-self: center;
     justify-content: space-between;
 
-    
+
 
     .final-star {
         font-size: 28px;
-        margin-top: 16px;
+        margin:16px 0;
     }
 
     .header-wrap {
@@ -518,11 +522,16 @@ $main-quiz-blue: #194BAE;
 @mixin main-card-content {
     text-align: center;
     width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
 
     .question-wrap {
         display: flex;
         align-items: baseline;
         gap: 0 16px;
+        padding: 0 24px;
         justify-content: center;
 
         .filled {
@@ -536,7 +545,8 @@ $main-quiz-blue: #194BAE;
             color: $main-quiz-blue;
             font-size: 120px;
             font-weight: 900;
-            padding: 32px 16px;
+            margin: 32px 0;
+            // padding: 32px 16px;
         }
 
         .audio-trigger {
@@ -548,7 +558,7 @@ $main-quiz-blue: #194BAE;
         }
 
     }
-    
+
 
     .listen-quiz-audio {
 
@@ -795,6 +805,7 @@ $main-quiz-blue: #194BAE;
 
 
     .result-title {
+        margin: 0 0 8px;
         font-size: 36px;
     }
 
@@ -804,12 +815,15 @@ $main-quiz-blue: #194BAE;
 
     .result-score {
         font-size: 20px;
-        margin-top: 18px;
+        margin: 0;
         color: $main-dark-blue;
         font-weight: 600;
     }
 
-
+.correct-quiz-count{
+    color: $main-black-text;
+    font-weight: 600;
+}
 }
 
 @mixin result-back-btn {
@@ -825,5 +839,24 @@ $main-quiz-blue: #194BAE;
 
     &:hover {
         background-color: #2db698;
+    }
+}
+
+
+@mixin back-system-action-btn {
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    @include flex-center;
+    gap: 6px;
+    transition: opacity 0.2s;
+    background-color: $main-green;
+    color: white;
+
+    &:hover {
+        background-color: #08635a;
     }
 }

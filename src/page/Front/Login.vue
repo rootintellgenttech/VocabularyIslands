@@ -116,15 +116,15 @@
           </div>
 
           <!-- 快速身份登錄 -->
-       <div class="dev-test-zone">
-              <p class="dev-title">🛠️ 開發測試快速通道 (點擊直接登入)</p>
-              <div class="dev-btn-grid">
-                <button v-for="(role, index) in testRoles" :key="index" class="dev-role-btn" :class="role.class"
-                  @click="handleTestLogin(role)">
-                  {{ role.name }}
-                </button>
-              </div>
-            </div> 
+          <div class="dev-test-zone">
+            <p class="dev-title">🛠️ 開發測試快速通道 (點擊直接登入)</p>
+            <div class="dev-btn-grid">
+              <button v-for="(role, index) in testRoles" :key="index" class="dev-role-btn" :class="role.class"
+                @click="handleTestLogin(role)">
+                {{ role.name }}
+              </button>
+            </div>
+          </div>
 
         </div>
       </el-col>
@@ -259,11 +259,11 @@ export default {
         { key: 'moe', name: '5. 教育部', path: '/dashboard', class: 'btn-top' },
         { key: 'teacher', name: '6. 老師', path: '/dashboard', class: 'btn-teacher' },
       ],
-      defaultBackendTokens: {
-        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY1ODY3NDc0LCJpYXQiOjE3NjU4NjU2NzQsImp0aSI6ImU2YTc4OTVhZDRlNzQ1NzBhMmEyMmE4OTA4YjM1ZDBjIiwidXNlcl9pZCI6MzV9.lewJXA_rBur_1gPtrZqcmeai4K5etxhSN27X7P4FU0",
-        "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2NjQ3MDQ3NCwiaWF0IjoxNzY1ODY1Njc0LCJqdGkiOiIxNTc3MDU0YWQ0NzI0NmEyOGY0OGVhNDhiMDM1ODNkMyIsInVzZXJfaWQiOjM1fQ.E_wvI9MgdA0rNC9XCRRYGFpggsl1N6djXj9zfMM2BeI",
-        "email": "test@example.com"
-      },
+      // defaultBackendTokens: {
+      //   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY1ODY3NDc0LCJpYXQiOjE3NjU4NjU2NzQsImp0aSI6ImU2YTc4OTVhZDRlNzQ1NzBhMmEyMmE4OTA4YjM1ZDBjIiwidXNlcl9pZCI6MzV9.lewJXA_rBur_1gPtrZqcmeai4K5etxhSN27X7P4FU0",
+      //   "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2NjQ3MDQ3NCwiaWF0IjoxNzY1ODY1Njc0LCJqdGkiOiIxNTc3MDU0YWQ0NzI0NmEyOGY0OGVhNDhiMDM1ODNkMyIsInVzZXJfaWQiOjM1fQ.E_wvI9MgdA0rNC9XCRRYGFpggsl1N6djXj9zfMM2BeI",
+      //   "email": "test@example.com"
+      // },
       showFirstLoginDialog: false,
       showChangePassDialog: false,
       tempLoginData: null,
@@ -288,7 +288,7 @@ export default {
         ]
       },
       showResetPassDialog: false,
-      resetPassToken: '', // 用於存儲網址帶來的 token
+      resetPassToken: '', // 存儲網址帶來的 token
       resetPassForm: {
         new_password: ''
       }
@@ -322,7 +322,7 @@ export default {
     }
   },
   methods: {
-    // 1. 觸發忘記密碼彈窗
+    //  觸發忘記密碼彈窗
     openForgetPassModal() {
       this.showForgetPassDialog = true;
       if (this.$refs.forgetForm) {
@@ -330,7 +330,7 @@ export default {
       }
     },
 
-    // 2. 忘記密碼提交
+    //  忘記密碼提交
     async handleForgetPassword() {
       this.$refs.forgetForm.validate(async (valid) => {
         if (!valid) return;
@@ -347,7 +347,6 @@ export default {
       });
     },
 
-    // 3. 處理登入 API
     async handleLogin() {
       this.showAlert = false;
       if (!this.loginForm.account || !this.loginForm.password) {
@@ -389,7 +388,7 @@ export default {
       }
     },
 
-    // 4.沿用舊密碼：回傳 skip_change: true
+    // 沿用舊密碼：回傳 skip_change: true
     async handleKeepOldPassword() {
       this.performLogin(this.tempLoginData, null); // 需先存 Token
       try {
@@ -403,7 +402,7 @@ export default {
       }
     },
 
-    // 5. 前往修改密碼對話框
+    // 前往修改密碼對話框
     openChangePassDialog() {
       this.showFirstLoginDialog = false;
       this.showChangePassDialog = true;
@@ -475,13 +474,13 @@ export default {
       }
     },
 
-    // 9. 測試帳號快捷登入
+    //  測試帳號快捷登入
     handleTestLogin(role) {
       const loginResponseData = { ...this.defaultBackendTokens, role: role.key };
       this.performLogin(loginResponseData, role.path);
     },
 
-    // 10. Token 刷新計時器
+    //Token 刷新計時器
     async startTokenRefreshTimer() {
       if (this.refreshTimer) return;
 
@@ -506,7 +505,6 @@ export default {
       this.$refs.resetPassForm.validate(async (valid) => {
         if (!valid) return;
         try {
-          // 根據你的 API 需求，傳入 token 與新密碼
           await api.post('students/reset-password/', {
             token: this.resetPassToken,
             new_password: this.resetPassForm.new_password
@@ -542,6 +540,7 @@ $bg-path: "~@/assets/image/login-bg.jpg";
   background-position: center center;
   background-repeat: no-repeat;
   padding: 0 18%;
+  overflow-y: scroll;
 
   i {
     margin-right: 4px;
@@ -788,7 +787,7 @@ $bg-path: "~@/assets/image/login-bg.jpg";
     }
 
     .card-subtitle {
-      font-size: 16px;
+      font-size: 1rem;
       text-align: center;
       color: #666;
       margin-bottom: 25px;
@@ -891,9 +890,12 @@ $bg-path: "~@/assets/image/login-bg.jpg";
   }
 
   .login-page {
-    padding: 5%;
+    padding: 5% !important;
     height: auto;
     overflow-y: auto;
+    // .card-subtitle{
+    //   font-size: 18px;
+    // }
   }
 
 }

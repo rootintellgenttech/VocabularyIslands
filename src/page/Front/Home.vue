@@ -2,7 +2,6 @@
     <div class="home-page">
         <div class="main-content">
             <h1 class="page-title">大廳</h1>
-
             <vue-custom-scrollbar class="islands-scroll-container" :settings="scrollSettings">
                 <div class="island-map-container">
                     <div v-for="island in islands" :key="island.name" class="island-container">
@@ -23,12 +22,12 @@
 <script>
 export default {
     name: 'Home',
-      props:{
-            scrollSettings: {
-                suppressScrollY: true,  // 關閉直向滾動
-                suppressScrollX: false, // 開啟橫向滾動
-                wheelPropagation: false
-            }
+    props: {
+        scrollSettings: {
+            suppressScrollY: true,
+            suppressScrollX: false,
+            wheelPropagation: false
+        }
     },
     data() {
         return {
@@ -46,9 +45,9 @@ export default {
                     imagePath: require('../../assets/image/home/primary-island.png'),
                     route: '/secondaryisland',
                 },
-              {
-                    name: '試煉殿堂', 
-                    imagePath: require('../../assets/image/home/exam-island.png'),                    route: '/trial-hall',
+                {
+                    name: '試煉殿堂',
+                    imagePath: require('../../assets/image/home/exam-island.png'), route: '/trial-hall',
                 },
                 {
                     name: '競技島',
@@ -58,7 +57,7 @@ export default {
                 {
                     name: '成就島',
                     imagePath: require('../../assets/image/home/achievement-island.png'),
-                    route: '/achievementIsland', 
+                    route: '/achievementIsland',
                 },
             ],
         };
@@ -101,7 +100,7 @@ export default {
     align-items: end;
     gap: 0 8%;
     margin-top: calc(8% - 5%);
-    padding:0 32px 24px;
+    padding: 0 32px 24px;
 
     .action-section {
         display: flex;
@@ -152,7 +151,7 @@ export default {
 @media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
 
     .islands-scroll-container {
-          margin:0 20px 20px;
+        margin: 0 20px 20px;
     }
 
     .island-map-container {

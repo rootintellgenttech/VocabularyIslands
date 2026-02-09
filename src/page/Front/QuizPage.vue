@@ -82,8 +82,8 @@
                 <img :src="wonderfulAvatarPath" alt="Result" class="result-avatar">
 
                 <div v-if="earnedStars > 0" class="final-star">
-                    <i v-for="n in 5" :key="n" style="color: #ffc940;" class="fas fa-star"
-                        :class="{ 'filled': n <= earnedStars }"></i>
+                    <i v-for="n in earnedStars" :key="n" style="color: #ffc940;" class="fas fa-star filled">
+                    </i>
                 </div>
 
                 <p class="result-score">你獲得了 {{ earnedStars }} 顆星星</p>
@@ -129,7 +129,6 @@ export default {
             isLoading: true,
             currentPhase: 'quiz', // 'quiz' | 'complete'
 
-            // 圖片
             correctAvatarPath: require('@/assets/image/correct.png'),
             wrongAvatarPath: require('@/assets/image/answer-avatar.png'),
             wonderfulAvatarPath: require('@/assets/image/wonderful-avatar.png'),
@@ -169,8 +168,22 @@ export default {
             return this.currentQuestionIndex === this.maxQuestions - 1;
         },
         quizMode() {
-            if (this.activityType.includes('listening')) return 'listening';
-            if (['af', 'gl', 'mr', 'sz', 'final'].includes(this.unitId)) return 'abc';
+            //  優先級：明確的聽力活動
+            if (this.activityType && this.activityType.includes('listening')) return 'listening';
+
+            //  判定 ABC 模式：
+            //    條件 A: unitId 是 ABC 相關的 ID (af, gl, mr, sz, final)
+            //    條件 B: wordCount 為 'abc'
+            //    條件 C: 單元名稱或階段標籤包含 'ABC' 或 'A-Z' (總複習)
+            const isAbc =
+                ['af', 'gl', 'mr', 'sz', 'final'].includes(this.unitId) ||
+                this.wordCount === 'abc' ||
+                (this.unitName && this.unitName.includes('ABC')) ||
+                (this.stageLabel && this.stageLabel.includes('A-Z'));
+
+            if (isAbc) return 'abc';
+
+            //  預設為一般單字模式
             return 'word';
         },
         instructionText() {
@@ -185,6 +198,12 @@ export default {
         }
     },
     created() {
+        console.log('QuizPage Params:', {
+            unitId: this.unitId,
+            activityType: this.activityType,
+            wordCount: this.wordCount,
+            quizMode: this.quizMode
+        });
         this.fetchQuestions();
     },
     methods: {
@@ -203,127 +222,173 @@ export default {
         async fetchQuestions() {
             this.isLoading = true;
             try {
-                console.log('--- [QuizPage Strict Debug] ---');
-                console.log('ID:', this.unitId, '| Label:', this.stageLabel, '| Name:', this.unitName);
+                console.log('--- [QuizPage Final Integrated Debug] ---');
 
-                let payload = {};
+                // 基礎判定變數
+                const isAbcUnit = ['af', 'gl', 'mr', 'sz', 'final'].includes(this.unitId) || this.wordCount === 'abc';
+                const isListeningBay = this.unitName.includes('聽力海灣');
+                // 複習模式判定
+                const isReviewMode = (this.unitName.includes('複習') || this.unitName.includes('復習') || this.unitId === 'final') && !isListeningBay;
 
-                // 1. 決定島嶼名稱
-                let islandName = '300字島';
-                if (this.wordCount === '800' || (this.unitId && this.unitId.includes('800'))) islandName = '800字島';
-                if (this.wordCount === '1200' || (this.unitId && this.unitId.includes('1200'))) islandName = '1200字島';
-
-                // 只要單元名稱包含「複習」，就認定為複習模式
-                const isReviewMode = this.unitName.includes('複習') || this.unitName.includes('復習') || ['06', '800-06', '1200-05'].includes(this.unitId);
+                let apiData = [];
+                let sliceCount = 10; // 預設 10 題
 
                 // =========================================================
-                // 分流 A：複習模式 (針對 300/800/1200 複習單元內的點擊)
+                // 邏輯分流 A：ABC 字母島模式
                 // =========================================================
-                if (isReviewMode) {
-                    console.log('✅ 進入強效複習模式分流');
-
-                    // 1. 全島/全項目抓題標籤 (不傳「單元」，不傳「關卡」)
-                    const islandOnlyLabels = [
-                        '300字島', '800字島', '1200字島', '300字複習', '800字複習', '1200字複習', '超級總複習'
-                    ];
-
-                    if (islandOnlyLabels.includes(this.stageLabel)) {
-                        // 正確格式：{"島嶼": "...", "題數": ..., "include_answer": true}
-                        payload = {
-                            "島嶼": islandName,
-                            "題數": (islandName === '300字島') ? 300 : 1200,
-                            "include_answer": true
-                        };
-                    } else {
-                        // 2. 特定單元抓題 (例如: 奇異峽谷)
-                        payload = {
-                            "島嶼": islandName,
-                            "單元": this.stageLabel,
-                            "題數": 1200,
-                            "include_answer": true
-                        };
+                if (isAbcUnit) {
+                    console.log('✅ 執行 ABC 模式');
+                    let dynamicCount = 26;
+                    const rangeMatch = this.stageLabel.match(/([A-Z])-([A-Z])/);
+                    if (rangeMatch) {
+                        const startChar = rangeMatch[1].charCodeAt(0);
+                        const endChar = rangeMatch[2].charCodeAt(0);
+                        dynamicCount = Math.abs(endChar - startChar) + 1;
                     }
-                }
-                // =========================================================
-                // 分流 B：其他特殊模式 (ABC, 聽力海灣)
-                // =========================================================
-                else if (this.unitId === 'final' || this.wordCount === 'abc') {
-                    const island = 'ABC啟航島';
+                    if (this.stageLabel.includes('總復習') || this.stageLabel.includes('總複習') || this.stageLabel === 'A-Z') {
+                        dynamicCount = 26;
+                    }
+                    sliceCount = dynamicCount;
+                    let payload = {};
                     if (this.unitId === 'final') {
-                        payload = this.stageLabel === 'A-Z' ? { "島嶼": island, "題數": 26, "include_answer": true } : { "島嶼": island, "單元": this.stageLabel, "題數": 26, "include_answer": true };
+                        if (this.stageLabel === 'A-Z') {
+                            payload = { "島嶼": "ABC啟航島", "題數": 26, "include_answer": true };
+                        } else {
+                            payload = { "單元": this.stageLabel, "題數": dynamicCount, "include_answer": true };
+                        }
                     } else {
-                        const mapping = { 'af': 'A-F', 'gl': 'G-L', 'mr': 'M-R', 'sz': 'S-Z' };
-                        payload = { "島嶼": island, "單元": mapping[this.unitId], "關卡": this.stageLabel, "題型": "字母", "題數": 26, "include_answer": true };
+                        payload = { "關卡": this.stageLabel, "題數": dynamicCount, "include_answer": true };
                     }
+                    const response = await api.post('/questionbank/generate/', payload);
+                    apiData = response.data;
                 }
-                else if (this.unitName.includes('聽力海灣')) {
-                    console.log('✅ 進入路徑 3: 聽力海灣模式');
 
-                    // 針對國中聽力海灣的複習關卡做特殊判定
-                    if (this.stageLabel === '800字複習') {
-                        // 800字複習專用：指向 800字島
-                        payload = {
-                            "島嶼": "800字島",
-                            "題數": 1200,
-                            "include_answer": true
-                        };
-                    } else if (this.stageLabel === '1200單字複習') {
-                        // 1200單字複習：指向 1200字島
-                        payload = {
-                            "島嶼": "1200字島",
-                            "題數": 1200,
-                            "include_answer": true
-                        };
-                    } else {
-                        // 一般單元 (霧靄之境、永恆圖書館等)
-                        payload = {
-                            "單元": this.stageLabel,
-                            "題數": 1200,
-                            "include_answer": true
-                        };
-                    }
-                }
                 // =========================================================
-                // 分流 C：一般單元 (01~05) 
+                // 邏輯分流 B：300/800/1200 複習模式 (特定複習單元)
+                // =========================================================
+                else if (isReviewMode) {
+                    console.log('✅ 執行複習模式');
+                    sliceCount = 20;
+                    const islandLabels = ['300字複習', '300單字島', '800字複習', '800單字島', '1200字複習', '1200單字島', '超級總複習', '1200單字複習'];
+                    let p1 = { "題數": 10, "題型": "英翻中", "include_answer": true };
+                    let p2 = { "題數": 10, "題型": "中翻英", "include_answer": true };
+
+                    if (islandLabels.includes(this.stageLabel)) {
+                        let targetIsland = this.stageLabel.includes('800') ? "800字島" : (this.stageLabel.includes('1200') || this.stageLabel.includes('超級') ? "1200字島" : "300字島");
+                        p1["島嶼"] = targetIsland; p2["島嶼"] = targetIsland;
+                    } else {
+                        p1["單元"] = this.stageLabel; p2["單元"] = this.stageLabel;
+                    }
+                    const [res1, res2] = await Promise.all([api.post('/questionbank/generate/', p1), api.post('/questionbank/generate/', p2)]);
+                    apiData = [...res1.data, ...res2.data];
+                }
+
+                // =========================================================
+                // 邏輯分流 C：聽力海灣
+                // =========================================================
+                else if (isListeningBay) {
+                    console.log('✅ 執行聽力海灣雙呼叫模式');
+                    sliceCount = 20;
+
+                    // 兩個 Payload：分別取英翻中與中翻英
+                    let p1 = { "題數": 10, "題型": "英翻中", "include_answer": true };
+                    let p2 = { "題數": 10, "題型": "中翻英", "include_answer": true };
+
+                    // 判斷應該傳送「島嶼」還是「單元」
+                    if (this.stageLabel === '300字複習') {
+                        p1["島嶼"] = "300字島"; p2["島嶼"] = "300字島";
+                    } else if (this.stageLabel === '800字複習') {
+                        p1["島嶼"] = "800字島"; p2["島嶼"] = "800字島";
+                    } else if (this.stageLabel.includes('1200')) {
+                        p1["島嶼"] = "1200字島"; p2["島嶼"] = "1200字島";
+                    } else {
+                        // 一般聽力關卡統一傳「單元」
+                        p1["單元"] = this.stageLabel; p2["單元"] = this.stageLabel;
+                    }
+
+                    console.log('聽力海灣雙 Payload:', { p1, p2 });
+                    const [res1, res2] = await Promise.all([
+                        api.post('/questionbank/generate/', p1),
+                        api.post('/questionbank/generate/', p2)
+                    ]);
+
+                    // 合併 10 + 10 成為 20 題
+                    apiData = [...res1.data, ...res2.data];
+                }
+
+                // =========================================================
+                // 邏輯分流 D：一般單元練習 ( 針對 300/800/1200 島嶼管卡)
                 // =========================================================
                 else {
-                    payload = {
+                    console.log('✅ 執行普通單元模式 (啟蒙小木屋 ~ 黎光秘境島)');
+
+                    // 1. 決定動態題數上限
+                    let dynamicLimit = 1200;
+                    if (this.wordCount === '300') dynamicLimit = 300;
+                    else if (this.wordCount === '800') dynamicLimit = 800;
+                    else if (this.wordCount === '1200') dynamicLimit = 1200;
+
+                    const isTotalStudy = (this.stageLabel === 'ALL');
+                    const isChallengeMode = (this.activityType === 'quiz');
+
+                    let islandName = this.wordCount === '1200' ? '1200字島' : (this.wordCount === '800' ? '800字島' : '300字島');
+
+                    // 2. 構建 Payload
+                    let payload = {
                         "島嶼": islandName,
                         "單元": this.unitName,
-                        "關卡": this.stageLabel,
-                        "題數": 1200,
-                        "include_answer": true
+                        "題數": dynamicLimit,
+                        "include_answer": isChallengeMode
                     };
+
+                    // 如果是總學習 (ALL)，不傳關卡，顯示全部
+                    // 如果是挑戰 (quiz)，必須傳關卡，切片取 10 題
+                    if (isTotalStudy) {
+                        sliceCount = dynamicLimit;
+                    } else {
+                        sliceCount = 10;
+                        payload["關卡"] = this.stageLabel;
+                    }
+
+                    console.log(' D 分流最終 Payload:', JSON.stringify(payload));
+
+                    try {
+                        const response = await api.post('/questionbank/generate/', payload);
+                        apiData = response.data;
+
+                        if (!apiData || apiData.length === 0) {
+                            throw new Error('API 返回數據為空');
+                        }
+
+                        // 過濾克漏字
+                        apiData = apiData.filter(q => q.type !== 'cloze');
+                    } catch (apiErr) {
+                        console.error("API 請求失敗:", apiErr);
+                        throw apiErr;
+                    }
                 }
 
-                console.log('🚀 發送 Payload:', JSON.stringify(payload, null, 2));
-
-                const response = await api.post('/questionbank/generate/', payload);
-                let apiData = response.data;
-
-                // 題型過濾
-                if (isReviewMode) {
-                    apiData = apiData.filter(q => q.type === 'en_to_zh' || q.type === 'zh_to_en');
-                } else {
-                    apiData = apiData.filter(q => q.type !== 'cloze');
-                }
-
-                // 隨機選題
-                let targetCount = 10;
-                if (isReviewMode || this.unitName.includes('聽力海灣') || this.unitId === 'final') {
-                    targetCount = (this.unitId === 'final' || this.wordCount === 'abc') ? 26 : 20;
-                }
-
-                apiData = apiData.sort(() => Math.random() - 0.5).slice(0, targetCount);
+                // =========================================================
+                // 通用資料處理
+                // =========================================================
+                apiData = apiData.sort(() => Math.random() - 0.5).slice(0, sliceCount);
 
                 this.questionsList = apiData.map(q => {
                     const hasChinese = (str) => /[\u4e00-\u9fa5]/.test(str);
                     let audioText = q.question_text;
                     if (hasChinese(q.question_text)) audioText = q.answer;
+
                     return {
-                        id: q.id, title: q.question_text, audioSrc: audioText,
-                        correctAnswer: q.answer, explanation: q.explanation || '無題解',
-                        options: (q.options || []).map(opt => ({ value: opt.id, label: opt.text, audioSrc: opt.text }))
+                        id: q.id,
+                        title: q.question_text,
+                        audioSrc: audioText,
+                        correctAnswer: q.answer,
+                        explanation: q.explanation || '無題解',
+                        options: (q.options || []).map(opt => ({
+                            value: opt.id,
+                            label: opt.text,
+                            audioSrc: opt.text
+                        }))
                     };
                 });
 
@@ -332,7 +397,7 @@ export default {
 
             } catch (error) {
                 console.error('Fetch error:', error);
-                alert('無法取得題庫');
+                alert('無法取得題庫，請稍後再試');
                 this.goBack();
             } finally {
                 this.isLoading = false;
@@ -343,14 +408,18 @@ export default {
             this.currentQuestionIndex = index;
             if (this.questionsList[index]) {
                 this.currentQuestion = this.questionsList[index];
+
+                // 不管什麼模式都播，只要有音訊文字就播
+                this.$nextTick(() => {
+                    this.playAudio(this.currentQuestion.audioSrc);
+                });
             }
         },
-
         playAudio(text) {
             if (!text) return;
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'en-US';
-            utterance.rate = 0.3;
+            utterance.rate = 0.4;
             window.speechSynthesis.cancel();
             window.speechSynthesis.speak(utterance);
         },
@@ -371,13 +440,13 @@ export default {
         handleSubmit() {
             if (!this.selectedAnswer) return;
 
-            // 1. 記錄答案
+            // 記錄答案
             this.userAnswers.push({
                 question_id: this.currentQuestion.id,
                 option_id: this.selectedAnswer
             });
 
-            // 2. 判斷流程
+            // 判斷流程
             if (this.isLastQuestion) {
                 // 如果是最後一題，送出整包答案
                 this.submitFinalResults();
@@ -398,13 +467,11 @@ export default {
             }, 1000);
         },
         async submitFinalResults() {
-            // 1. 清除計時器，防止重複觸發
+            // 清除計時器，防止重複觸發
             if (this.timerInterval) clearInterval(this.timerInterval);
 
             this.isLoading = true;
             try {
-                // 🔥 新增邏輯：補齊未作答的題目
-                // 遍歷原本的題目列表 (questionsList)
                 // 如果 userAnswers 裡找不到該題的答案，就補上 null
                 const finalAnswers = this.questionsList.map(q => {
                     const existingAnswer = this.userAnswers.find(a => a.question_id === q.id);
@@ -442,7 +509,6 @@ export default {
                     submitStage = this.stageLabel;
                 }
 
-                // 4. 構建 Payload
                 const payload = {
                     "answers": finalAnswers,
                     "island": islandName,
@@ -496,7 +562,7 @@ export default {
                 wordCount: this.wordCount
             };
 
-            // 關鍵判斷：如果是聽力海灣
+            // 判斷如果是聽力海灣
             if (this.unitName.includes('聽力海灣')) {
                 // 根據 level 對應 index.js 裡的路由 name
                 targetRouteName = this.level === 'primary' ? 'PrimaryListenDetail' : 'SecondaryListenDetail';
@@ -532,8 +598,6 @@ export default {
 <style lang="scss" scoped>
 .quiz-page {
     @include main-card-page;
-
-
 }
 
 i {
@@ -566,6 +630,7 @@ i {
 
             .back-link {
                 @include card-return-text;
+                margin-bottom: 24px;
             }
 
 
@@ -577,16 +642,18 @@ i {
     }
 }
 
-.question-mode .question-content .question-wrap .question-title {
-    font-size: 140px;
-}
+
 
 .progress-header {
     @include progress-star
 }
 
 .question-content {
-    @include main-card-content
+    @include main-card-content;
+
+    .question-title {
+        font-size: 140px;
+    }
 }
 
 

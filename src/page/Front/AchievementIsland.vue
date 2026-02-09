@@ -102,7 +102,6 @@ export default {
         attendance_days: 0,
         island_stars: {}
       },
-      // 成就定義：增加 target 屬性來對比
       achievements: [
         { id: 1, title: '踏出第一步', desc: '堅持學習\n連續登入10天', icon: 'fa-solid fa-shoe-prints', target: 10, category: 'attendance' },
         { id: 2, title: '初次閃耀', desc: '連續簽到14天', icon: 'fa-solid fa-star', target: 14, category: 'attendance' },
@@ -123,6 +122,15 @@ export default {
     };
   },
   computed: {
+    completedCount() {
+      return this.achievements.filter(item => item.isCompleted).length;
+    },
+    //計算完成率 (百分比)
+    completionRate() {
+      if (this.achievements.length === 0) return 0;
+      const rate = (this.completedCount / this.achievements.length) * 100;
+      return Math.round(rate); // 取整數
+    },
     // 判定哪些成就是「可兌換」的
     processedAchievements() {
       return this.achievements.map(item => {
@@ -289,9 +297,14 @@ export default {
 
 
 .page-title {
-  font-size: 28px;
+  font-size: 32px;
   color: $main-black-text;
   margin: 0 0 10px 0;
+}
+
+.page-desc{
+  margin: 0;
+  font-size: 20px;
 }
 
 // .page-desc{
@@ -347,12 +360,14 @@ export default {
   }
 
   .card-title {
+   margin:16px 0 8px;
     color: $main-black-text;
   }
 
   .card-desc {
     color: $main-grey-text;
     white-space: pre-line;
+    margin: 0;
   }
 }
 
@@ -456,9 +471,11 @@ export default {
   border: 2px solid #f1c40f;
   cursor: pointer;
   animation: pulse 2s infinite;
-&:hover{
-  background-color: #5fb5acb3;
-    }
+
+  &:hover {
+    background-color: #5fb5acb3;
+  }
+
   .unfinished-mask {
     background: rgba(24, 172, 157, 0.7);
   }
@@ -468,7 +485,7 @@ export default {
     color: white;
     text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     font-weight: 800;
-    
+
   }
 }
 
@@ -523,10 +540,15 @@ export default {
 
 @media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
   .achievement-island-page {
-    padding: 0 8%;
+    padding: 0 8% !important;
 
     .main-content-wrap {
       width: 100%;
+
+      .top-info-wrap .first-row {
+        flex-direction: column;
+        gap: 24px 0;
+      }
     }
   }
 }

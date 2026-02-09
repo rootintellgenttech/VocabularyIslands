@@ -102,6 +102,12 @@ body {
   margin: 0;
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 .el-form--label-top .el-form-item__label {
   display: flex !important;
   // justify-content: center;
@@ -127,7 +133,7 @@ body {
     border: 2px solid #e1e0e0;
     border-radius: 16px;
 
-   .el-progress-bar__innerText {
+    .el-progress-bar__innerText {
       font-size: 16px;
       font-weight: bold;
       color: #ffffff !important;
@@ -202,9 +208,9 @@ body {
 
     .title {
       font-weight: 600;
+      margin: 0 0 16px;
       font-size: 20px;
       color: $main-black-text;
-      margin-bottom: 4px;
     }
   }
 
@@ -222,6 +228,7 @@ body {
 
 
     .description {
+      margin: 0;
       text-align: center;
       color: $main-grey-text;
       font-size: 16px;
@@ -267,6 +274,7 @@ body {
 .confirm-pw-modal,
 .confirm-change-pw-modal,
 .settings-modal,
+.mails-modal,
 .exit-confirm-modal {
   border: 6px solid var(--btn-g, #4ABCB1);
   border-radius: 16px !important;
@@ -429,6 +437,11 @@ button {
   .return-last-page {
     padding: 16px 0 0 0;
   }
+
+  .main-card,
+  .intro-card {
+    min-width: 500px !important;
+  }
 }
 
 @media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
@@ -440,14 +453,23 @@ button {
     min-width: unset;
   }
 
-  .main-card {
-    width: 500px !important;
+  .main-card,
+  .intro-card {
+    min-width: 500px !important;
 
     .question-content {
       padding: 5% !important;
 
-      .question-wrap .question-title {
-        font-size: 32px;
+      .instruction-text {
+        margin: 0 0 24px;
+      }
+
+      .question-title {
+        font-size: 120px !important;
+      }
+
+      .context-fill-title {
+        font-size: 34px !important;
       }
     }
 
@@ -467,11 +489,6 @@ button {
   // :deep(.multiselect__single) {
   //   font-size: 24px;
   // }
-
-  .router-view-content {
-    padding-left: 0;
-  }
-
 
 }
 </style>

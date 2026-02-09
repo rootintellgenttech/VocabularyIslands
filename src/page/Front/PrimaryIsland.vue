@@ -143,9 +143,6 @@ export default {
                     name: 'WordIslandDetail',
                     params: { level: 'primary', wordCount: '300' }
                 });
-            } else {
-                // 這裡處理進入其他島嶼的邏輯
-                // this.$router.push(`/game/${id}`);
             }
         }
     }

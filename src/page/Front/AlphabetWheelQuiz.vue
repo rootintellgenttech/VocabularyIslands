@@ -36,9 +36,9 @@
                         </button>
                     </div>
 
-                    <el-button class="submit-btn" :disabled="!tempSelectedAnswer" @click="handleQuestionSubmit">
+                    <button class="submit-btn" :disabled="!tempSelectedAnswer" @click="handleQuestionSubmit">
                         提交
-                    </el-button>
+                    </button>
                 </div>
             </template>
 
@@ -47,7 +47,7 @@
                     <img :src="wonderfulAvatarPath" alt="太棒了!" class="result-avatar">
                     <h2 class="result-title">挑戰{{ isExitConfirmed ? '中止' : '完成' }}!</h2>
                     <p class="result-score">獲得了 {{ finalScore }} 積分</p>
-                    <p v-if="!isExitConfirmed" style="color: #666;">答對 {{ correctCount }} 題</p>
+                    <p v-if="!isExitConfirmed" class="correct-quiz-count">總計答對 {{ correctCount }} 題</p>
                 </div>
                 <button class="result-back-btn" @click="goBack">返回</button>
             </template>
@@ -97,8 +97,6 @@ export default {
             blocks: [{ padding: '13px', background: '#097C70' }],
             prizes: prizesList,
             buttons: [{ radius: '40%', background: '#077065' }, { radius: '35%', background: '#38ADA2', pointer: true, fonts: [{ text: '開始', top: '-10px', fontColor: '#333', fontSize: '24px', fontWeight: 'bold' }] }],
-
-            questionCount: 1,
             finalScore: 0,
             correctCount: 0, // 從 API check 回傳的正確題數
             tempSelectedAnswer: null, // 當前題目的暫存選擇
@@ -140,7 +138,13 @@ export default {
             this.isWheelPhase = false;
             this.isQuestionPhase = true;
             this.tempSelectedAnswer = null;
-            this.$nextTick(() => this.playAudio(this.currentQuestionText));
+
+            //  渲染完成後才執行播放
+            this.$nextTick(() => {
+                if (this.currentQuestionText) {
+                    this.playAudio(this.currentQuestionText);
+                }
+            });
         },
         handleOptionClick(option) {
             this.tempSelectedAnswer = option.id; // 存儲 option_id
@@ -168,7 +172,7 @@ export default {
         async confirmExit() {
             this.exitDialogVisible = false;
 
-            // 1. 自動補齊剩餘題目為 null
+            // 自動補齊剩餘題目為 null
             const remainingCount = 5 - this.userAnswers.length;
             if (remainingCount > 0) {
                 // 從目前的題目索引開始補齊到第 5 題
@@ -176,12 +180,12 @@ export default {
                     const q = this.questionsData[i];
                     this.userAnswers.push({
                         question_id: q.external_id,
-                        selected_option: null //  傳送 null 讓後端判錯
+                        selected_option: null
                     });
                 }
             }
 
-            // 2. 執行正式提交
+            // 執行正式提交
             await this.processFinalSubmit();
         },
 
@@ -192,8 +196,8 @@ export default {
                 const checkPayload = {
                     answers: this.userAnswers,
                     island: "ABC啟航島",
-                    unit: this.currentQuestion.unit, // 從題目數據中取得
-                    stage: "A-Z" // 固定或動態取得
+                    unit: this.currentQuestion.unit,
+                    stage: "A-Z"
                 };
 
                 const checkRes = await api.post('/questionbank/check/', checkPayload);
@@ -222,11 +226,21 @@ export default {
             if (!text) return;
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'en-US';
-            utterance.rate = 0.3;
+            utterance.rate = 0.4;
             window.speechSynthesis.cancel();
             window.speechSynthesis.speak(utterance);
         },
-    }
+    },
+    watch: {
+        // MP3自動播放
+        questionCount(newVal) {
+            if (this.isQuestionPhase) {
+                this.$nextTick(() => {
+                    this.playAudio(this.currentQuestionText);
+                });
+            }
+        }
+    },
 };
 </script>
 

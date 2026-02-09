@@ -6,13 +6,14 @@
         </div>
 
         <div v-else-if="currentPhase === 'quiz'" class="quiz-container-wide">
-            <el-row type="flex" justify="center" align="middle" :gutter="80" style="width: 100%; max-width: 1200px;">
+            <el-row type="flex" justify="center" align="middle" :gutter="80" style=" max-width: 1300px;">
                 <el-col :xs="24" :md="10" class="left-image-col">
-                    <img :src="tempAvatar" alt="Role" class="side-role-img desktop-img">
+                    <img :key="animationKey" :src="tempAvatar" alt="Role" class="side-role-img desktop-img">
 
                     <div class="timer-bar-wrap" style="width: 80%; margin: 20px auto 0;">
                         <el-progress :text-inside="true" :stroke-width="26" :percentage="timerPercentage"
-                            :format="formatTimerText" status="exception" class="timer-progress">
+                            :format="formatTimerText" :status="questionTimeLeft <= 5 ? 'exception' : 'success'"
+                            class="timer-progress">
                         </el-progress>
                     </div>
                 </el-col>
@@ -34,7 +35,13 @@
                                 </div>
                             </div>
 
-                            <img :src="tempAvatar" alt="Role" class="side-role-img mobile-img">
+                            <img :key="animationKey" :src="tempAvatar" alt="Role" class="side-role-img mobile-img">
+                            <div class="timer-bar-wrap-sm">
+                                <el-progress :text-inside="true" :stroke-width="26" :percentage="timerPercentage"
+                                    :format="formatTimerText" :status="questionTimeLeft <= 5 ? 'exception' : 'success'"
+                                    class="timer-progress">
+                                </el-progress>
+                            </div>
                             <div class="question-content">
                                 <div class="question-wrap">
                                     <p class="question-title context-fill-title">
@@ -96,8 +103,8 @@
                 <img :src="wonderfulAvatarPath" alt="Result" class="result-avatar">
 
                 <div v-if="earnedStars > 0" class="final-star">
-                    <i v-for="n in 5" :key="n" style="color: #ffc940;" class="fas fa-star"
-                        :class="{ 'filled': n <= earnedStars }"></i>
+                    <i v-for="n in earnedStars" :key="n" style="color: #ffc940;" class="fas fa-star filled">
+                    </i>
                 </div>
 
                 <p class="result-score">你獲得了 {{ earnedStars }} 顆星星</p>
@@ -133,11 +140,13 @@ export default {
     },
     data() {
         return {
+            animationKey: 0,
             currentPhase: 'intro',
             isLoading: true,
             introAvatar: require('@/assets/image/hero-avatar.png'),
             wonderfulAvatarPath: require('@/assets/image/wonderful-avatar.png'),
-            tempAvatar: require('@/assets/image/15sec.gif'),
+            rawGifPath: require('@/assets/image/15sec.gif'),
+            tempAvatar: '',
             maxQuestions: 20,
             questionTimeLeft: 15,
             questionTimer: null,
@@ -189,16 +198,16 @@ export default {
                     payload = {
                         "島嶼": "1200字島",   // 強制指定 1200字島 (包含所有國中題)
                         "題型": "克漏字",      // 固定題型
-                        "題數": 1200,
+                        "題數": 20,
                         "include_answer": true
                     };
                 } else {
-                    //  一般關卡 (霧靄之境、永恆圖書館等) 維持原有邏輯
+                    //  一般關卡 (霧靄之境、永恆圖書館等) 
                     console.log(`✅ 進入會考大殿堂一般單元模式: ${this.stageName}`);
                     payload = {
                         "單元": this.stageName,
                         "題型": "克漏字",
-                        "題數": 1200,
+                        "題數": 20,
                         "include_answer": true
                     };
                 }
@@ -208,7 +217,7 @@ export default {
                 const res = await api.post('/questionbank/generate/', payload);
                 let apiData = res.data;
 
-                // 既然 API 已經指定克漏字，且後端會直接回傳正確數據，我們直接處理
+                // API 已經指定克漏字，且後端會直接回傳正確數據
                 // 隨機抽 20 題
                 const targetCount = 20;
                 apiData = apiData.sort(() => Math.random() - 0.5).slice(0, targetCount);
@@ -244,9 +253,7 @@ export default {
             // 載入第一題
             this.loadQuestion(0);
         },
-
         loadQuestion(index) {
-            // 清除上一題的計時器，避免重疊
             if (this.questionTimer) clearInterval(this.questionTimer);
 
             this.selectedAnswer = null;
@@ -255,8 +262,30 @@ export default {
             this.currentQuestion = this.questionsList[index];
             this.isProcessing = false;
 
-            // 啟動 15 秒倒數
+            this.tempAvatar = this.rawGifPath;
+
+            this.animationKey++;
+
             this.startQuestionTimer();
+        },
+        // 處理時間到 (未作答) 也要確保下一題會重置
+        handleQuestionTimeout() {
+            clearInterval(this.questionTimer);
+            if (this.isProcessing) return;
+            this.isProcessing = true;
+
+            this.userAnswers.push({
+                question_id: this.currentQuestion.id,
+                option_id: "未填寫"
+            });
+
+            setTimeout(() => {
+                if (this.currentQuestionIndex < this.maxQuestions) {
+                    this.loadQuestion(this.currentQuestionIndex);
+                } else {
+                    this.submitFinalResults();
+                }
+            }, 500);
         },
 
         // 單題 15 秒倒數邏輯
@@ -272,34 +301,13 @@ export default {
             }, 1000);
         },
 
-        // 處理時間到 (未作答)
-        handleQuestionTimeout() {
-            clearInterval(this.questionTimer);
-            if (this.isProcessing) return; // 防止重複觸發
-            this.isProcessing = true;
-
-            // 記錄為 "未填寫"
-            this.userAnswers.push({
-                question_id: this.currentQuestion.id,
-                option_id: "未填寫"
-            });
-
-            // 自動前往下一題 (延遲一下讓使用者意識到切換，或直接切換)
-            setTimeout(() => {
-                if (this.currentQuestionIndex < this.maxQuestions) {
-                    // currentQuestionIndex 是 1-based，載入下一題剛好用這個數字當 index
-                    this.loadQuestion(this.currentQuestionIndex);
-                } else {
-                    this.submitFinalResults();
-                }
-            }, 500);
-        },
 
         selectAnswer(option) {
             if (this.isProcessing) return;
 
             // 玩家作答後，立刻停止該題倒數
             clearInterval(this.questionTimer);
+            this.tempAvatar = require('@/assets/image/15sec-temp.png');
 
             this.selectedAnswer = option.value;
             this.selectedAnswerLabel = option.label;
@@ -436,7 +444,7 @@ export default {
 
 .main-card {
     @include main-card;
-    width: 650px;
+    width: 700px;
     min-height: 500px;
     padding: 30px 40px 40px;
     display: flex;
@@ -635,27 +643,14 @@ export default {
     }
 }
 
-@media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
-    .quiz-container-wide .el-row--flex.is-align-middle {
-        justify-self: center;
-    }
 
-    .router-view-content {
-        padding: 5%;
-    }
+.timer-bar-wrap-sm {
+    display: none;
+}
 
-    .main-card {
-        min-width: 500px !important;
-        width: 100% !important;
-    }
-
-    .timer-bar-wrap {
-        width: 100% !important;
-        margin: 10px 0 !important;
-    }
-
-    .left-image-col {
-        display: none;
+@media (orientation: landscape) and (max-height: 1199.98px) and (pointer: coarse) {
+    .question-content {
+        padding-top: 4%;
     }
 
     .side-role-img {
@@ -670,5 +665,31 @@ export default {
             align-self: center;
         }
     }
+
+    .left-image-col {
+        display: none;
+    }
+}
+
+@media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
+    .quiz-container-wide .el-row--flex.is-align-middle {
+        justify-self: center;
+    }
+
+    .router-view-content {
+        padding: 5%;
+    }
+
+    .main-card {
+        min-width: 500px !important;
+        width: 100% !important;
+    }
+
+    .timer-bar-wrap-sm {
+        display: block;
+        width: 70%;
+        margin: 10px 0;
+    }
+
 }
 </style>

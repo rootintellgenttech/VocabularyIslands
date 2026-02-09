@@ -10,8 +10,12 @@
                     </div>
                     <button class="return-btn">返回國小島</button>
                 </div>
-                <div v-for="(item, index) in units" :key="item.id"
-                    :class="['unit-card-container', { 'is-up': index % 2 !== 0 || index === units.length - 1 }]">
+               <div
+  v-for="(item, index) in units"
+  :key="item.id"
+  :class="['unit-card-container', { 'is-up': index % 2 !== 0 }]"
+>
+
                     <div class="island-card">
                         <img :src="item.imgColor" :alt="item.name" :class="{ 'is-bw': item.stars === 0 }" />
                     </div>
@@ -107,7 +111,7 @@ export default {
         },
         enterUnit(unit) {
             console.log('--- AbcIsland Navigation Debug ---');
-            console.log('Target Unit ID:', unit.id); // 這裏應該是 af, gl, mr, sz 或 final
+            console.log('Target Unit ID:', unit.id);
             console.log('Target Unit Name:', unit.name);
 
             this.$router.push({
@@ -124,14 +128,12 @@ export default {
 
 <style lang="scss" scoped>
 .abc-page {
-
     .page-title {
         @include page-main-title
     }
 }
 
 .unit-card-container.back-to-island {
-
     .return-btn {
         @include common-btn
     }
@@ -179,18 +181,20 @@ export default {
     transition: transform 0.3s ease;
 }
 
+.island-map-container {
+    align-items: center;
+    margin-top: 5%;
+}
+
 @media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
     .abc-page {
-
-
         .island-map-container {
-
             .island-card img {
                 width: 150px;
             }
 
             .unit-card-container {
-                padding-top: 18px;
+                padding-top: 48px;
 
                 .back-to-island .return-btn {
                     padding: 8px 16px;

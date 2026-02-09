@@ -1,5 +1,23 @@
 <template>
     <div class="competition-page">
+        <el-dialog custom-class="challenge-confirm-modal" :visible.sync="challengeDialogVisible" width="500px" center
+            :close-on-click-modal="false" :show-close="false">
+
+            <div class="dialog-content">
+                <h3 class="title">使用今日挑戰機會？</h3>
+                <p class="description">此挑戰將消耗您每日僅有一次的挑戰機會。</p>
+                <p class="description">使用後，今天將無法再挑戰其他任務，請確認您已準備好開始。</p>
+
+                <p v-if="currentWeekType === 'listening'" class="description warning-text">
+                    本週挑戰主題為聽力挑戰，記得開啟裝置的音量，以免影響挑戰。
+                </p>
+            </div>
+
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="challengeDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="confirmStartChallenge">開始挑戰</el-button>
+            </span>
+        </el-dialog>
         <div class="return-last-page" @click="goToHome">
             <i class="fas fa-angle-left"></i> 返回
         </div>
@@ -12,7 +30,6 @@
                         <img src="../../assets/image/competition/island.png">
                         <div class="header-info">
                             <h2 class="header-title">競技聯盟</h2>
-                            <p class="header-sub">Arena Hub</p>
                         </div>
                     </div>
 
@@ -34,7 +51,7 @@
                                 <i class="fa-solid fa-crown" style="color: #eab308;"></i>
                                 {{ rankingType === 'all' ? '所屬聯盟排行' : '所屬學校排行' }}
                             </span>
-                            <span class="stat-value">{{ currentRanking ? currentRanking.display_name : '載入中...'
+                            <span class="stat-value">{{ currentRanking ? currentRanking.display_name : '無排行'
                             }}</span>
                             <span class="stat-status">排名第 {{ currentRanking ? currentRanking.my_rank : '-' }} 名</span>
                         </div>
@@ -96,8 +113,10 @@
                                     <p class="game-title">{{ game.title }}</p>
                                     <div class="game-info-wrap">
                                         <p class="game-description">{{ game.description }}</p>
-                                        <p class="game-island">{{ game.island }}</p>
-                                        <p class="game-point">{{ game.point }}</p>
+                                        <div class="info-wrap">
+                                            <p class="game-island">{{ game.island }}</p>
+                                            <p class="game-point">{{ game.point }}</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -152,10 +171,10 @@
                 </div>
             </div>
         </div>
-        <div class="footer-fixed" v-if="currentRanking && studentInfo">
+        <div class="footer-fixed" v-if="studentInfo">
             <div class="player-summary">
                 <div class="player-left-info">
-                    <span class="player-rank">#{{ currentRanking.my_rank }}</span>
+                    <span class="player-rank">#{{ currentRanking ? currentRanking.my_rank : '--' }}</span>
                     <div class="player-wrap">
                         <div class="player-info-wrap">
                             <span class="player-name">
@@ -165,48 +184,34 @@
                         <span class="player-school">{{ studentInfo.school_name || '' }}</span>
                     </div>
                 </div>
+
                 <div class="player-right-info">
                     <div class="player-actual-score">
-                        <span class="player-score">{{ formatScore(currentRanking.my_score) }}</span>
+                        <span class="player-score">{{ currentRanking ? formatScore(currentRanking.my_score) : 0
+                        }}</span>
                         <span class="score-title">積分</span>
                     </div>
 
-                    <div class="player-score-compare" v-if="currentRanking.my_rank > 1">
+                    <div class="player-score-compare" v-if="currentRanking && currentRanking.my_rank > 1">
                         <span class="player-rank-diff">與前一名差</span>
                         <div class="player-rank-diff-score">
                             <span>{{ formatScore(myDiffFromPrevious) }}</span><span>分</span>
                         </div>
                     </div>
-                    <div class="player-score-compare" v-else style="background: #FEFAD0; border-color: #EAB308;">
+                    <div class="player-score-compare" v-else-if="currentRanking && currentRanking.my_rank === 1"
+                        style="background: #FEFAD0; border-color: #EAB308;">
                         <span class="player-rank-diff" style="color: #856404;">保持領先！</span>
                         <div class="player-rank-diff-score">
                             <span style="font-size: 16px;">目前排名第一</span>
                         </div>
                     </div>
+                    <div class="player-score-compare" v-else>
+                        <span class="player-rank-diff">暫無挑戰數據</span>
+                    </div>
                 </div>
             </div>
         </div>
-        <el-dialog custom-class="challenge-confirm-modal" :visible.sync="challengeDialogVisible" width="500px" center
-            :close-on-click-modal="false" :show-close="false">
-
-            <div class="dialog-content">
-                <h3 class="title">使用今日挑戰機會？</h3>
-                <p class="description">此挑戰將消耗您每日僅有一次的挑戰機會。</p>
-                <p class="description">使用後，今天將無法再挑戰其他任務，請確認您已準備好開始。</p>
-
-                <p v-if="currentWeekType === 'listening'" class="description warning-text">
-                    本週挑戰主題為聽力挑戰，記得開啟裝置的音量，以免影響挑戰。
-                </p>
-            </div>
-
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="challengeDialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="confirmStartChallenge">開始挑戰</el-button>
-            </span>
-        </el-dialog>
-
     </div>
-
 </template>
 
 <script>
@@ -236,7 +241,7 @@ export default {
             timeUpdateInterval: null,
             dailyCheckInterval: null,
             challengeDialogVisible: false,
-           isDailyChallengeCompleted: true, 
+            isDailyChallengeCompleted: true,
             selectedGame: null,
             activeTab: 'ranking', // 'ranking' or 'challenge'
             rankingType: 'all',   // 'all' or 'school'
@@ -267,11 +272,11 @@ export default {
                 primary: [
                     { id: 'abc', title: '字母轉盤樂', description: '答對所有題目', point: '每題10分，共5題', island: 'ABC啟航島', iconClass: 'ABC_ICON', level: 'primary' },
                     { id: 'perfect', title: '完美連擊', description: '連續答對題目直到錯誤', point: '每題10分', island: '國小聽力海灣', iconClass: 'TARGET_ICON', level: 'both' },
-                    { id: 'speed', title: '速度對決', description: '1分鐘內，盡可能的答對題目', point: '每題10分', island: '國小聽力海灣', iconClass: 'THUNDER_ICON', level: 'both' },
+                    { id: 'speed', title: '速度對決', description: '1分鐘內，盡可能的答對', point: '每題10分', island: '國小聽力海灣', iconClass: 'THUNDER_ICON', level: 'both' },
                 ],
                 secondary: [
                     { id: 'perfect', title: '完美連擊', description: '連續答對題目直到錯誤', point: '每題10分', island: '國中聽力海灣', iconClass: 'TARGET_ICON', level: 'both' },
-                    { id: 'speed', title: '速度對決', description: '1分鐘內，盡可能的答對題目', point: '每題10分', island: '國中聽力海灣', iconClass: 'THUNDER_ICON', level: 'both' },
+                    { id: 'speed', title: '速度對決', description: '1分鐘內，盡可能的答對', point: '每題10分', island: '國中聽力海灣', iconClass: 'THUNDER_ICON', level: 'both' },
                 ]
             },
             studentInfo: null,
@@ -310,12 +315,12 @@ export default {
             return '<i class="fa-solid fa-medal"></i>';
         },
         currentWeekType() {
-            // 1. 如果有測試手動類型設定，則優先使用手動值
+            // 如果有測試手動類型設定，則優先使用手動值
             if (this.manualGameType) {
                 return this.manualGameType;
             }
 
-            // 2. 否則，使用原本的日期計算邏輯
+            // 否則，使用原本的日期計算邏輯
             const now = this.currentTime;
             const weekNumber = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 1).getTime()) / (7 * 24 * 60 * 60 * 1000));
             // 偶數週為 listening，奇數週為 reading
@@ -325,15 +330,15 @@ export default {
         weekData() {
             const now = this.currentTime;
 
-            // 1. 決定本週挑戰類型中文
+            // 決定本週挑戰類型中文
             const challengeType = this.currentWeekType === 'listening' ? '聽力大賽' : '閱讀大賽';
 
-            // 2. 計算活動結束時間 (本週日 23:59:59)
+            // 計算活動結束時間 (本週日 23:59:59)
             const endOfWeek = new Date(now);
             endOfWeek.setDate(now.getDate() + (7 - now.getDay()) % 7);
             endOfWeek.setHours(23, 59, 59, 999);
 
-            // 3. 計算倒數時間
+            // 計算倒數時間
             const diffMs = endOfWeek.getTime() - now.getTime();
 
             if (diffMs <= 0) {
@@ -367,7 +372,7 @@ export default {
             const myRank = this.currentRanking.my_rank;
             const list = this.currentRanking.top_30;
 
-            // 如果我是第一名，就沒有前一名，回傳 0 或其他提示
+            // 如果目前是第一名，就沒有前一名，回傳 0 或其他提示
             if (myRank === 1) return 0;
 
             // 尋找清單中 rank 為 (我的排名 - 1) 的那位學生
@@ -395,8 +400,6 @@ export default {
             try {
                 const response = await api.get('students/dashboard/student/');
                 this.studentInfo = response.data;
-
-                // 根據後端回傳的 school_type 設定遊戲難度等級
                 if (this.studentInfo.school_type === '國中') {
                     this.gameLevel = 'secondary';
                 } else {
@@ -415,27 +418,45 @@ export default {
         },
 
         //非同步獲取排行榜數據
-    async fetchRanking(scope) {
-    this.isLoadingRanking = true;
-    try {
-        const apiScope = scope === 'all' ? 'league' : 'school';
-        const response = await api.get('/students/competition-score/weekly-ranking/', {
-            params: { scope: apiScope }
-        });
+        async fetchRanking(scope) {
+            this.isLoadingRanking = true;
+            try {
+                const apiScope = scope === 'all' ? 'league' : 'school';
+                const response = await api.get('/students/competition-score/weekly-ranking/', {
+                    params: { scope: apiScope }
+                });
 
-        this.isDailyChallengeCompleted = response.data.has_done_today;
+                this.isDailyChallengeCompleted = response.data.has_done_today;
 
-        if (scope === 'all') {
-            this.rankingData.all = response.data;
-        } else {
-            this.rankingData.school = response.data;
-        }
-    } catch (err) {
-        console.error('獲取排行榜失敗:', err);
-    } finally {
-        this.isLoadingRanking = false;
-    }
-},
+                if (scope === 'all') {
+                    this.rankingData.all = response.data;
+                } else {
+                    this.rankingData.school = response.data;
+                }
+            } catch (err) {
+                console.error('獲取排行榜失敗:', err);
+                // 報錯時給予預設值
+                const defaultData = {
+                    my_rank: '--',
+                    my_score: 0,
+                    top_30: [],
+                    compare_yesterday: { score_diff: 0 }
+                };
+
+                if (scope === 'all') {
+                    this.rankingData.all = this.rankingData.all || defaultData;
+                } else {
+                    this.rankingData.school = this.rankingData.school || defaultData;
+                }
+
+                // 即使API回傳error，也要讓用戶可以挑戰
+                if (this.isDailyChallengeCompleted === null) {
+                    this.isDailyChallengeCompleted = false;
+                }
+            } finally {
+                this.isLoadingRanking = false;
+            }
+        },
         // 切換 Tab 時自動重新抓取
         handleRankingToggle(type) {
             this.rankingType = type;
@@ -560,20 +581,21 @@ export default {
             return score.toLocaleString('en-US');
         }
     },
-async mounted() {
-    await this.fetchStudentInfo();
-    
-    this.fetchRanking('all');
-    this.fetchRanking('school');
-    this.timeUpdateInterval = setInterval(() => {
-        this.currentTime = new Date();
-    }, 60000);
-},
+    async mounted() {
+        await this.fetchStudentInfo();
+
+        this.fetchRanking('all');
+        this.fetchRanking('school');
+        this.timeUpdateInterval = setInterval(() => {
+            this.currentTime = new Date();
+        }, 60000);
+    },
     beforeDestroy() {
         clearInterval(this.timeUpdateInterval);
     }
 };
 </script>
+
 
 <style lang="scss" scoped>
 @mixin section-card-layout {
@@ -790,11 +812,6 @@ async mounted() {
             .header-title {
                 font-size: 28px;
                 font-weight: bold;
-            }
-
-            .header-sub {
-                font-size: 16px;
-                color: #666;
             }
         }
 
@@ -1059,11 +1076,20 @@ async mounted() {
             display: flex;
             align-items: center;
 
+            .game-description,
+            .game-island,
+            .game-point {
+                margin: 0;
+            }
+
             .game-text {
+                display: flex;
+                flex-direction: column;
                 text-align: left;
 
                 .game-title {
                     font-weight: 600;
+                    margin: 0;
                     font-size: 24px;
                 }
 
@@ -1071,6 +1097,11 @@ async mounted() {
                     @include flex-center;
                     gap: 0 8px;
                     font-size: 18px;
+
+                    .info-wrap {
+                        display: flex;
+                        gap: 0 8px;
+                    }
 
                     .game-island {
                         font-size: 14px;
@@ -1224,6 +1255,7 @@ async mounted() {
 @media (min-width: 768px) and (pointer: coarse) {
     .competition-page {
         padding: 0 4% 8% 12%;
+
         .content-wrapper {
             width: 1000px;
         }
@@ -1232,9 +1264,22 @@ async mounted() {
 
 @media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
     .competition-page {
-        .ranking-list{
-    width: 100%;
-}
+        .page-title {
+            margin-top: 24px;
+        }
+
+        .stat-label {
+            text-wrap-mode: nowrap;
+        }
+
+        .ranking-challenge-section .game-item {
+            gap: 0 24px;
+        }
+
+        .ranking-list {
+            width: 100%;
+        }
+
         .footer-fixed {
             padding: 0 78px 16px;
             display: unset;
@@ -1243,7 +1288,7 @@ async mounted() {
             z-index: 0;
         }
 
-        padding:0 50px 80px;
+        padding:0 50px 80px !important;
 
         .content-wrapper {
             width: 100%;
@@ -1256,6 +1301,12 @@ async mounted() {
 
         .content-wrapper {
             flex-direction: column;
+        }
+
+        .ranking-challenge-section .game-item .game-info .game-text .game-info-wrap {
+            flex-direction: column;
+            gap: 10px 0;
+            align-items: flex-start;
         }
     }
 }
