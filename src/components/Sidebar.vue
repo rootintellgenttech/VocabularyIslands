@@ -1,80 +1,80 @@
 <template>
     <div ref="sidebarRef" :class="['sidebar', { 'is-expanded': isMenuExpanded, 'teacher-sidebar': !isStudent }]">
-     <div class="top-section">
-        <div class="sidebar-header">
-            <div v-if="isMenuExpanded" class="user-info">
-                <div class="user-row">
-                    <template v-if="isStudent">
-                        <div class="user-name">{{ studentInfo.student_name || '載入中...' }}</div>
-                    </template>
-                    <template v-else>
-                        <div class="user-name">{{ currentRoleName }}</div>
-                    </template>
+        <div class="top-section">
+            <div class="sidebar-header">
+                <div v-if="isMenuExpanded" class="user-info">
+                    <div class="user-row">
+                        <template v-if="isStudent">
+                            <div class="user-name">{{ studentInfo.student_name || '載入中...' }}</div>
+                        </template>
+                        <template v-else>
+                            <div class="user-name">{{ currentRoleName }}</div>
+                        </template>
 
-                    <div class="toggle-btn" @click="toggleMenu">
-                        <i :class="['fas', isMenuExpanded ? 'fa-angle-double-left' : 'fa-angle-double-right']"
-                            @click.stop="toggleMenu"></i>
+                        <div class="toggle-btn" @click="toggleMenu">
+                            <i :class="['fas', isMenuExpanded ? 'fa-angle-double-left' : 'fa-angle-double-right']"
+                                @click.stop="toggleMenu"></i>
+                        </div>
                     </div>
+
+                    <template v-if="isStudent">
+                        <div class="second-row">
+                            <p class="user-status">{{ studentInfo.school_name }}</p>
+                            <p class="class-name">{{ studentInfo.class_name }}</p>
+                        </div>
+                    </template>
                 </div>
+
+                <div v-else class="toggle-btn" @click="toggleMenu">
+                    <i class="fas fa-angle-double-right"></i>
+                </div>
+            </div>
+
+            <div class="menu-section">
 
                 <template v-if="isStudent">
-                    <div class="second-row">
-                        <p class="user-status">{{ studentInfo.school_name }}</p>
-                        <p class="class-name">{{ studentInfo.class_name }}</p>
+                    <div class="stat-item" :style="{ backgroundColor: 'rgba(245, 113, 72, 1)' }">
+                        <div class="stat-icon"><i class="fas fa-star"></i></div>
+                        <span v-if="isMenuExpanded" class="stat-label">星星</span>
+                        <span class="stat-value">
+                            {{ isMenuExpanded ? studentInfo.total_stars + ' 顆' : studentInfo.total_stars }}
+                        </span>
+                    </div>
+                    <div class="stat-item" :style="{ backgroundColor: '#FFDB81' }">
+                        <div class="stat-icon"><i class="fas fa-calendar"></i></div>
+                        <span v-if="isMenuExpanded" class="stat-label">已學習天數</span>
+                        <span class="stat-value">
+                            {{ isMenuExpanded ? studentInfo.attendance_days + ' 天' : studentInfo.attendance_days }}
+                        </span>
                     </div>
                 </template>
+
+                <template v-else>
+                 <div v-for="(item, index) in filteredMenuItems" :key="index" class="teacher-menu-item"
+    :class="{ active: isItemActive(item) }" @click="handleNavigation(item.path)">
+    <div class="menu-icon"><i :class="['fas', item.icon]"></i></div>
+    <span v-if="isMenuExpanded" class="menu-label">{{ item.title }}</span>
+</div>
+                </template>
+
             </div>
-
-            <div v-else class="toggle-btn" @click="toggleMenu">
-                <i class="fas fa-angle-double-right"></i>
-            </div>
-        </div>
-
-        <div class="menu-section">
-
-            <template v-if="isStudent">
-                <div class="stat-item" :style="{ backgroundColor: 'rgba(245, 113, 72, 1)' }">
-                    <div class="stat-icon"><i class="fas fa-star"></i></div>
-                    <span v-if="isMenuExpanded" class="stat-label">星星</span>
-                    <span class="stat-value">
-                        {{ isMenuExpanded ? studentInfo.total_stars + ' 顆' : studentInfo.total_stars }}
-                    </span>
+            <div v-if="isMenuExpanded && isStudent" class="achievement-section"
+                @click="handleNavigation('/achievementisland')" style="cursor: pointer;">
+                <div class="section-title">
+                    <p>成就獎章</p>
                 </div>
-                <div class="stat-item" :style="{ backgroundColor: '#FFDB81' }">
-                    <div class="stat-icon"><i class="fas fa-calendar"></i></div>
-                    <span v-if="isMenuExpanded" class="stat-label">已學習天數</span>
-                    <span class="stat-value">
-                        {{ isMenuExpanded ? studentInfo.attendance_days + ' 天' : studentInfo.attendance_days }}
-                    </span>
-                </div>
-            </template>
+                <div class="achievement-badges">
+                    <div v-for="(log, idx) in achievementLogs.slice(0, 3)" :key="idx" class="badge-item">
+                        <i :class="getAchievementIcon(log.name)" style="color: #F56C42; font-size: 32px;"></i>
+                    </div>
 
-            <template v-else>
-                <div v-for="(item, index) in filteredMenuItems" :key="index" class="teacher-menu-item"
-                    :class="{ active: currentPath === item.path }" @click="handleNavigation(item.path)">
-                    <div class="menu-icon"><i :class="['fas', item.icon]"></i></div>
-                    <span v-if="isMenuExpanded" class="menu-label">{{ item.title }}</span>
-                </div>
-            </template>
-
-        </div>
-        <div v-if="isMenuExpanded && isStudent" class="achievement-section"
-            @click="handleNavigation('/achievementisland')" style="cursor: pointer;">
-            <div class="section-title">
-                <p>成就獎章</p>
-            </div>
-            <div class="achievement-badges">
-                <div v-for="(log, idx) in achievementLogs.slice(0, 3)" :key="idx" class="badge-item">
-                    <i :class="getAchievementIcon(log.name)" style="color: #F56C42; font-size: 32px;"></i>
-                </div>
-
-                <div v-if="achievementLogs.length === 0" style="color: #999; font-size: 14px; margin-top: 5px;">
-                    尚未獲得獎章
+                    <div v-if="achievementLogs.length === 0" style="color: #999; font-size: 14px; margin-top: 5px;">
+                        尚未獲得獎章
+                    </div>
                 </div>
             </div>
         </div>
-     </div>
-        
+
 
         <div class="bottom-menu">
             <div class="menu-item" @click="contactDialogVisible = true">
@@ -196,12 +196,12 @@ export default {
                     path: '/news',
                     roles: ['global_leader']
                 },
-                {
-                    title: '學習總覽',
-                    icon: 'fa-book-reader',
-                    path: '/learning-overview',
-                    roles: ['teacher', 'school_admin', 'union_leader', 'global_leader']
-                },
+                // {
+                //     title: '學習總覽',
+                //     icon: 'fa-book-reader',
+                //     path: '/learning-overview',
+                //     roles: ['teacher', 'school_admin', 'union_leader', 'global_leader']
+                // },
                 {
                     title: '練習進度與狀況',
                     icon: 'fa-tasks',
@@ -234,23 +234,25 @@ export default {
     },
 
     watch: {
-        '$route': {
-            handler(to) {
-                if (to.path === '/achievement-island') {
-                    this.isMenuExpanded = false;
-                }
+       '$route.path': {
+        handler(newPath) {
+            // 當路由路徑改變時，同步更新 currentPath
+            this.currentPath = newPath;
 
-                // 無論音樂是否開啟，如果進入作答區，先確保音樂停止
-                if (!this.isMusicEnabled) {
-                    this.stopAllMusic();
-                    return;
-                }
+            // 處理成就島收合
+            if (newPath === '/achievement-island') {
+                this.isMenuExpanded = false;
+            }
 
-                // 執行音樂判定邏輯
-                this.playAppropriateMusic(to.path);
-            },
-            immediate: true
+            // 處理音樂
+            if (!this.isMusicEnabled) {
+                this.stopAllMusic();
+            } else {
+                this.playAppropriateMusic(newPath);
+            }
         },
+        immediate: true 
+    },
         userRole(newRole) {
             if (newRole === 'student') {
                 this.fetchStudentDashboard();
@@ -293,7 +295,15 @@ export default {
         document.removeEventListener('click', this.handleOutsideClick);
     },
     methods: {
+isItemActive(item) {
+        // 如果當前路徑完全等於選單路徑
+        if (this.currentPath === item.path) return true;
+        
+        // 額外判定：如果是考試詳情頁，讓「考試分析」保持高亮
+        if (item.path === '/exam-analysis' && this.currentPath === '/exam-detail') return true;
 
+        return false;
+    },
         copyEmail() {
             const email = 'rootintellgenttech@gmail.com';
 
@@ -359,10 +369,10 @@ export default {
                 if (isSilentMode) {
                     console.log('[BGM] 進入作答或遊戲區域，暫停背景音樂');
                     this.stopAllMusic();
-                    return; // 直接中斷，不執行後續播放邏輯
+                    return; // 直接中斷，不執行後續播放
                 }
 
-                // 2. 正常播放邏輯
+                // 2. 正常播放
                 const isCompetitionIsland = path === '/competition';
                 const targetAudio = isCompetitionIsland ? this.$refs.fightAudio : this.$refs.mainAudio;
                 const otherAudio = isCompetitionIsland ? this.$refs.mainAudio : this.$refs.fightAudio;
@@ -445,12 +455,11 @@ export default {
         toggleMenu() {
             this.isMenuExpanded = !this.isMenuExpanded;
         },
-        handleNavigation(path) {
-            this.currentPath = path;
-            if (this.$route.path !== path) {
-                this.$router.push(path).catch(err => { }); // 防止重複導航報錯
-            }
-        },
+       handleNavigation(path) {
+    if (this.$route.path !== path) {
+        this.$router.push(path).catch(err => { });
+    }
+},
         handleLogout() {
             this.stopAllMusic(); // 停止音樂
             localStorage.removeItem('accessToken');
@@ -466,7 +475,7 @@ export default {
 
         if (savedRole) {
             this.userRole = savedRole;
-            // 確保身份更新後才根據身份執行對應邏輯
+            // 確保身份更新後才根據身份執行對應
             await this.checkAndFetchData();
         } else {
             // 若無身份，導回登入
@@ -487,9 +496,11 @@ export default {
         margin-top: 16px;
         font-size: 16px;
     }
-.copy-icon{
-    cursor: pointer;
-}
+
+    .copy-icon {
+        cursor: pointer;
+    }
+
     a {
         text-decoration: none;
         color: $main-dark-blue;
@@ -510,11 +521,11 @@ export default {
     background-color: transparent;
     width: 90px;
     color: $main-black-text;
-   padding-top: 16px;
+    padding-top: 16px;
     transition: width 0.3s ease-in-out, background-color 0.3s ease;
     display: flex;
     flex-direction: column;
-    z-index: 99999;
+    z-index: 99;
     box-shadow: none;
     position: fixed;
     top: 0;
@@ -524,6 +535,7 @@ export default {
 
     .sidebar-header {
         display: flex;
+
         .user-info {
             width: 100%;
 
@@ -591,6 +603,7 @@ export default {
     .user-info {
         white-space: nowrap;
         overflow: hidden;
+
         .second-row {
             @include flex-center;
             justify-content: space-between;
@@ -658,9 +671,10 @@ export default {
 
     .bottom-menu {
         padding-bottom: 38px;
+
         .menu-item {
             @include flex-center;
-            padding:0 16px;
+            padding: 0 16px;
             cursor: pointer;
             transition: background-color 0.2s, color 0.2s;
             color: $main-black-text;
@@ -688,7 +702,7 @@ export default {
         background-color: #F0FAFFBF;
         box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1);
 
-        .user-info{
+        .user-info {
             padding: 0 16px;
         }
 
@@ -799,6 +813,7 @@ export default {
             @include flex-center;
             flex-direction: column;
             gap: 16px;
+
             .menu-item {
                 background-color: #F0FAFFBF;
                 border: #DAE2E7 2px solid;
@@ -838,9 +853,9 @@ export default {
         }
 
         &.active {
-            background-color: #e6f7f5; 
+            background-color: #e6f7f5;
             color: #2aaea0;
-            border-right: 3px solid #2aaea0; 
+            border-right: 3px solid #2aaea0;
         }
 
         .menu-icon {
@@ -943,7 +958,7 @@ export default {
         box-shadow: 2px 0 6px rgba(0, 0, 0, 0.3);
         position: fixed;
 
-        .bottom-menu{
+        .bottom-menu {
             padding-bottom: 0;
         }
 

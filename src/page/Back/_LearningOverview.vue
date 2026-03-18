@@ -83,7 +83,7 @@ export default {
                 }
             ],
 
-            // --- 學習成效表格數據 ---
+            // 學習成效表格數據
             learningData: [
                 { alliance: '海之鄉聯盟', schoolCount: 8, studentCount: 892, loginRate: '89%', completionRate: 85 },
                 { alliance: '美濃書香聯盟', schoolCount: 7, studentCount: 756, loginRate: '91%', completionRate: 87 },
@@ -104,60 +104,130 @@ export default {
         }
     },
     methods: {
-        async exportFullTable(containerId) {
-            const target = document.getElementById(containerId);
-            if (!target) return;
+     exportFullTable(containerId) {
+    const reportTitle = '學習成效比較報表';
+    const data = this.learningData;
+    const role = this.userRole || localStorage.getItem('userRole') || 'school_admin';
+    const isGlobal = role === 'global_leader';
 
-            const tableEl = target.querySelector('.el-table');
-            const tableBody = target.querySelector('.el-table__body-wrapper');
+    // 1. 打開空白新視窗
+    const printWindow = window.open('', '_blank');
 
-            const loading = this.$loading({
-                lock: true,
-                text: '正在生成完整截圖...',
-                spinner: 'el-icon-loading',
-                background: 'rgba(0, 0, 0, 0.7)'
-            });
+    // 2. 構建表格內容 HTML
+    let tableHtml = '';
+    
+    data.forEach(item => {
+        if (isGlobal) {
+            // 總召模式：聯盟彙總 + 學校明細
+            tableHtml += `
+                <tr class="league-row">
+                    <td colspan="4" style="text-align: center;">${item.alliance} (聯盟彙總)</td>
+                </tr>
+                <tr class="summary-header">
+                    <td>包含學校: ${item.schoolCount || 0} 間</td>
+                    <td>學生總數: ${item.studentCount}</td>
+                    <td>平均登入率: <span style="color: #2A9D8F;">${item.loginRate}</span></td>
+                    <td>平均完成率: ${item.completionRate}%</td>
+                </tr>
+            `;
 
-            try {
-                const originalTableHeight = tableEl.style.height;
-                const originalBodyHeight = tableBody.style.height;
-                const originalOverflow = tableBody.style.overflow;
-
-                tableEl.style.height = 'auto';
-                tableBody.style.height = 'auto';
-                tableBody.style.overflow = 'visible';
-
-                await this.$nextTick();
-
-                const canvas = await this.$html2canvas(target, {
-                    backgroundColor: 'white',
-                    useCORS: true,
-                    scale: 2,
-                    scrollY: 0,
-                    scrollX: 0,
-                    x: 0,
-                    y: 0,
-                    height: target.scrollHeight,
-                    windowHeight: target.scrollHeight
+            // 如果有下屬學校數據則展開 (假設數據結構中有 schools 陣列)
+            if (item.schools && item.schools.length > 0) {
+                item.schools.forEach(school => {
+                    tableHtml += `
+                        <tr class="detail-row">
+                            <td style="text-align: left; padding-left: 30px;">└ ${school.schoolName}</td>
+                            <td>${school.studentCount}</td>
+                            <td>${school.loginRate}</td>
+                            <td>${school.completionRate}</td>
+                        </tr>
+                    `;
                 });
-
-                tableEl.style.height = originalTableHeight;
-                tableBody.style.height = originalBodyHeight;
-                tableBody.style.overflow = originalOverflow;
-
-                const link = document.createElement('a');
-                link.href = canvas.toDataURL('image/png');
-                link.download = `報表匯出_${new Date().getTime()}.png`;
-                link.click();
-
-            } catch (error) {
-                console.error('匯出失敗', error);
-                this.$message.error('匯出失敗，請重試');
-            } finally {
-                loading.close();
             }
-        },
-        // 篩選邏輯：判斷該列的聯盟是否等於選中的值
+        } else {
+            // 召集人/校管模式：平鋪結構
+            const label = (role === 'school_admin') 
+                ? (item.grade && item.classroom ? `${item.grade}${item.classroom}` : item.classroom)
+                : (item.schoolName || item.alliance);
+                
+            tableHtml += `
+                <tr class="detail-row">
+                    <td style="text-align: left;">${label}</td>
+                    <td>${item.studentCount}</td>
+                    <td><span style="color: #2A9D8F; font-weight: bold;">${item.loginRate}</span></td>
+                    <td>${item.completionRate}%</td>
+                </tr>
+            `;
+        }
+    });
+
+    // 3. 定義第一欄標題
+    const firstColLabel = isGlobal ? '名稱' : (role === 'school_admin' ? '班級' : '學校名稱');
+
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>${reportTitle}</title>
+            <style>
+                /* 強制色彩與列印優化 */
+                * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                body { font-family: "Microsoft JhengHei", sans-serif; padding: 20px; color: #333; line-height: 1.5; }
+                .report-header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #2A9D8F; padding-bottom: 10px; }
+                .report-header h2 { color: #2A9D8F; margin: 0; }
+                .info-bar { display: flex; justify-content: space-between; font-size: 13px; color: #666; margin: 10px 0; }
+                
+                table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+                th, td { border: 1px solid #ddd; padding: 10px 8px; text-align: center; font-size: 13px; }
+                th { background-color: #f8f9fa; font-weight: bold; }
+
+                /* 層級樣式 */
+              .league-row td { 
+                    background-color: #2A9D8F !important; color: black; 
+                    font-weight: bold; font-size: 16px;
+                }
+                .summary-header td { 
+                    background-color: #E9F5F4 !important; font-weight: bold; color: #264653 !important;
+                }
+                .detail-row td { border-bottom: 1px solid #eee; }
+
+                .print-btn {
+                    background: #2A9D8F; color: white; border: none; padding: 10px 20px;
+                    border-radius: 4px; cursor: pointer; margin-bottom: 20px; font-weight: bold;
+                }
+                @media print { .no-print { display: none !important; } }
+            </style>
+        </head>
+        <body>
+            <div class="no-print">
+                <button class="print-btn" onclick="window.print()">確認列印 / 存為 PDF</button>
+            </div>
+            <div class="report-header">
+                <h2>${reportTitle}</h2>
+            </div>
+            <div class="info-bar">
+                <span>身分：${role === 'global_leader' ? '總召集人' : (role === 'union_leader' ? '聯盟召集人' : '管理員')}</span>
+                <span>統計日期：${new Date().toLocaleString()}</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 35%;">${firstColLabel}</th>
+                        <th>學生總數</th>
+                        <th>登入率</th>
+                        <th>練習完成率</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableHtml}
+                </tbody>
+            </table>
+        </body>
+        </html>
+    `);
+
+    printWindow.document.close();
+},
+        // 判斷該列的聯盟是否等於選中的值
         filterHandler(value, row, column) {
             const property = column['property'];
             return row[property] === value;

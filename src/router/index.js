@@ -23,7 +23,7 @@ const routes = [
   {
     path: '/learning-overview',
     name: 'LearningOverview',
-    component: () => import('../page/Back/LearningOverview.vue')
+    component: () => import('../page/Back/_LearningOverview.vue')
   },
   {
     path: '/island-analysis',

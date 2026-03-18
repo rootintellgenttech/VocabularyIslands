@@ -10,16 +10,23 @@
     <div class="news-section">
       <el-table height="600" :data="newsList" style="width: 100%" class="custom-table">
         <el-table-column prop="title" label="標題" min-width="150"></el-table-column>
-        <el-table-column prop="type" label="類型" min-width="120" align="center"></el-table-column>
-        <el-table-column prop="content" label="内容" min-width="300"></el-table-column>
+        <el-table-column prop="category" label="類型" min-width="120" align="center"></el-table-column>
+        <el-table-column prop="content" label="內容" min-width="300"></el-table-column>
         <el-table-column prop="date" label="發布日期" width="150" align="center"></el-table-column>
+
+        <el-table-column label="操作" width="180" align="center">
+          <template slot-scope="scope">
+            <el-button type="text" style="color: #4ABCB1;" @click="openEditDialog(scope.row)">編輯</el-button>
+            <el-button type="text" style="color: #F56C6C;" @click="deleteNews(scope.row.id)">刪除</el-button>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
 
     <el-dialog custom-class="custom-news-modal" :visible.sync="addDialogVisible" width="500px" center
       :close-on-click-modal="false" append-to-body>
       <div class="dialog-header-custom">
-        <h3 class="title">發布消息</h3>
+        <h3 class="title">{{ isEdit ? '編輯消息' : '發布消息' }}</h3>
         <span class="publish-date">發布日期: {{ currentDay }}</span>
       </div>
 
@@ -31,10 +38,10 @@
 
         <div class="form-item">
           <label>類型</label>
-          <el-select v-model="newMsg.type" placeholder="下拉選單" class="full-width-select">
-            <el-option label="系統更新" value="系統更新"></el-option>
-            <el-option label="活動通知" value="活動通知"></el-option>
-            <el-option label="維護通知" value="維護通知"></el-option>
+          <el-select v-model="newMsg.category" placeholder="下拉選單" class="full-width-select">
+            <el-option label="活動(聯盟競技/試煉殿堂)" value="活動(聯盟競技/試煉殿堂)"></el-option>
+            <el-option label="消息" value="消息"></el-option>
+            <el-option label="資訊" value="資訊"></el-option>
           </el-select>
         </div>
 
@@ -48,50 +55,109 @@
 
       <span slot="footer" class="dialog-footer two-btns">
         <el-button @click="addDialogVisible = false" class="btn-cancel">取消</el-button>
-        <el-button @click="submitNews" class="btn-submit">發佈</el-button>
+        <el-button @click="submitNews" class="btn-submit" :loading="loading">{{ isEdit ? '更新' : '發佈' }}</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
+import api from '@/config/api';
+
 export default {
   name: 'NewsManagement',
   data() {
     return {
       addDialogVisible: false,
-      currentDay: '2025-01-24',
-      newsList: [
-        { title: '新島嶼開放', type: '類型', content: '文字說明(消息文字說明，上限90個字元，含標點符號)', date: '2025-01-05' },
-        { title: '新島嶼開放', type: '類型', content: '文字說明(消息文字說明，上限90個字元，含標點符號)', date: '2025-01-05' },
-        { title: '新島嶼開放', type: '類型', content: '文字說明(消息文字說明，上限90個字元，含標點符號)', date: '2025-01-05' },
-      ],
+      isEdit: false,        // 是否為編輯模式
+      currentEditId: null,  // 當前編輯的消息 ID
+      loading: false,       // 按鈕加載狀態
+      currentDay: '2026-03-10', // 同步後端要求的日期
+      newsList: [],
       newMsg: {
         title: '',
-        type: '',
+        category: '',
         content: ''
       }
     };
   },
+  mounted() {
+    this.fetchNews();
+  },
   methods: {
+    async fetchNews() {
+      try {
+        const res = await api.get('/students/news/list/');
+        this.newsList = res.data || [];
+      } catch (err) {
+        console.error('獲取列表失敗', err);
+      }
+    },
+
     openAddDialog() {
-      this.newMsg = { title: '', type: '', content: '' };
+      this.isEdit = false;
+      this.newMsg = { title: '', category: '', content: '' };
       this.addDialogVisible = true;
     },
-    submitNews() {
-      if (!this.newMsg.title || !this.newMsg.content) {
+
+    openEditDialog(row) {
+      this.isEdit = true;
+      this.currentEditId = row.id;
+      // 複製資料到表單，避免直接修改原物件
+      this.newMsg = {
+        title: row.title,
+        category: row.category,
+        content: row.content
+      };
+      this.addDialogVisible = true;
+    },
+
+    // 發布或更新消息
+    async submitNews() {
+      if (!this.newMsg.title || !this.newMsg.category || !this.newMsg.content) {
         this.$message.warning('請填寫完整資訊');
         return;
       }
 
+      this.loading = true;
       const payload = {
         ...this.newMsg,
         date: this.currentDay
       };
-      this.newsList.unshift(payload);
 
-      this.addDialogVisible = false;
-      this.$message.success('消息發布成功');
+      try {
+        if (this.isEdit) {
+          // 更新
+          await api.put(`/students/news/update/${this.currentEditId}/`, payload);
+          this.$message.success('更新消息成功');
+        } else {
+          // 新增
+          await api.post('/students/news/create/', payload);
+          this.$message.success('消息發布成功');
+        }
+
+        this.addDialogVisible = false;
+        this.fetchNews();
+      } catch (err) {
+        this.$message.error('提交失敗，請檢查輸入');
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    // 刪除消息
+    deleteNews(id) {
+      this.$confirm('確定要刪除這條消息嗎？', '提示', {
+        type: 'warning'
+      }).then(async () => {
+        try {
+          await api.delete(`/students/news/delete/${id}/`);
+          this.$message.success('刪除成功');
+          this.fetchNews();
+        } catch (err) {
+          this.$message.error('刪除失敗');
+        }
+      }).catch(() => { });
     }
   }
 };
@@ -107,7 +173,8 @@ export default {
 }
 
 .page-header {
-  @include flex-center;
+  display: flex;
+  align-items: baseline;
   justify-content: space-between;
   margin-bottom: 30px;
 
@@ -195,8 +262,7 @@ export default {
     .form-textarea,
     .el-input__inner {
       width: 100%;
-      background-color: #F0FAFF !important;
-      border: 1px solid rgba(74, 188, 177, 0.2);
+      border: 1px solid rgba(38, 41, 41, 0.2);
       border-radius: 10px;
       padding: 12px 15px;
       outline: none;
@@ -209,19 +275,6 @@ export default {
       }
     }
 
-    .form-textarea {
-      resize: none;
-    }
-
-    .word-count {
-      position: absolute;
-      right: 12px;
-      bottom: 12px;
-      font-size: 12px;
-      color: #999;
-      background: rgba(240, 250, 255, 0.8);
-      padding: 2px 4px;
-    }
   }
 
   .dialog-footer {
@@ -251,7 +304,6 @@ export default {
     .btn-submit {
       background: #4ABCB1;
       color: white;
-      @include main-box-shadow;
 
       &:hover {
         opacity: 0.9;

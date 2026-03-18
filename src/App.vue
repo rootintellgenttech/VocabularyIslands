@@ -102,6 +102,10 @@ body {
   margin: 0;
 }
 
+.apexcharts-legend-text {
+  top: -1px !important;
+}
+
 *,
 *::before,
 *::after {
@@ -146,6 +150,38 @@ body {
   }
 }
 
+
+.scrollable-chart-container {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 20px;
+
+  ::v-deep .apexcharts-canvas,
+  ::v-deep .apexcharts-svg {
+    width: 100% !important;
+  }
+}
+
+
+
+.select-all-box {
+  padding: 5px 15px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 5px;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 1;
+}
+
+.el-select-dropdown.is-multiple .el-select-dropdown__item.selected,
+.el-select-dropdown__item.selected {
+  color: #4abcb1 !important;
+}
 
 .el-table .cell {
   font-size: 16px;
@@ -302,6 +338,54 @@ button {
 }
 
 
+.teal-select {
+  width: 250px;
+
+  .el-input__inner {
+    background-color: $main-green;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.8);
+    }
+  }
+
+  ::v-deep .el-input__icon {
+    color: white;
+  }
+}
+
+
+.expand-table-wrapper {
+  padding: 20px;
+  background-color: #f9fbfb;
+  border-radius: 8px;
+  margin: 10px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+
+  .expand-title {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: $main-green;
+    font-size: 16px;
+    border-left: 4px solid $main-green;
+    padding-left: 10px;
+  }
+
+  .el-table th {
+    background-color: #f0f2f5 !important;
+  }
+}
+
+.el-tag.el-tag--info {
+  color: #000000 !important;
+  font-weight: 600;
+  font-size: 14px;
+}
+
 
 .tinder-card {
   display: flex;
@@ -382,7 +466,7 @@ button {
   }
 
   60% {
-    transform: rotate(-90deg); // 模擬向左轉橫
+    transform: rotate(-90deg);
     opacity: 1;
   }
 
@@ -391,47 +475,6 @@ button {
     opacity: 0;
   }
 }
-
-// .multiselect__single {
-//   overflow: hidden;
-//   text-overflow: ellipsis;
-//   white-space: nowrap;
-//   text-align: center;
-//   line-height: unset !important;
-// border-radius: 16px !important;
-//   margin-bottom: 0 !important;
-//   min-height: 54px;
-// }
-
-// .multiselect--active {
-
-//   .multiselect__tags {
-//     border-bottom-left-radius: 0 !important;
-//     border-bottom-right-radius: 0 !important;
-//   }
-
-//   .multiselect__content-wrapper {
-//     border-top-left-radius: 0;
-//     border-top-right-radius: 0;
-//   }
-// }
-
-// .multiselect__single {
-//   font-size: 32px !important;
-//   font-weight: 600;
-// }
-
-// .multiselect__select {
-//   height: 54px !important;
-// }
-
-
-// .multiselect__tags {
-//   border-radius: 16px !important;
-//   padding: 0 40px 0 0 !important;
-//   min-height: 54px !important;
-//   border: none
-// }
 
 @media (orientation: landscape) and (max-height: 1199.98px) and (pointer: coarse) {
   .return-last-page {
@@ -478,17 +521,5 @@ button {
   .page-title {
     font-size: 24px;
   }
-
-  // :deep(.multiselect__tags),
-  // :deep(.multiselect__select),
-  // :deep(.multiselect__single) {
-  //   min-height: 43px !important;
-  //   height: 43px !important;
-  // }
-
-  // :deep(.multiselect__single) {
-  //   font-size: 24px;
-  // }
-
 }
 </style>

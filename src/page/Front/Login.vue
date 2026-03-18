@@ -1,19 +1,17 @@
 <template>
   <div class="login-page">
-    <el-row class="login-container" :gutter="40">
-      <el-col :sm='24' :xl="13">
+<el-row class="login-container" :gutter="40" type="flex">
+        <el-col :sm='24' :xl="13">
         <div class="announcement-card mobile-scroll-box">
           <h2 class="card-title"><i class="fa-solid fa-bullhorn"></i>最新公告</h2>
-          <div class="announcement-list">
-
-            <vue-custom-scrollbar :settings="scrollSettings">
+            <vue-custom-scrollbar :settings="scrollSettings" class="announcement-list">
               <div class="announcement-item">
                 <div class="item-header">
                   <div class="news-title">
                     <i class="fa-solid fa-star" style="color: #FFD43B;"></i>新島嶼開放
                   </div>
                   <div class="news-tag">
-                    <span class="tag new">新</span>
+                    <span class="tag new">活動</span>
                   </div>
 
                 </div>
@@ -41,7 +39,7 @@
                     <i class="fa-solid fa-rocket" style="color: #63E6BE;"></i>新功能上線
                   </div>
                   <div class="news-tag">
-                    <span class="tag update">更新</span>
+                    <span class="tag update">資訊</span>
                   </div>
 
                 </div>
@@ -55,7 +53,7 @@
                     <i class="fa-solid fa-triangle-exclamation" style="color: #e12323;"></i>伺服器維護
                   </div>
                   <div class="news-tag">
-                    <span class="tag maintain">維護</span>
+                    <span class="tag maintain">消息</span>
                   </div>
 
                 </div>
@@ -77,8 +75,6 @@
                 <span class="item-date">2024-01-05</span>
               </div>
             </vue-custom-scrollbar>
-
-          </div>
         </div>
       </el-col>
       <el-col :sm='24' :xl="11">
@@ -91,30 +87,44 @@
               學生
             </button>
             <button :class="['role-btn', { active: currentRole === 'teacher' }]" @click="currentRole = 'teacher'">
-              老師
+              教職員
             </button>
           </div>
 
-          <div class="login-form-container">
-            <div class="input-group">
-              <label class="input-label">帳號</label>
-              <el-input id="user" type="text" class="custom-input" v-model="loginForm.account"
-                :placeholder="rolePlaceholder.account"></el-input>
-            </div>
+          <p v-if="currentRole === 'teacher'" class="role-notice-text">
+  * 帳號密碼請跟主管機關索取
+</p>
 
-            <div class="input-group">
-              <label class="input-label">密碼</label>
-              <el-input id="pw" type="password" class="custom-input" show-password v-model="loginForm.password"
-                :placeholder="rolePlaceholder.password"></el-input>
-            </div>
+   <div class="login-form-container">
+  <template v-if="currentRole === 'teacher'">
+    <div class="input-group">
+      <label class="input-label">教職員帳號</label>
+      <el-input id="user" type="text" class="custom-input" v-model="loginForm.account"
+        :placeholder="rolePlaceholder.account"></el-input>
+    </div>
 
-            <button class="login-submit-btn" @click="handleLogin">
-              {{ submitButtonText }}
-            </button>
+    <div class="input-group">
+      <label class="input-label">密碼</label>
+      <el-input id="pw" type="password" class="custom-input" show-password v-model="loginForm.password"
+        :placeholder="rolePlaceholder.password"></el-input>
+    </div>
+    
+    <button class="login-submit-btn" @click="handleLogin">
+      教職員登入
+    </button>
+    
+    <p class="forgot-password-link" @click="openForgetPassModal">忘記密碼</p>
+  </template>
 
-            <p class="forgot-password-link" @click="openForgetPassModal">忘記密碼</p>
-          </div>
-
+  <template v-else>
+    <div class="oidc-guide-box">
+      <p class="guide-text">請點擊下方按鈕，使用「學生簽入」登入系統</p>
+      <button class="login-submit-btn oidc-btn" @click="handleOidcLogin">
+        <i class="fa-solid fa-graduation-cap"></i> 學生登入
+      </button>
+    </div>
+  </template>
+</div>
           <!-- 快速身份登錄 -->
           <div class="dev-test-zone">
             <p class="dev-title">🛠️ 開發測試快速通道 (點擊直接登入)</p>
@@ -129,6 +139,7 @@
         </div>
       </el-col>
     </el-row>
+    
     <el-dialog custom-class="confirm-pw-modal" :visible.sync="showFirstLoginDialog" width="600px" center
       :close-on-click-modal="false" :show-close="false">
       <div class="dialog-content">
@@ -231,14 +242,11 @@ import api from '../../config/api';
 export default {
   name: 'Login',
   props: {
-    scrollSettings: {
-      type: Object,
-      default: () => ({
-        suppressScrollY: true,
-        suppressScrollX: false,
-        wheelPropagation: false
-      })
-    }
+   scrollSettings: {
+            suppressScrollY: true,
+            suppressScrollX: false,
+            wheelPropagation: false
+        }
   },
   data() {
     return {
@@ -250,15 +258,33 @@ export default {
       alertMessage: '',
       alertType: 'error', // success, info, warning, error
       showAlert: false,
-
-      testRoles: [
-        { key: 'student', name: '1. 學生', path: '/home', class: 'btn-student' },
-        { key: 'school_admin', name: '2. 學校管理員', path: '/dashboard', class: 'btn-admin' },
-        { key: 'alliance_leader', name: '3. 聯盟召集人', path: '/dashboard', class: 'btn-admin' },
-        { key: 'general_leader', name: '4. 總召集人', path: '/dashboard', class: 'btn-top' },
-        { key: 'moe', name: '5. 教育部', path: '/dashboard', class: 'btn-top' },
-        { key: 'teacher', name: '6. 老師', path: '/dashboard', class: 'btn-teacher' },
-      ],
+testRoles: [
+    { key: 'student', name: '1. 學生', path: '/home', class: 'btn-student',        account: '9898' 
+ },
+  { 
+        key: 'school_admin', 
+        name: '2. 學校管理員', 
+        path: '/dashboard', 
+        class: 'btn-admin',
+        account: 'school_admin@example.com' 
+    },
+    { 
+        key: 'union_leader', 
+        name: '3. 聯盟召集人', 
+        path: '/dashboard', 
+        class: 'btn-admin',
+        account: 'union_leader@example.com' 
+    },
+    { 
+        key: 'global_leader', 
+        name: '4. 總召集人/教育部', 
+        path: '/dashboard', 
+        class: 'btn-top',
+        account: 'global_leader@example.com' 
+    }
+    // 教職員身分暫時註解
+    // { key: 'teacher', name: '6. 教職員', path: '/dashboard', class: 'btn-teacher' },
+],
       // defaultBackendTokens: {
       //   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY1ODY3NDc0LCJpYXQiOjE3NjU4NjU2NzQsImp0aSI6ImU2YTc4OTVhZDRlNzQ1NzBhMmEyMmE4OTA4YjM1ZDBjIiwidXNlcl9pZCI6MzV9.lewJXA_rBur_1gPtrZqcmeai4K5etxhSN27X7P4FU0",
       //   "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2NjQ3MDQ3NCwiaWF0IjoxNzY1ODY1Njc0LCJqdGkiOiIxNTc3MDU0YWQ0NzI0NmEyOGY0OGVhNDhiMDM1ODNkMyIsInVzZXJfaWQiOjM1fQ.E_wvI9MgdA0rNC9XCRRYGFpggsl1N6djXj9zfMM2BeI",
@@ -310,18 +336,84 @@ export default {
         this.showResetPassDialog = true;
       }
     }
+    // 監聽跨視窗通訊
+  window.addEventListener('message', this.handleOidcMessage);
   },
+  beforeDestroy() { 
+  // 移除監聽器
+  window.removeEventListener('message', this.handleOidcMessage);
+},
   computed: {
     rolePlaceholder() {
       return this.currentRole === 'student'
         ? { account: '輸入學生帳號', password: '輸入密碼' }
-        : { account: '輸入老師帳號', password: '輸入密碼' };
+        : { account: '輸入教職員帳號', password: '輸入密碼' };
     },
     submitButtonText() {
-      return this.currentRole === 'teacher' ? '老師登入' : '學生登入';
-    }
+    return this.currentRole === 'teacher' ? '教職員登入' : '學生登入';
+  }
   },
   methods: {
+    // 觸發 OIDC 彈出視窗登入
+  handleOidcLogin() {
+    // 產生亂數 state 和 nonce 增加安全性
+    const state = Math.random().toString(36).substring(2, 15);
+    const nonce = Math.random().toString(36).substring(2, 15);
+    
+    // 儲存 state 供後續驗證 
+    sessionStorage.setItem('oidc_state', state);
+
+    // 根據設定檔填寫參數
+    const clientId = 'kh_vendor_a95da8c087d6f9c3f62acc5e22c26f42';
+    const redirectUri = encodeURIComponent('https://englishability.rootadviser.com/api/oidccallback/'); 
+    const scope = encodeURIComponent('openid email kh_profile kh_classes kh_titles');
+    
+    // 組合授權網址
+    const authUrl = `https://oidc.kh.edu.tw/oauth2/auth?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}&nonce=${nonce}`;
+
+    // 設定彈出視窗大小與置中
+    const width = 600;
+    const height = 650;
+    const left = window.screen.width / 2 - width / 2;
+    const top = window.screen.height / 2 - height / 2;
+
+    // 開啟彈出視窗並儲存參考
+    this.oidcWindow = window.open(
+      authUrl,
+      'OIDC_Login',
+      `width=${width},height=${height},top=${top},left=${left},toolbar=no,menubar=no,scrollbars=yes,resizable=no`
+    );
+  },
+
+  // 接收來自彈出視窗 (後端回傳) 的 Token 訊息
+  handleOidcMessage(event) {
+    //  安全驗證：確保訊息來自的後端網域
+    const allowedOrigins = [
+      'https://www.elr.kh.edu.tw', 
+      'https://englishability.rootadviser.com',
+      'http://localhost:8080'
+    ];
+    if (!allowedOrigins.includes(event.origin)) return;
+
+    // 解析資料
+    const message = event.data;
+    if (message && message.type === 'OIDC_LOGIN_SUCCESS') {
+      // 關閉小視窗
+      if (this.oidcWindow) this.oidcWindow.close();
+      
+      const loginData = message.payload; 
+      
+      // 判斷登入身分與導向路徑
+      let targetPath = (loginData.role === 'student') ? '/home' : '/dashboard';
+      
+      // 執行既有的登入機制 (存 Token、啟動 Refresh timer)
+      this.performLogin(loginData, targetPath);
+
+    } else if (message && message.type === 'OIDC_LOGIN_ERROR') {
+      if (this.oidcWindow) this.oidcWindow.close();
+      alert('教育局單一簽入失敗：' + (message.error || '未知錯誤'));
+    }
+  },
     //  觸發忘記密碼彈窗
     openForgetPassModal() {
       this.showForgetPassDialog = true;
@@ -346,48 +438,27 @@ export default {
         }
       });
     },
+// 教職員點擊按鈕觸發這個
+  async handleLogin() {
+    if (this.currentRole === 'student') return; // 防呆
 
-    async handleLogin() {
-      this.showAlert = false;
-      if (!this.loginForm.account || !this.loginForm.password) {
-        alert('請輸入帳號和密碼');
-        return;
-      }
+    if (!this.loginForm.account || !this.loginForm.password) {
+      alert('請輸入帳號和密碼');
+      return;
+    }
 
-      // 根據切換按鈕決定請求路徑（學生/老師/行政）
-      const endpoint = this.currentRole === 'student' ? 'students/login/' : 'teachers/login/';
-
-      try {
-        const response = await api.post(endpoint, {
-          username: this.loginForm.account,
-          password: this.loginForm.password,
-        });
-
-        // 優先使用後端回傳的真實 role (如 school_admin, union_leader 等)
-        // 如果後端沒給， fallback 到目前的按鈕身分
-        const realRole = response.data.role || (this.currentRole === 'student' ? 'student' : 'teacher');
-
-        const loginResponseData = { ...response.data, role: realRole };
-
-        // 決定跳轉路徑
-        let targetPath = '/home'; // 預設學生首頁
-        if (realRole !== 'student') {
-          targetPath = '/dashboard'; // 老師與所有行政管理員統一去後台
-        }
-
-        // 學生首次登入攔截
-        if (realRole === 'student' && loginResponseData.first_login) {
-          this.tempLoginData = loginResponseData;
-          this.tempPath = targetPath;
-          this.showFirstLoginDialog = true;
-        } else {
-          this.performLogin(loginResponseData, targetPath);
-        }
-      } catch (error) {
-        alert(error.response?.data?.detail || '登入失敗');
-      }
-    },
-
+    try {
+      const response = await api.post('students/login/', {
+        username: this.loginForm.account,
+        password: this.loginForm.password,
+      });
+      
+      // 教職員/管理員登入後的處理
+      this.performLogin(response.data, '/dashboard');
+    } catch (error) {
+      alert(error.response?.data?.detail || '登入失敗');
+    }
+  },
     // 沿用舊密碼：回傳 skip_change: true
     async handleKeepOldPassword() {
       this.performLogin(this.tempLoginData, null); // 需先存 Token
@@ -474,12 +545,27 @@ export default {
       }
     },
 
-    //  測試帳號快捷登入
-    handleTestLogin(role) {
-      const loginResponseData = { ...this.defaultBackendTokens, role: role.key };
-      this.performLogin(loginResponseData, role.path);
-    },
+// 測試帳號快捷登入：自動填入並執行 API 登入
+   handleTestLogin(role) {
+        // 切換 UI 頁籤狀態 (學生或教職員/管理員)
+        this.currentRole = role.key === 'student' ? 'student' : 'teacher';
 
+        // 自動帶入對應的測試帳號
+        this.loginForm.account = role.account;
+
+        // 根據身份判斷帶入哪一組測試密碼
+        if (role.key === 'student') {
+            this.loginForm.password = '123456min'; // 學生專用測試密碼
+        } else {
+            this.loginForm.password = 'ENpassword123'; // 管理員/召集人測試密碼
+        }
+
+        console.log(`[GodMode] 身份: ${role.name}, 帳號: ${this.loginForm.account}, 執行登入...`);
+
+        this.$nextTick(() => {
+            this.handleLogin();
+        });
+    },
     //Token 刷新計時器
     async startTokenRefreshTimer() {
       if (this.refreshTimer) return;
@@ -588,6 +674,26 @@ $bg-path: "~@/assets/image/login-bg.jpg";
 .login-container {
   @include flex-center;
   height: 100vh;
+  .oidc-guide-box {
+  text-align: center;
+
+  .guide-text {
+    color: #666;
+  }
+
+  .oidc-btn {
+    @include flex-center;
+    justify-content: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #4ABCB1 0%, #38bdf8 100%) !important;
+    color: white !important;
+    border-radius: 12px;
+    
+    &:hover {
+      filter: brightness(1.1);
+    }
+  }
+}
 
   .announcement-card,
   .login-card {
@@ -598,16 +704,31 @@ $bg-path: "~@/assets/image/login-bg.jpg";
     height: 100%;
   }
 
+  .role-notice-text {
+  font-size: 14px;
+  color: #e67e22; 
+  margin-top: -20px; 
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 500;
+  animation: fadeIn 0.3s ease; 
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
   .announcement-card {
     position: relative;
     z-index: 10;
 
     .announcement-list {
       margin-top: 8px;
-
-      .ps {
-        height: 380px;
-      }
+ height: 380px;
+      // .ps {
+      //   height: 380px;
+      // }
 
     }
 
@@ -631,7 +752,7 @@ $bg-path: "~@/assets/image/login-bg.jpg";
       }
 
       .tag {
-        font-size: 12px;
+        font-size: 14px;
         padding: 6px 10px;
         border-radius: 4px;
         color: $card-bg;
@@ -759,7 +880,7 @@ $bg-path: "~@/assets/image/login-bg.jpg";
             @include second-green-bg;
           }
 
-          // 老師 (第二個按鈕)
+          // 教職員 (第二個按鈕)
           &:nth-child(2) {
             background-color: #4ABCB1;
             color: $main-black-text;
@@ -869,13 +990,10 @@ $bg-path: "~@/assets/image/login-bg.jpg";
 
 @media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
   .login-container {
-    display: flex;
-    flex-direction: column;
+height: 100%;
   }
 
   .mobile-scroll-box {
-    max-height: 100vh;
-    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     margin-bottom: 20px;
 

@@ -140,17 +140,20 @@
 import api from '@/config/api';
 
 const EXAM_MASTER_SETTINGS = {
+    // 總共35分鐘
     'ps-2': {
         'EngToChi': { time: 15 },
         'ChiToEng': { time: 15 },
         'Listening': { time: 5 }
     },
+    // 總共40分鐘
     'ms7-2': {
         'EngToChi': { time: 10 },
         'ChiToEng': { time: 10 },
         'Listening': { time: 5 },
         'ContextFill': { time: 15 }
     },
+    // 總共40分鐘
     'ms8-2': {
         'EngToChi': { time: 10 },
         'ChiToEng': { time: 10 },
@@ -773,6 +776,7 @@ export default {
 @media (min-width: 768px) and (pointer: coarse) {
     .trial-hall-page {
         padding: 6%;
+
         .main-card {
             padding: 5%;
         }
@@ -796,7 +800,7 @@ export default {
             }
         }
 
-          .card-header-content {
+        .card-header-content {
             padding: 8px;
 
             img {
