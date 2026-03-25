@@ -5,6 +5,6 @@ services:
     build: .
     container_name: vue-app
     ports:
-      - "5000:5000"
+      - "9008:5000"
     environment:
       - NODE_ENV=production
