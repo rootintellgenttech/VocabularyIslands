@@ -213,4 +213,18 @@ const router = new VueRouter({
 });
 
 
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('accessToken');
+  
+  // 讓 Login 和 OidcCallback 可以無條件進入
+  if (to.name === 'Login' || to.name === 'OidcCallback') {
+    next();
+  } else if (!token) {
+    next('/login'); // 其他頁面沒 token 就踢回 login
+  } else {
+    next();
+  }
+});
+
+
 export default router;
