@@ -402,36 +402,37 @@ export default {
   },
   methods: {
     // 觸發 OIDC 彈出視窗登入
-    handleOidcLogin() {
-      if (!this.studentForm.account) {
-        alert('請先輸入學生帳號');
-        return;
-      }
+  handleOidcLogin() {
+  if (!this.studentForm.account) {
+    alert('請先輸入學生帳號');
+    return;
+  }
 
-      const state = Math.random().toString(36).substring(2, 15);
-      const nonce = Math.random().toString(36).substring(2, 15);
-      sessionStorage.setItem('oidc_state', state);
+  const state = Math.random().toString(36).substring(2, 15);
+  const nonce = Math.random().toString(36).substring(2, 15);
+  sessionStorage.setItem('oidc_state', state);
 
-      const clientId = 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42';
+  const clientId = 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42';
 
-      const redirectUri = encodeURIComponent('https://englishability.rootadviser.com/oidccallback');
+  const redirectUri = encodeURIComponent('https://englishability.rootadviser.com/api/oidccallback/');
 
-      const scope = encodeURIComponent('openid email kh_profile kh_classes kh_titles');
-      const loginHint = encodeURIComponent(this.studentForm.account);
+  const scope = encodeURIComponent('openid email kh_profile kh_classes kh_titles');
+  const loginHint = encodeURIComponent(this.studentForm.account);
 
-      const authUrl = `https://oidc.kh.edu.tw/oauth2/auth?response_type=id_token+token&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}&nonce=${nonce}&login_hint=${loginHint}`;
+  // response_type 使用 id_token+token 是為了讓前端能直接拿到資料
+  const authUrl = `https://oidc.kh.edu.tw/oauth2/auth?response_type=id_token+token&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}&nonce=${nonce}&login_hint=${loginHint}`;
 
-      const width = 600;
-      const height = 650;
-      const left = window.screen.width / 2 - width / 2;
-      const top = window.screen.height / 2 - height / 2;
+  const width = 600;
+  const height = 650;
+  const left = window.screen.width / 2 - width / 2;
+  const top = window.screen.height / 2 - height / 2;
 
-      this.oidcWindow = window.open(
-        authUrl,
-        'OIDC_Login',
-        `width=${width},height=${height},top=${top},left=${left},toolbar=no,menubar=no,scrollbars=yes,resizable=no`
-      );
-    },
+  this.oidcWindow = window.open(
+    authUrl,
+    'OIDC_Login',
+    `width=${width},height=${height},top=${top},left=${left},toolbar=no,menubar=no,scrollbars=yes,resizable=no`
+  );
+},
     // 接收來自彈出視窗 (後端回傳) 的 Token 訊息
     // handleOidcMessage(event) {
     //   //  安全驗證：確保訊息來自的後端網域
