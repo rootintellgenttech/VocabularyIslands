@@ -1,10 +1,17 @@
 <template>
   <div id="app" :class="{ 'has-global-bg': $route.path !== '/login' }">
-    <Sidebar v-if="!$route.meta.hideSidebar" />
-    <router-view class="router-view-content" />
-    <div class="orientation-lock">
+    <aside v-if="!$route.meta.hideSidebar" role="complementary" aria-label="側邊選單">
+      <Sidebar />
+    </aside>
+
+    <main id="main-content" role="main" class="router-view-content">
+      <!-- <a id="C" name="C" title="中央內容區塊" class="sr-only">:::</a> -->
+      <router-view />
+    </main>
+
+    <div class="orientation-lock" aria-live="polite">
       <div class="lock-content">
-        <i class="fas fa-mobile-alt"></i>
+        <i class="fas fa-mobile-alt" aria-hidden="true"></i>
         <p>為了最佳學習體驗<br>請將平板轉為橫向</p>
       </div>
     </div>
@@ -140,7 +147,7 @@ body {
     .el-progress-bar__innerText {
       font-size: 16px;
       font-weight: bold;
-      color: #ffffff !important;
+      color: black !important;
     }
 
     :deep(.el-progress-bar__inner) {
@@ -290,12 +297,12 @@ body {
   }
 
   .el-dialog__footer button:nth-child(2) {
-    background-color: #4ABCB1;
+    background-color: #115B53;
     color: white;
-    border-color: #4ABCB1;
+    border-color: #115B53;
 
     &:hover {
-      background-color: #2eaf92;
+      background-color: #075E55
     }
   }
 }

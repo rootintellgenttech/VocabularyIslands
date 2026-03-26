@@ -302,7 +302,7 @@ export default {
   margin: 0 0 10px 0;
 }
 
-.page-desc{
+.page-desc {
   margin: 0;
   font-size: 20px;
 }
@@ -360,7 +360,7 @@ export default {
   }
 
   .card-title {
-   margin:16px 0 8px;
+    margin: 16px 0 8px;
     color: $main-black-text;
   }
 
@@ -395,7 +395,7 @@ export default {
     background: #18AC9D;
     padding: 12px 20px;
     border-radius: 8px;
-    color: white;
+    color: #000000;
 
     i {
       font-size: 32px;
@@ -419,12 +419,12 @@ export default {
 
   .card-desc,
   .card-title {
-    color: white;
+    color: #000000;
   }
 }
 
 .achievement-card.is-completed i {
-  color: white !important;
+  color: #000000 !important;
 }
 
 .unfinished-mask {

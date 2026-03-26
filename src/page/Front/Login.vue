@@ -3,8 +3,14 @@
 <el-row class="login-container" :gutter="40" type="flex">
         <el-col :span="12">
         <div class="announcement-card mobile-scroll-box">
-          <h2 class="card-title"><i class="fa-solid fa-bullhorn"></i>最新公告</h2>
-            <vue-custom-scrollbar :settings="scrollSettings" class="announcement-list">
+         <h2 class="card-title">
+    <i class="fa-solid fa-bullhorn" aria-hidden="true"></i>最新公告
+  </h2>
+<vue-custom-scrollbar 
+  :settings="scrollSettings" 
+  class="announcement-list"
+  aria-label="最新公告列表"
+>
               <div class="announcement-item">
                 <div class="item-header">
                   <div class="news-title">
@@ -111,22 +117,29 @@
 
 <div class="login-form-container">
   <div v-if="currentRole === 'student'" class="student-input-zone">
-    <div class="input-group">
-      <label class="input-label">帳號</label>
-      <el-input 
-        v-model="studentForm.account" 
-        placeholder="請輸入學生帳號"
-        class="custom-input">
-      </el-input>
-    </div>
+   <div class="input-group">
+    <label class="input-label" for="student-account">帳號</label>
+    <el-input 
+      id="student-account" 
+      v-model="studentForm.account" 
+      placeholder="請輸入學生帳號"
+      class="custom-input">
+    </el-input>
+  </div>
     
-    <div class="input-group" style="position: relative;">
-      <label class="input-label">密碼</label>
-      <div class="password-overlay">
-        <i class="fa-solid fa-circle-info"></i> 密碼請於彈出視窗中輸入
-      </div>
-      <el-input type="password" disabled placeholder="請輸入密碼" class="custom-input"></el-input>
-    </div>
+  <div class="input-group">
+    <label class="input-label" for="student-pass-disabled">密碼</label>
+    <!-- <div class="password-overlay">
+      <i class="fa-solid fa-circle-info" aria-hidden="true"></i> 密碼請於彈出視窗中輸入
+    </div> -->
+    <el-input 
+      id="student-pass-disabled"
+      type="password" 
+      disabled 
+      placeholder=" 密碼請於彈出視窗中輸入 " 
+      class="custom-input">
+    </el-input>
+  </div>
 
     <button class="login-submit-btn" @click="handleOidcLogin">
       <i class="fa-solid fa-graduation-cap"></i> 學生登入
@@ -134,26 +147,26 @@
   </div>
 
   <div v-if="currentRole === 'teacher'" class="teacher-input-zone">
-    <div class="input-group">
-      <label class="input-label">帳號</label>
-      <el-input 
-        v-model="teacherForm.account" 
-        placeholder="請輸入教職員帳號"
-        class="custom-input">
-      </el-input>
-    </div>
-
-    <div class="input-group">
-      <label class="input-label">密碼</label>
-      <el-input 
-        type="password" 
-        v-model="teacherForm.password" 
-        show-password 
-        placeholder="請輸入密碼"
-        class="custom-input">
-      </el-input>
-    </div>
-
+   <div class="input-group">
+    <label class="input-label" for="teacher-account">帳號</label>
+    <el-input 
+      id="teacher-account" 
+      v-model="teacherForm.account" 
+      placeholder="請輸入教職員帳號"
+      class="custom-input">
+    </el-input>
+  </div>
+   <div class="input-group">
+    <label class="input-label" for="teacher-password">密碼</label>
+    <el-input 
+      id="teacher-password"
+      type="password" 
+      v-model="teacherForm.password" 
+      show-password 
+      placeholder="請輸入密碼"
+      class="custom-input">
+    </el-input>
+  </div>
     <button @click="handleLogin">
       <i class="fa-solid fa-chalkboard-user"></i> 教職員登入
     </button>
@@ -162,7 +175,7 @@
   </div>
 </div>
           <!-- 快速身份登錄 -->
-          <div class="dev-test-zone">
+          <!-- <div class="dev-test-zone">
             <p class="dev-title">🛠️ 開發測試快速通道 (點擊直接登入)</p>
             <div class="dev-btn-grid">
               <button v-for="(role, index) in testRoles" :key="index" class="dev-role-btn" :class="role.class"
@@ -170,7 +183,7 @@
                 {{ role.name }}
               </button>
             </div>
-          </div>
+          </div> -->
 
         </div>
       </el-col>
@@ -302,8 +315,8 @@ testRoles: [
     name: '1. 學生 (God Mode)', 
     path: '/home', 
     class: 'btn-student', 
-    account: '9898',
-    password: '你的測試密碼' // 補上測試密碼
+    account: 'chinyimin11@gmail.com',
+    password: '123456min'
   },
   { 
     key: 'school_admin', 
@@ -367,6 +380,15 @@ testRoles: [
     };
   },
   mounted() {
+    this.$nextTick(() => {
+    // 尋找該公告卡片內所有可能漏掉 label 的 input (通常是滾動條元件產生的)
+    const scrollInputs = this.$el.querySelectorAll('.announcement-card input');
+    scrollInputs.forEach((input, index) => {
+      if (!input.getAttribute('aria-label')) {
+        input.setAttribute('aria-label', `公告列表滾動控制 ${index + 1}`);
+      }
+    });
+  });
     const fullPath = window.location.href;
     // 尋找 login 字樣後的內容
     if (fullPath.includes('/login/')) {
@@ -410,7 +432,7 @@ testRoles: [
   const nonce = Math.random().toString(36).substring(2, 15);
   sessionStorage.setItem('oidc_state', state);
 
-  const clientId = 'kh_vendor_a95da8c087d6f9c3f62acc5e22c26f42';
+  const clientId = 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42';
   const redirectUri = encodeURIComponent('https://englishability.rootadviser.com/api/oidccallback/'); 
   const scope = encodeURIComponent('openid email kh_profile kh_classes kh_titles');
   
@@ -432,34 +454,62 @@ const loginHint = encodeURIComponent(this.studentForm.account);
   );
 },
   // 接收來自彈出視窗 (後端回傳) 的 Token 訊息
+  // handleOidcMessage(event) {
+  //   //  安全驗證：確保訊息來自的後端網域
+  //   const allowedOrigins = [
+  //     'https://www.elr.kh.edu.tw', 
+  //     'https://englishability.rootadviser.com',
+  //     'http://localhost:8080'
+  //   ];
+  //   if (!allowedOrigins.includes(event.origin)) return;
+
+  //   // 解析資料
+  //   const message = event.data;
+  //   if (message && message.type === 'OIDC_LOGIN_SUCCESS') {
+  //     // 關閉小視窗
+  //     if (this.oidcWindow) this.oidcWindow.close();
+      
+  //     const loginData = message.payload; 
+      
+  //     // 判斷登入身分與導向路徑
+  //     let targetPath = (loginData.role === 'student') ? '/home' : '/dashboard';
+      
+  //     // 執行既有的登入機制 (存 Token、啟動 Refresh timer)
+  //     this.performLogin(loginData, targetPath);
+
+  //   } else if (message && message.type === 'OIDC_LOGIN_ERROR') {
+  //     if (this.oidcWindow) this.oidcWindow.close();
+  //     alert('教育局單一簽入失敗：' + (message.error || '未知錯誤'));
+  //   }
+  // },
   handleOidcMessage(event) {
-    //  安全驗證：確保訊息來自的後端網域
-    const allowedOrigins = [
-      'https://www.elr.kh.edu.tw', 
-      'https://englishability.rootadviser.com',
-      'http://localhost:8080'
-    ];
-    if (!allowedOrigins.includes(event.origin)) return;
+  if (event.origin !== window.location.origin) return;
 
-    // 解析資料
-    const message = event.data;
-    if (message && message.type === 'OIDC_LOGIN_SUCCESS') {
-      // 關閉小視窗
-      if (this.oidcWindow) this.oidcWindow.close();
-      
-      const loginData = message.payload; 
-      
-      // 判斷登入身分與導向路徑
-      let targetPath = (loginData.role === 'student') ? '/home' : '/dashboard';
-      
-      // 執行既有的登入機制 (存 Token、啟動 Refresh timer)
-      this.performLogin(loginData, targetPath);
+  const message = event.data;
+  if (message.type === 'OIDC_LOGIN_SUCCESS') {
+    const loginData = message.payload; // 這就是後端「兌換」完後回傳的 JSON
 
-    } else if (message && message.type === 'OIDC_LOGIN_ERROR') {
-      if (this.oidcWindow) this.oidcWindow.close();
-      alert('教育局單一簽入失敗：' + (message.error || '未知錯誤'));
+    // --- 這裡就是您要求的：判斷各自抵達的頁面 ---
+    
+    // 1. 取得真實角色 (例如: 'student', 'teacher', 'admin')
+    const realRole = loginData.role; 
+
+    // 2. 決定跳轉路徑
+    let targetPath = '';
+    if (realRole === 'student') {
+      targetPath = '/home';
+    } else {
+      // 老師、管理員、召集人等非學生身分，一律去後台
+      targetPath = '/dashboard';
     }
-  },
+
+    // 3. 執行正式登入 (儲存 Token 並跳轉)
+    this.performLogin(loginData, targetPath);
+
+  } else if (message.type === 'OIDC_LOGIN_ERROR') {
+    alert('登入失敗: ' + message.error);
+  }
+},
     //  觸發忘記密碼彈窗
     openForgetPassModal() {
       this.showForgetPassDialog = true;
@@ -767,7 +817,7 @@ justify-content: center;
 
   .role-notice-text {
   font-size: 14px;
-  color: #e67e22; 
+  color: #ad5910; 
   margin-top: -20px; 
   margin-bottom: 20px;
   text-align: center;
@@ -819,7 +869,7 @@ justify-content: center;
     font-size: 14px;
     padding: 6px 10px;
     border-radius: 4px;
-    color: $card-bg;
+    color:$main-black-text;
 
     &.new {
       background-color: $primary-color;
@@ -830,11 +880,11 @@ justify-content: center;
     }
 
     &.update {
-      background-color: #6366f1;
+      background-color: #9a9bf8;
     }
 
     &.maintain {
-      background-color: #268b7b;
+      background-color: #4caf9f;
     }
   }
 

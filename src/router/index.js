@@ -4,16 +4,21 @@ import Login from '../page/Front/Login.vue';
 
 Vue.use(VueRouter);
 
-const routes = [
-  {
+const routes = [{
     path: '/',
     redirect: '/login'
+  },
+  {
+    path: '/oidc-callback',
+    component: () => import('../page/Front/OidcCallback.vue')
   },
   {
     path: '/login/:token?',
     name: 'Login',
     component: Login,
-    meta: { hideSidebar: true }
+    meta: {
+      hideSidebar: true
+    }
   },
   {
     path: '/dashboard',
@@ -76,7 +81,10 @@ const routes = [
     path: '/abc-island',
     name: 'AbcIsland',
     component: () => import('../page/Front/AbcIsland.vue'),
-    props: { level: 'primary', wordCount: 'abc' }
+    props: {
+      level: 'primary',
+      wordCount: 'abc'
+    }
   },
   {
     path: '/lesson/:level/:wordCount?/:unitId',
@@ -89,14 +97,20 @@ const routes = [
     path: '/listen-detail/primary',
     name: 'PrimaryListenDetail',
     component: () => import('../page/Front/StageDetail.vue'),
-    props: { unitId: 'listen', level: 'primary' }
+    props: {
+      unitId: 'listen',
+      level: 'primary'
+    }
   },
   // 小英雄大本營 (國小)
   {
     path: '/hero-detail/primary',
     name: 'PrimaryHeroDetail',
     component: () => import('../page/Front/StageDetail.vue'),
-    props: { unitId: 'hero', level: 'primary' }
+    props: {
+      unitId: 'hero',
+      level: 'primary'
+    }
   },
   {
     path: '/hero-quiz/:stageId/:level',
@@ -109,7 +123,10 @@ const routes = [
     path: '/listen-detail/secondary',
     name: 'SecondaryListenDetail',
     component: () => import('../page/Front/StageDetail.vue'),
-    props: { unitId: 'listen', level: 'secondary' }
+    props: {
+      unitId: 'listen',
+      level: 'secondary'
+    }
   },
 
   // 國中大本營 (國中) 
@@ -117,7 +134,10 @@ const routes = [
     path: '/hero-detail/secondary',
     name: 'SecondaryHeroDetail',
     component: () => import('../page/Front/StageDetail.vue'),
-    props: { unitId: 'hero', level: 'secondary' }
+    props: {
+      unitId: 'hero',
+      level: 'secondary'
+    }
   },
   {
     path: '/quiz/:unitId/:activityType/:level',
@@ -183,7 +203,10 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes,
   scrollBehavior(_to, _from, _savedPosition) {
-    return { x: 0, y: 0 };
+    return {
+      x: 0,
+      y: 0
+    };
   }
 });
 

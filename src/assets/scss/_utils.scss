@@ -1,5 +1,5 @@
 $main-green: #13786F;
-$main-black-text: #333;
+$main-black-text: #010101;
 $main-blue-text: #325362;
 $main-dark-blue: #097C70;
 $main-grey-text: #67777E;
@@ -517,6 +517,7 @@ $main-back-blue-text: #00332D;
     @include flex-center;
     flex-direction: column;
     justify-content: center;
+        height: 90vh;
 }
 
 @mixin main-card-content {
@@ -638,7 +639,7 @@ $main-back-blue-text: #00332D;
         &.is-selected {
             background-color: #5D9CEC;
             border-color: #4A89DC;
-            color: white;
+            color: $main-black-text;
         }
     }
 }
@@ -678,7 +679,7 @@ $main-back-blue-text: #00332D;
 
     .island-map {
         @include island-map-wrap;
-        margin-top: 2%;
+        // margin-top: 2%;
 
         .action-section {
             @include island-action-section

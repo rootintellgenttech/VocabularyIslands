@@ -9,7 +9,7 @@
                 <img :src="avatarPath" alt="Avatar" class="avatar-img">
                 <div class="header-info">
                     <h2 class="lesson-title">{{ lessonData.name }}</h2>
-                    <p class="lesson-description">{{ lessonData.description }}</p>
+                    <h3 class="lesson-description">{{ lessonData.description }}</h3>
                 </div>
             </div>
 
@@ -24,7 +24,7 @@
                             v-if="option.type === 'learn' || ['final', '06', '800-06', '1200-05'].includes(currentKey)">
                             <div class="item-single-row" @click="startActivity(option.type, option)">
                                 <div class="single-left">
-                                    <img :src="option.iconPath" :alt="option.label" class="main-icon" />
+                                    <img :src="option.iconPath" alt="" aria-hidden="true" class="main-icon" />
                                     <span class="option-label">{{ option.label }}</span>
                                 </div>
                                 <div class="single-right">
@@ -41,7 +41,7 @@
                         <template v-else>
                             <div class="item-top">
                                 <div class="top-left">
-                                    <img :src="option.iconPath" :alt="option.label" class="main-icon" />
+                                    <img :src="option.iconPath" alt="" aria-hidden="true" class="main-icon" />
                                     <span class="option-label">{{ option.label }}</span>
                                 </div>
                                 <div class="top-right" @click.stop="startActivity('learn', option)">
@@ -52,7 +52,7 @@
                             <div class="item-bottom" @click.stop="startActivity('quiz', option)">
                                 <div class="bottom-right">
                                     <div class="star-rating">
-                                        <img :src="firePath" alt="Challenge" class="fire-icon"
+                                        <img :src="firePath" alt="" aria-hidden="true" class="fire-icon"
                                             :class="{ 'is-bw': option.stars <= 0 }" />
                                         <i v-for="n in 5" :key="n"
                                             :class="['fas', option.stars >= n ? 'fa-star filled' : 'fa-star outline']">
@@ -399,14 +399,18 @@ export default {
 
 .main-card {
     @include lesson-detail-boxs-two-row;
-    .header-info{
-        .lesson-title,.lesson-description{
-        margin: 0;
+
+    .header-info {
+
+        .lesson-title,
+        .lesson-description {
+            margin: 0;
+        }
+
+        .lesson-description {
+            font-size: 28px;
+        }
     }
-.lesson-description{
-    font-size: 28px;
-}  
-    }
-  
+
 }
 </style>
