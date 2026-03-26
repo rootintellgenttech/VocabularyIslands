@@ -6,7 +6,7 @@ Vue.use(VueRouter);
 
 const routes = [
   {
-    path: '/api/oidccallback',
+   path: '/oidc/callback',
     name: 'OidcCallback',
     component: () => import('../page/Front/OidcCallback.vue')
   },
@@ -214,15 +214,13 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('accessToken');
   
-  // 只要網址路徑包含 'oidccallback'，不管是哪種寫法，全部無條件放行！
-  if (to.name === 'Login' || to.path.includes('/api/oidccallback')) {
+  if (to.name === 'Login' || to.path.includes('/oidc/callback')) {
     next();
   } else if (!token) {
-    next('/login'); // 其他頁面沒 token 才踢回 login
+    next('/login');
   } else {
     next();
   }
 });
-
 
 export default router;

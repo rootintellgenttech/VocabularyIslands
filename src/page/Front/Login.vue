@@ -415,7 +415,7 @@ export default {
       const clientId = 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42';
 
       const currentOrigin = window.location.origin;
-      const redirectUri = encodeURIComponent(`${currentOrigin}/api/oidccallback/`);
+      const redirectUri = encodeURIComponent(`${currentOrigin}/oidc/callback`);
 
       const scope = encodeURIComponent('openid email kh_profile kh_classes kh_titles');
       const loginHint = encodeURIComponent(this.studentForm.account);
