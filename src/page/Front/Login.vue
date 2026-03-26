@@ -414,7 +414,7 @@ export default {
     }
   },
   methods: {
-    async processOidcFromUrl(code, state) {
+  async processOidcFromUrl(code, state) {
     try {
       console.log('=== [攔截模式] 開始交換 Token ===');
       const params = new URLSearchParams();
@@ -443,11 +443,22 @@ export default {
 
       const loginResponse = await api.post('students/oidc/oidclogin/', postData);
       
-      // 成功後直接調用原本的登入跳轉
-      const realRole = loginResponse.data.role || 'student';
-      const targetPath = (realRole === 'student') ? '/home' : '/dashboard';
-      
-      this.performLogin(loginResponse.data, targetPath);
+      // 判斷現在是不是在「彈出視窗」裡面
+      if (window.opener && window.opener !== window) {
+        // 通知主視窗登入成功，並把資料傳過去
+        window.opener.postMessage({
+          type: 'OIDC_LOGIN_SUCCESS',
+          payload: loginResponse.data
+        }, window.location.origin);
+        
+        // 傳遞完畢後，關閉彈出視窗
+        window.close();
+      } else {
+        // 如果不是在彈出視窗（例如直接在同一頁轉址），就自己跳轉
+        const realRole = loginResponse.data.role || 'student';
+        const targetPath = (realRole === 'student') ? '/home' : '/dashboard';
+        this.performLogin(loginResponse.data, targetPath);
+      }
 
     } catch (error) {
       console.error("OIDC 攔截處理失敗:", error);
@@ -455,7 +466,7 @@ export default {
     }
   },
     // 觸發 OIDC 彈出視窗登入
-    handleOidcLogin() {
+   handleOidcLogin() {
       if (!this.studentForm.account) {
         alert('請先輸入學生帳號');
         return;
@@ -468,7 +479,8 @@ export default {
       const clientId = 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42';
 
       const currentOrigin = window.location.origin;
-      const redirectUri = encodeURIComponent(`${currentOrigin}/oidc/callback`);
+    
+      const redirectUri = encodeURIComponent(`${currentOrigin}/api/oidccallback/`);
 
       const scope = encodeURIComponent('openid email kh_profile kh_classes kh_titles');
       const loginHint = encodeURIComponent(this.studentForm.account);
@@ -486,6 +498,7 @@ export default {
         `width=${width},height=${height},top=${top},left=${left},toolbar=no,menubar=no,scrollbars=yes,resizable=no`
       );
     },
+
     handleOidcMessage(event) {
       if (event.origin !== window.location.origin) return;
 
