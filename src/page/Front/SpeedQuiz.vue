@@ -29,8 +29,9 @@
                     <div class="options-grid">
                         <button v-for="(option, index) in currentOptions" :key="index"
                             :class="['option-btn', { 'is-selected': tempSelectedAnswer === option.id }]"
-                            @click="handleOptionClick(option)">
-                            <i class="fas fa-volume-up"></i>
+                            @click="handleOptionClick(option)" type="button" :aria-label="`播放選項 ${index + 1} 的音檔並選擇`"
+                            :aria-pressed="tempSelectedAnswer === option.id">
+                            <i class="fas fa-volume-up" aria-hidden="true"></i>
                         </button>
                     </div>
                     <el-button class="submit-btn" :disabled="!tempSelectedAnswer" @click="handleQuestionSubmit">
@@ -67,7 +68,7 @@
             :close-on-click-modal="false" :show-close="false" append-to-body>
             <div class="dialog-content">
                 <h3 class="title exam-warning-title"><i class="fas fa-exclamation-circle"></i> 確定要離開嗎？</h3>
-                <p class="description" style="color: #e74c3c; font-weight: bold;">
+                <p class="description" style="color:#AA1F0F; font-weight: bold;">
                     ⚠️ 注意：中途離開將會自動將剩餘題目視為「未填寫」並立即結算。
                 </p>
             </div>

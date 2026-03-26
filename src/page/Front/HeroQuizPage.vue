@@ -570,9 +570,9 @@ export default {
 }
 
 .instruction-text {
-    font-size: 22px;
+    font-size: 22px !important;
     color: $main-black-text;
-    margin: 4% 0 6%;
+    margin: 4% 0 6% !important;
 }
 
 .options-grid {

@@ -19,8 +19,10 @@
 
                             <h1 v-if="!scope.data.isImageMode" class="card-word-title">{{ scope.data.mainText }}</h1>
 
-                            <img v-if="scope.data.isImageMode" :src="getImageUrl(scope.data.mainText)"
-                                class="card-image" alt="card-img" />
+                            <img v-if="scope.data.isImageMode" 
+     :src="getImageUrl(scope.data.mainText)"
+     class="card-image" 
+     :alt="`${scope.data.mainText} 的學習圖片`" />
                         </div>
 
                         <div v-if="scope.data.subText" class="word-translation">

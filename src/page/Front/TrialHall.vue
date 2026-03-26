@@ -90,7 +90,7 @@
                                             <p class="detail-summary">
                                                 總題數: {{ record.summary.total }} | 答對: <span style="color: #27ae60;">{{
                                                     record.summary.correct }}</span> | 答錯: <span
-                                                    style="color: #e74c3c;">{{
+                                                    style="color:#AA1F0F;">{{
                                                         record.summary.wrong }}</span>
                                             </p>
                                         </div>

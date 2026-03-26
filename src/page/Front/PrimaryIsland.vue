@@ -2,26 +2,33 @@
     <div class="primary-page">
 
         <div class="islands-grid">
-            <div class="top-bar">
-                <h1 class="page-title">國小</h1>
-                <button class="back-btn" @click="goBack">
-                    返回大廳
-                </button>
-            </div>
+           <main role="main" class="islands-grid">
+      <div class="top-bar">
+        <h1 class="page-title">國小</h1>
+        <button class="back-btn" @click="goBack" title="返回大廳">
+          返回大廳
+        </button>
+      </div>
+      
+      </main>
 
             <vue-custom-scrollbar class="islands-scroll-container" :settings="scrollSettings">
                 <div class="island-map">
                     <div v-for="island in islands" :key="island.id" class="island-container">
-                        <div class="island-card">
-                            <img :src="island.imgColor" :class="{ 'is-bw': island.stars === 0 }" alt="Island Image"
-                                class="island-image" />
-                        </div>
+                    <div class="island-card">
+  <img 
+    :src="island.imgColor" 
+    :class="{ 'is-bw': island.stars === 0 }" 
+    :alt="`${island.name}關卡地圖`"
+    class="island-image" 
+  />
+</div>
 
                         <div class="stats-row">
-                            <div class="stat-group">
-                                <img src="../../assets/image/elementary/star.png" alt="⭐">
-                                <span>{{ island.stars }}/{{ island.totalStars || 0 }}</span>
-                            </div>
+                           <div class="stat-group">
+  <img src="../../assets/image/elementary/star.png" alt="" aria-hidden="true">
+  <span>{{ island.stars }}/{{ island.totalStars || 0 }}</span>
+</div>
                             <!-- <div class="stat-group">
                                 <img src="../../assets/image/elementary/book.png" alt="⭐">
                                 <span>學習 {{ island.progress }}%</span>
@@ -29,10 +36,13 @@
                         </div>
 
                         <div class="island-title">{{ island.name }}</div>
-
-                        <button class="enter-btn" @click="enterIsland(island.id)">
-                            進入學習
-                        </button>
+<button 
+  class="enter-btn" 
+  @click="enterIsland(island.id)"
+  :aria-label="`進入${island.name}學習`"
+>
+  進入學習
+</button>
                     </div>
                 </div>
             </vue-custom-scrollbar>

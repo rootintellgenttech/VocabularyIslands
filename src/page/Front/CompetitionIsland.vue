@@ -27,7 +27,7 @@
 
                 <div class="arena-header-card">
                     <div class="header-wrap">
-                        <img src="../../assets/image/competition/island.png">
+                        <img alt='島嶼圖片' src="../../assets/image/competition/island.png">
                         <div class="header-info">
                             <h2 class="header-title">競技聯盟</h2>
                         </div>
@@ -52,7 +52,7 @@
                                 {{ rankingType === 'all' ? '所屬聯盟排行' : '所屬學校排行' }}
                             </span>
                             <span class="stat-value">{{ currentRanking ? currentRanking.display_name : '無排行'
-                            }}</span>
+                                }}</span>
                             <span class="stat-status">排名第 {{ currentRanking ? currentRanking.my_rank : '-' }} 名</span>
                         </div>
                     </div>
@@ -86,13 +86,14 @@
                                 <div v-for="(player, index) in filteredRanking" :key="index"
                                     :class="['player-row', { 'is-top3': index < 3 }]">
                                     <div class="rank-icon-name">
-                                        <img v-if="index < 3" :src="getRankIcon(index + 1)" class="rank-icon">
+                                        <img alt="排行榜Icon" v-if="index < 3" :src="getRankIcon(index + 1)"
+                                            class="rank-icon">
                                         <span v-else class="rank-number">#{{ player.rank }}</span>
 
                                         <div class="player-info">
                                             <span class="player-name">{{ player.displayName }}</span>
                                             <span v-if="player.school_name" class="player-school">{{ player.school_name
-                                            }}</span>
+                                                }}</span>
                                         </div>
                                     </div>
                                     <div class="score-info">
@@ -188,7 +189,7 @@
                 <div class="player-right-info">
                     <div class="player-actual-score">
                         <span class="player-score">{{ currentRanking ? formatScore(currentRanking.my_score) : 0
-                        }}</span>
+                            }}</span>
                         <span class="score-title">積分</span>
                     </div>
 
@@ -620,10 +621,14 @@ export default {
 .activity-countdown,
 .diff-score,
 .player-rank,
-.score-title,
-.player-school {
+.score-title {
     color: $main-grey-text;
 }
+
+.player-school {
+    color: $main-black-text;
+}
+
 
 .score-info .player-score,
 .player-name,
@@ -964,7 +969,7 @@ export default {
             }
 
             &.is-active {
-                background-color: #28A99C;
+                background-color: #095e55;
                 color: white;
                 border: 1px solid #DAE2E7;
 
@@ -1196,7 +1201,7 @@ export default {
                 .player-tag {
                     background: #CAEBEB;
                     font-size: 16px;
-                    color: #28A99C;
+                    color: #01302C;
                     padding: 4px 8px;
                     border-radius: 8px;
                     margin-left: 8px;
@@ -1225,13 +1230,13 @@ export default {
             .player-score-compare {
                 display: flex;
                 flex-direction: column;
-                background: #FEDEC6;
-                border: 1px solid #F5BE99;
+                background: #FFFDEA;
+                border: 1px solid #FFFDEA;
                 padding: 8px 16px;
                 border-radius: 16px;
 
                 .player-rank-diff-score {
-                    color: #F88739;
+                    color: #972E19;
                     font-weight: 600;
                     font-size: 22px;
                 }

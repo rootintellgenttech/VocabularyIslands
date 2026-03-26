@@ -31,8 +31,8 @@
                 </div>
                 <el-tabs v-model="activePartId" class="part-tabs" v-if="quizParts && quizParts.length > 0">
                     <el-tab-pane v-for="part in quizParts" :key="part.id" :label="part.title" :name="part.id">
-                        <el-table :data="part.questions" style="width: 100%" :row-class-name="tableRowClassName" border
-                            height="550">
+                        <el-table aria-label="測驗詳細結果列表" :data="part.questions" style="width: 100%"
+                            :row-class-name="tableRowClassName" border height="550">
                             <el-table-column prop="index" label="序" width="60" align="center"></el-table-column>
 
                             <el-table-column label="題目" min-width="180">
@@ -48,7 +48,7 @@
                             <el-table-column label="我的答案" min-width="120">
                                 <template slot-scope="scope">
                                     <span :class="{ 'text-danger': !scope.row.isCorrect }">{{ scope.row.myAnswer
-                                        }}</span>
+                                    }}</span>
                                 </template>
                             </el-table-column>
 
@@ -66,7 +66,7 @@
                 </el-tabs>
 
                 <div v-else-if="quizParts && quizParts.length === 1" class="single-part-container">
-                    <el-table :data="quizParts[0].questions" style="width: 100%" :height="600"
+                    <el-table aria-label="測驗結果列表" :data="quizParts[0].questions" style="width: 100%" :height="600"
                         :row-class-name="tableRowClassName" border>
                         <el-table-column prop="index" label="序列" width="60" align="center"></el-table-column>
 
@@ -83,7 +83,7 @@
                         <el-table-column prop="myAnswer" label="我的答案" min-width="120">
                             <template slot-scope="scope">
                                 <span :class="{ 'text-danger': !scope.row.isCorrect }">{{ scope.row.myAnswer || '未作答'
-                                    }}</span>
+                                }}</span>
                             </template>
                         </el-table-column>
 
@@ -366,11 +366,11 @@ export default {
     }
 
     .success strong {
-        color: #27ae60;
+        color: #085328;
     }
 
     .danger strong {
-        color: #e74c3c;
+        color: #b11604;
     }
 
     .stat-tag {

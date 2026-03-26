@@ -58,7 +58,7 @@
                 <h3 class="title exam-warning-title">
                     <i class="fas fa-exclamation-circle"></i> 確定要離開考試嗎？
                 </h3>
-                <p class="description" style="color: #e74c3c; font-weight: bold;">
+                <p class="description" style="color:#AA1F0F; font-weight: bold;">
                     ⚠️ 注意：中途離開將會自動將剩餘題目視為「未填寫」並直接提交，這將導致您失去今天的挑戰機會。
                 </p>
             </div>

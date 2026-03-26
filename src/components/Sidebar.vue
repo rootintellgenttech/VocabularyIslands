@@ -50,11 +50,11 @@
                 </template>
 
                 <template v-else>
-                 <div v-for="(item, index) in filteredMenuItems" :key="index" class="teacher-menu-item"
-    :class="{ active: isItemActive(item) }" @click="handleNavigation(item.path)">
-    <div class="menu-icon"><i :class="['fas', item.icon]"></i></div>
-    <span v-if="isMenuExpanded" class="menu-label">{{ item.title }}</span>
-</div>
+                    <div v-for="(item, index) in filteredMenuItems" :key="index" class="teacher-menu-item"
+                        :class="{ active: isItemActive(item) }" @click="handleNavigation(item.path)">
+                        <div class="menu-icon"><i :class="['fas', item.icon]"></i></div>
+                        <span v-if="isMenuExpanded" class="menu-label">{{ item.title }}</span>
+                    </div>
                 </template>
 
             </div>
@@ -125,7 +125,7 @@
                     <span v-if="isMenuExpanded">設定</span>
                 </div>
 
-                <audio ref="mainAudio" :src="require('@/assets/mp3/main-bg.mp3')" loop></audio>
+                <audio ref="mainAudio" :src="require('@/assets/mp3/main-bg.mp3')" loop title="系統背景音樂"></audio>
                 <audio ref="fightAudio" :src="require('@/assets/mp3/fight-island.mp3')" loop></audio>
 
                 <el-dialog :visible.sync="settingsDialogVisible" width="400px" center custom-class="settings-modal"
@@ -234,25 +234,25 @@ export default {
     },
 
     watch: {
-       '$route.path': {
-        handler(newPath) {
-            // 當路由路徑改變時，同步更新 currentPath
-            this.currentPath = newPath;
+        '$route.path': {
+            handler(newPath) {
+                // 當路由路徑改變時，同步更新 currentPath
+                this.currentPath = newPath;
 
-            // 處理成就島收合
-            if (newPath === '/achievement-island') {
-                this.isMenuExpanded = false;
-            }
+                // 處理成就島收合
+                if (newPath === '/achievement-island') {
+                    this.isMenuExpanded = false;
+                }
 
-            // 處理音樂
-            if (!this.isMusicEnabled) {
-                this.stopAllMusic();
-            } else {
-                this.playAppropriateMusic(newPath);
-            }
+                // 處理音樂
+                if (!this.isMusicEnabled) {
+                    this.stopAllMusic();
+                } else {
+                    this.playAppropriateMusic(newPath);
+                }
+            },
+            immediate: true
         },
-        immediate: true 
-    },
         userRole(newRole) {
             if (newRole === 'student') {
                 this.fetchStudentDashboard();
@@ -295,15 +295,15 @@ export default {
         document.removeEventListener('click', this.handleOutsideClick);
     },
     methods: {
-isItemActive(item) {
-        // 如果當前路徑完全等於選單路徑
-        if (this.currentPath === item.path) return true;
-        
-        // 額外判定：如果是考試詳情頁，讓「考試分析」保持高亮
-        if (item.path === '/exam-analysis' && this.currentPath === '/exam-detail') return true;
+        isItemActive(item) {
+            // 如果當前路徑完全等於選單路徑
+            if (this.currentPath === item.path) return true;
 
-        return false;
-    },
+            // 額外判定：如果是考試詳情頁，讓「考試分析」保持高亮
+            if (item.path === '/exam-analysis' && this.currentPath === '/exam-detail') return true;
+
+            return false;
+        },
         copyEmail() {
             const email = 'rootintellgenttech@gmail.com';
 
@@ -455,11 +455,11 @@ isItemActive(item) {
         toggleMenu() {
             this.isMenuExpanded = !this.isMenuExpanded;
         },
-       handleNavigation(path) {
-    if (this.$route.path !== path) {
-        this.$router.push(path).catch(err => { });
-    }
-},
+        handleNavigation(path) {
+            if (this.$route.path !== path) {
+                this.$router.push(path).catch(err => { });
+            }
+        },
         handleLogout() {
             this.stopAllMusic(); // 停止音樂
             localStorage.removeItem('accessToken');
@@ -849,7 +849,7 @@ isItemActive(item) {
 
         &:hover {
             background-color: rgba(0, 0, 0, 0.05);
-            color: #2aaea0; // 懸停時變色 (配合圖表主題色)
+            color: #2aaea0;
         }
 
         &.active {
@@ -881,7 +881,6 @@ isItemActive(item) {
         }
     }
 
-    /* 收合狀態下的老師選單微調 */
     &:not(.is-expanded) {
         .teacher-menu-item {
             padding: 15px 0;
@@ -894,7 +893,7 @@ isItemActive(item) {
 
             .menu-label,
             .menu-sub {
-                display: none; // 收合時隱藏文字
+                display: none;
             }
         }
     }

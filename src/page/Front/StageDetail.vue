@@ -6,7 +6,7 @@
                 <i class="fas fa-arrow-left"></i> 返回
             </div>
 
-            <div class="card-header">
+                       <div class="card-header">
                 <img :src="avatarPath" alt="Avatar" class="avatar-img">
                 <div class="header-info">
                     <h2 class="lesson-title">{{ lessonData.name }}</h2>
@@ -15,21 +15,34 @@
             </div>
             <vue-custom-scrollbar class="level-scroll-container" :settings="scrollSettings">
                 <div class="lesson-options">
-                    <div v-for="(stage, index) in lessonData.options" :key="index" class="option-item"
-                        @click="startStage(stage)">
-
+                 <div 
+    v-for="(stage, index) in lessonData.options" 
+    :key="index" 
+    class="option-item"
+    @click="startStage(stage)"
+    role="button"
+    tabindex="0"
+    :aria-label="`進入學習：${stage.label}`"
+    @keyup.enter="startStage(stage)"
+>
                         <div class="item-bottom">
-                            <div class="bottom-left">
-                                <img :src="getStageIcon(stage)" :alt="stage.label" class="main-icon"
-                                    :class="{ 'is-bw': stage.stars <= 0 }" /> <span class="option-label">{{ stage.label
-                                    }}</span>
-                            </div>
+                           <div class="bottom-left">
+    <img 
+      :src="getStageIcon(stage)" 
+      alt="" 
+      aria-hidden="true"
+      class="main-icon"
+      :class="{ 'is-bw': stage.stars <= 0 }" 
+    /> 
+    <span class="option-label">{{ stage.label }}</span>
+</div>
                             <div class="bottom-right">
-                                <div class="star-rating">
-                                    <i v-for="n in 5" :key="n"
-                                        :class="['fas', stage.stars >= n ? 'fa-star filled' : 'fa-star outline']">
-                                    </i>
-                                </div>
+                              <div class="star-rating" :aria-label="`獲得 ${stage.stars} 顆星`">
+    <i v-for="n in 5" :key="n"
+        :class="['fas', stage.stars >= n ? 'fa-star filled' : 'fa-star outline']"
+        aria-hidden="true">
+    </i>
+</div>
                             </div>
 
                         </div>
@@ -39,6 +52,7 @@
         </div>
     </div>
 </template>
+
 
 <script>
 import api from '@/config/api';

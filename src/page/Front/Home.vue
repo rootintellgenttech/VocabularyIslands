@@ -6,10 +6,13 @@
                 <div class="island-map-container">
                     <div v-for="island in islands" :key="island.name" class="island-container">
                         <div class="island-card">
-                            <img :src="island.imagePath" :alt="island.name" class="island-image">
+                            <img :src="island.imagePath" :alt="`${island.name}地圖圖示`" class="island-image">
                             <div class="action-section">
                                 <h2 class="island-name">{{ island.name }}</h2>
-                                <button class="enter-btn" @click="goToIsland(island.route)">進入學習</button>
+                                <button class="enter-btn" @click="goToIsland(island.route)"
+                                    :aria-label="`進入${island.name}學習`">
+                                    進入學習
+                                </button>
                             </div>
                         </div>
                     </div>
