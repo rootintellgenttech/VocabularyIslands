@@ -368,41 +368,45 @@ export default {
   },
 mounted() {
     console.log('=== [mounted] 頁面載入 ===');
-    
-    // 1. 解析網址參數
-    const urlParams = new URLSearchParams(window.location.search);
-    const oidcCode = this.$route.query.code || urlParams.get('code');
-    const errorParam = urlParams.get('error');
+    console.log('🔍 [偵錯] 1. 目前完整網址:', window.location.href);
+    console.log('🔍 [偵錯] 2. Vue Router query:', this.$route.query);
 
-    if (errorParam) {
-      console.error('[mounted] 教育局回傳錯誤:', errorParam, urlParams.get('error_description'));
-      this.$message.error('教育局授權失敗或取消登入');
-      // 清理網址
-      window.history.replaceState({}, document.title, '/login');
-      return;
-    }
+    try {
+      // 1. 嘗試解析網址參數
+      const urlParams = new URLSearchParams(window.location.search);
+      const oidcCode = this.$route.query.code || urlParams.get('code');
+      console.log('🔍 [偵錯] 3. 最終抓到的 code:', oidcCode);
 
-    // 2. 判斷是否為 OIDC Callback 狀態
-    if (oidcCode) {
-      console.log('[mounted] ✅ 成功攔截到 code，準備從前端兌換 Token:', oidcCode);
-      this.isOidcLoading = true;
-      this.processOidcFromUrl(oidcCode);
-      return; 
-    }
-
-    const fullPath = window.location.href;
-    if (fullPath.includes('/login/')) {
-      let rawToken = fullPath.split('/login/')[1];
-      const token = rawToken.split('?')[0].replace(/\/+$/, "");
-      if (token && token.length > 50) {
-        this.resetPassToken = token;
-        this.showResetPassDialog = true;
+      // 判斷是否有錯誤參數 (例如使用者按取消)
+      const errorParam = urlParams.get('error') || this.$route.query.error;
+      if (errorParam) {
+        console.error('❌ [偵錯] 教育局回傳錯誤:', errorParam);
+        this.$message.error('教育局授權失敗');
+        window.history.replaceState({}, document.title, '/login');
+        return;
       }
-    }
-    
-    window.addEventListener('message', this.handleOidcMessage);
-  },
 
+      // 2. 如果有 code，準備發送 API
+      if (oidcCode) {
+        console.log('✅ [偵錯] 4. 準備執行 processOidcFromUrl');
+        this.isOidcLoading = true;
+
+        // 防呆檢查：確認 processOidcFromUrl 方法是否真的存在
+        if (typeof this.processOidcFromUrl !== 'function') {
+          console.error('❌ [嚴重錯誤] 找不到 processOidcFromUrl！請檢查它是不是沒放在 methods: { ... } 裡面？');
+          return;
+        }
+
+        // 呼叫方法
+        this.processOidcFromUrl(oidcCode);
+      } else {
+        console.log('⚠️ [偵錯] 4. 沒有抓到 code，停留在一般密碼登入畫面');
+      }
+
+    } catch (error) {
+      console.error('❌ [偵錯] mounted 執行過程發生例外錯誤:', error);
+    }
+  },
   beforeDestroy() {
     // 移除監聽器
     window.removeEventListener('message', this.handleOidcMessage);
