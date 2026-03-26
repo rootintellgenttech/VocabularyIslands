@@ -266,6 +266,8 @@
 
 <script>
 import api from '../../config/api';
+import { jwtDecode } from 'jwt-decode';
+
 
 export default {
   name: 'Login',
@@ -359,33 +361,44 @@ export default {
 
     };
   },
-  mounted() {
-    this.$nextTick(() => {
-      // 尋找該公告卡片內所有可能漏掉 label 的 input (通常是滾動條元件產生的)
-      const scrollInputs = this.$el.querySelectorAll('.announcement-card input');
-      scrollInputs.forEach((input, index) => {
-        if (!input.getAttribute('aria-label')) {
-          input.setAttribute('aria-label', `公告列表滾動控制 ${index + 1}`);
-        }
-      });
-    });
-    const fullPath = window.location.href;
-    // 尋找 login 字樣後的內容
-    if (fullPath.includes('/login/')) {
-      let rawToken = fullPath.split('/login/')[1];
-
-      // 徹底移除結尾的斜槓與任何 Query String
-      const token = rawToken.split('?')[0].replace(/\/+$/, "");
-
-      if (token && token.length > 50) {
-        console.log('[系統] 成功解析 Token:', token);
-        this.resetPassToken = token;
-        this.showResetPassDialog = true;
+ mounted() {
+  this.$nextTick(() => {
+    const scrollInputs = this.$el.querySelectorAll('.announcement-card input');
+    scrollInputs.forEach((input, index) => {
+      if (!input.getAttribute('aria-label')) {
+        input.setAttribute('aria-label', `公告列表滾動控制 ${index + 1}`);
       }
+    });
+  });
+
+  // OIDC 攔截
+  const urlParams = new URLSearchParams(window.location.search);
+  const oidcCode = urlParams.get('code');
+  const oidcState = urlParams.get('state');
+
+  // 如果網址帶有 code，代表是從教育局跳回來的（即使被踢回 /login）
+  if (oidcCode) {
+    console.log('[系統] 偵測到 OIDC Code，準備模擬 Callback 流程...');
+    // 手動觸發原本在 OidcCallback.vue 裡的邏輯
+    // 我們可以構造一個假的 message event 給 handleOidcMessage
+    this.processOidcFromUrl(oidcCode, oidcState);
+  }
+  // -------------------------
+
+  const fullPath = window.location.href;
+  if (fullPath.includes('/login/')) {
+    let rawToken = fullPath.split('/login/')[1];
+    const token = rawToken.split('?')[0].replace(/\/+$/, "");
+    if (token && token.length > 50) {
+      console.log('[系統] 成功解析 Token:', token);
+      this.resetPassToken = token;
+      this.showResetPassDialog = true;
     }
-    // 監聽跨視窗通訊
-    window.addEventListener('message', this.handleOidcMessage);
-  },
+  }
+  
+  window.addEventListener('message', this.handleOidcMessage);
+},
+
   beforeDestroy() {
     // 移除監聽器
     window.removeEventListener('message', this.handleOidcMessage);
@@ -401,6 +414,46 @@ export default {
     }
   },
   methods: {
+    async processOidcFromUrl(code, state) {
+    try {
+      console.log('=== [攔截模式] 開始交換 Token ===');
+      const params = new URLSearchParams();
+      params.append('grant_type', 'authorization_code');
+      params.append('code', code);
+      params.append('redirect_uri', `${window.location.origin}/api/oidccallback/`);
+      params.append('client_id', 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42');
+      params.append('client_secret', '38efe712ebe3b6af5d7365441cf2e4d5b6d3c9dc07aa977f74d8f1c8e6c134d1');
+
+      const tokenResponse = await axios.post('https://oidc.kh.edu.tw/oauth2/token', params, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      });
+
+      const idToken = tokenResponse.data.id_token;
+      const decodedUser = jwtDecode(idToken);
+
+      const postData = {
+        sub: decodedUser.sub,
+        kh_profile: {
+          fullname: decodedUser.kh_profile?.fullname || '未知姓名',
+          email: decodedUser.kh_profile?.email || ''
+        },
+        kh_titles: decodedUser.kh_titles || {},
+        kh_classes: decodedUser.kh_classes || {}
+      };
+
+      const loginResponse = await api.post('students/oidc/oidclogin/', postData);
+      
+      // 成功後直接調用原本的登入跳轉
+      const realRole = loginResponse.data.role || 'student';
+      const targetPath = (realRole === 'student') ? '/home' : '/dashboard';
+      
+      this.performLogin(loginResponse.data, targetPath);
+
+    } catch (error) {
+      console.error("OIDC 攔截處理失敗:", error);
+      this.$message.error('自動登入失敗，請手動點擊學生登入按鈕');
+    }
+  },
     // 觸發 OIDC 彈出視窗登入
     handleOidcLogin() {
       if (!this.studentForm.account) {
