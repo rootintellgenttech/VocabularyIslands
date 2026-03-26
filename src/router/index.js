@@ -5,15 +5,15 @@ import Login from '../page/Front/Login.vue';
 Vue.use(VueRouter);
 
 const routes = [
-  {
-   path: '/oidc/callback',
+{
+    path: '/api/oidccallback', 
     name: 'OidcCallback',
-    component: () => import('../page/Front/OidcCallback.vue')
+    component: Login 
   },
   {
     path: '/api/oidccallback/', 
     name: 'OidcCallbackSlash',
-    component: () => import('../page/Front/OidcCallback.vue')
+    component: Login
   },
   {
     path: '/',
@@ -199,7 +199,7 @@ const routes = [
     props: true
   },
   // 增加 404 頁面處理，確保在任何情況下都能回到登入畫面
-  {
+ {
     path: '*',
     redirect: '/login'
   }
@@ -210,22 +210,18 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes
 });
+
+// 路由守衛：確保遇到 OIDC 網址時「絕對放行」
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('accessToken');
   
-  if (
-    to.name === 'Login' || 
-    to.path.includes('/oidc/callback') || 
-    to.path.includes('/api/oidccallback')
-  ) {
+  if (to.name === 'Login' || to.path.includes('/api/oidccallback')) {
     next();
   } else if (!token) {
-    next('/login'); 
+    next('/login');
   } else {
     next();
   }
 });
 
 export default router;
-
-

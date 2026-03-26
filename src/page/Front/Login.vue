@@ -1,5 +1,9 @@
 <template>
-  <div class="login-page">
+  <div v-if="isOidcLoading" class="callback-loading" style="text-align: center; padding: 100px;">
+    <h2><i class="fa-solid fa-spinner fa-spin"></i> 正在獲取學生資料並登入...</h2>
+    <p>請稍候，正在與教育局連線中...</p>
+  </div>
+  <div v-else class="login-page">
     <el-row class="login-container" :gutter="40" type="flex">
       <el-col :span="12">
         <div class="announcement-card mobile-scroll-box">
@@ -280,6 +284,7 @@ export default {
   },
   data() {
     return {
+      isOidcLoading: false,
       currentRole: 'student',
       studentForm: {
         account: '',
@@ -371,19 +376,18 @@ export default {
     });
   });
 
-  // OIDC 攔截
-  const urlParams = new URLSearchParams(window.location.search);
-  const oidcCode = urlParams.get('code');
-  const oidcState = urlParams.get('state');
 
-  // 如果網址帶有 code，代表是從教育局跳回來的（即使被踢回 /login）
-  if (oidcCode) {
-    console.log('[系統] 偵測到 OIDC Code，準備模擬 Callback 流程...');
-    // 手動觸發原本在 OidcCallback.vue 裡的邏輯
-    // 我們可以構造一個假的 message event 給 handleOidcMessage
-    this.processOidcFromUrl(oidcCode, oidcState);
-  }
-  // -------------------------
+    // OIDC 攔截
+    const urlParams = new URLSearchParams(window.location.search);
+    const oidcCode = urlParams.get('code');
+
+    // 如果網址有 code，代表是從教育局「跳轉回來」的
+    if (oidcCode) {
+      console.log('=== [Step 1] 偵測到教育局回傳的 Code ===', oidcCode);
+      this.isOidcLoading = true; // 切換成載入畫面
+      this.processOidcFromUrl(oidcCode); // 執行登入交換
+      return; // 提早結束，不跑後面的邏輯
+    }
 
   const fullPath = window.location.href;
   if (fullPath.includes('/login/')) {
@@ -414,89 +418,68 @@ export default {
     }
   },
   methods: {
-  async processOidcFromUrl(code, state) {
-    try {
-      console.log('=== [攔截模式] 開始交換 Token ===');
-      const params = new URLSearchParams();
-      params.append('grant_type', 'authorization_code');
-      params.append('code', code);
-      params.append('redirect_uri', `${window.location.origin}/api/oidccallback/`);
-      params.append('client_id', 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42');
-      params.append('client_secret', '38efe712ebe3b6af5d7365441cf2e4d5b6d3c9dc07aa977f74d8f1c8e6c134d1');
+async processOidcFromUrl(code) {
+      try {
+        console.log('=== [Step 2] 開始向教育局交換 Token ===');
+        const params = new URLSearchParams();
+        params.append('grant_type', 'authorization_code');
+        params.append('code', code);
+        params.append('redirect_uri', `${window.location.origin}/api/oidccallback/`);
+        params.append('client_id', 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42');
+        params.append('client_secret', '38efe712ebe3b6af5d7365441cf2e4d5b6d3c9dc07aa977f74d8f1c8e6c134d1');
 
-      const tokenResponse = await axios.post('https://oidc.kh.edu.tw/oauth2/token', params, {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-      });
+        const tokenResponse = await axios.post('https://oidc.kh.edu.tw/oauth2/token', params, {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
 
-      const idToken = tokenResponse.data.id_token;
-      const decodedUser = jwtDecode(idToken);
+        const idToken = tokenResponse.data.id_token;
+        const decodedUser = jwtDecode(idToken);
+        console.log("=== [Step 3] 解析學生資料 ===", decodedUser);
 
-      const postData = {
-        sub: decodedUser.sub,
-        kh_profile: {
-          fullname: decodedUser.kh_profile?.fullname || '未知姓名',
-          email: decodedUser.kh_profile?.email || ''
-        },
-        kh_titles: decodedUser.kh_titles || {},
-        kh_classes: decodedUser.kh_classes || {}
-      };
+        const postData = {
+          sub: decodedUser.sub,
+          kh_profile: {
+            fullname: decodedUser.kh_profile?.fullname || '未知姓名',
+            email: decodedUser.kh_profile?.email || ''
+          },
+          kh_titles: decodedUser.kh_titles || {},
+          kh_classes: decodedUser.kh_classes || {}
+        };
 
-      const loginResponse = await api.post('students/oidc/oidclogin/', postData);
-      
-      // 判斷現在是不是在「彈出視窗」裡面
-      if (window.opener && window.opener !== window) {
-        // 通知主視窗登入成功，並把資料傳過去
-        window.opener.postMessage({
-          type: 'OIDC_LOGIN_SUCCESS',
-          payload: loginResponse.data
-        }, window.location.origin);
+        console.log("=== [Step 4] 發給後端登入 ===", postData);
+        const loginResponse = await api.post('students/oidc/oidclogin/', postData);
         
-        // 傳遞完畢後，關閉彈出視窗
-        window.close();
-      } else {
-        // 如果不是在彈出視窗（例如直接在同一頁轉址），就自己跳轉
+        // 登入成功，直接跳轉大廳！
         const realRole = loginResponse.data.role || 'student';
         const targetPath = (realRole === 'student') ? '/home' : '/dashboard';
+        
+        // 清理網址，把很長的 code 藏起來
+        window.history.replaceState({}, document.title, '/login');
+        
         this.performLogin(loginResponse.data, targetPath);
-      }
 
-    } catch (error) {
-      console.error("OIDC 攔截處理失敗:", error);
-      this.$message.error('自動登入失敗，請手動點擊學生登入按鈕');
-    }
-  },
+      } catch (error) {
+        console.error("OIDC 登入失敗:", error);
+        this.isOidcLoading = false; // 失敗就變回登入畫面
+        this.$message.error('教育局授權失敗，請重新登入');
+      }
+    },
     // 觸發 OIDC 彈出視窗登入
-   handleOidcLogin() {
+  handleOidcLogin() {
       if (!this.studentForm.account) {
         alert('請先輸入學生帳號');
         return;
       }
-
       const state = Math.random().toString(36).substring(2, 15);
       const nonce = Math.random().toString(36).substring(2, 15);
-      sessionStorage.setItem('oidc_state', state);
-
       const clientId = 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42';
-
-      const currentOrigin = window.location.origin;
-    
-      const redirectUri = encodeURIComponent(`${currentOrigin}/api/oidccallback/`);
-
+      const redirectUri = encodeURIComponent(`${window.location.origin}/api/oidccallback/`);
       const scope = encodeURIComponent('openid email kh_profile kh_classes kh_titles');
       const loginHint = encodeURIComponent(this.studentForm.account);
 
       const authUrl = `https://oidc.kh.edu.tw/oauth2/auth?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}&nonce=${nonce}&login_hint=${loginHint}`;
 
-      const width = 600;
-      const height = 650;
-      const left = window.screen.width / 2 - width / 2;
-      const top = window.screen.height / 2 - height / 2;
-
-      this.oidcWindow = window.open(
-        authUrl,
-        'OIDC_Login',
-        `width=${width},height=${height},top=${top},left=${left},toolbar=no,menubar=no,scrollbars=yes,resizable=no`
-      );
+      window.location.href = authUrl; 
     },
 
     handleOidcMessage(event) {
