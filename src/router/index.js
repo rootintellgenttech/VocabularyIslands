@@ -215,11 +215,18 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('accessToken');
   
-  // 有 code 參數就一定放行，不管路徑是什麼
+  // 如果網址帶有 code，強制把它護送到 /login，並且【保留所有參數】
   if (to.query.code) {
-    console.log('[RouterGuard] 偵測到 code，放行:', to.fullPath);
-    next();
-    return;
+    console.log('🚀 [RouterGuard] 攔截到 code！強制帶往 /login 並保留參數:', to.query.code);
+    
+    // 如果目前不在 /login，我們強制把它導向 /login，並把 query (包含 code) 傳過去
+    if (to.path !== '/login') {
+      next({ path: '/login', query: to.query });
+      return;
+    } else {
+      next();
+      return;
+    }
   }
   
   if (to.name === 'Login' || to.path.includes('/api/oidccallback')) {
