@@ -9,7 +9,8 @@ const routes = [{
     redirect: '/login'
   },
   {
-    path: '/oidc-callback',
+    path: '/oidccallback',
+    name: 'OidcCallback',
     component: () => import('../page/Front/OidcCallback.vue')
   },
   {

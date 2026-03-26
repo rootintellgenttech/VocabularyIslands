@@ -5,49 +5,62 @@
 </template>
 
 <script>
+import { jwtDecode } from 'jwt-decode';
 import api from '../../config/api';
 
 export default {
   async mounted() {
-    // 從 URL 取得教育局回傳的 code 與 state
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
-    const state = urlParams.get('state');
+    // 取得 URL Hash 中的參數
+    const hash = window.location.hash.substring(1);
+    const params = new URLSearchParams(hash);
 
-    // 檢查安全性：比對 state 是否與發起請求時一致
+    const idToken = params.get('id_token');
+    const state = params.get('state');
+
+    // 驗證 State 安全性
     const savedState = sessionStorage.getItem('oidc_state');
     if (state !== savedState) {
-      this.sendToOpener({ type: 'OIDC_LOGIN_ERROR', error: 'State 驗證失敗' });
+      this.sendToOpener({ type: 'OIDC_LOGIN_ERROR', error: '安全驗證失敗' });
       return;
     }
 
-    if (code) {
+    if (idToken) {
       try {
-        // 將 code 傳給您的後端 API，由後端使用 client_secret 去交換 Token(兌換資料)
-        const response = await api.post('students/oidc-exchange/', { code: code });
-        
-        // 成功拿到系統 Token 與用戶資料，傳回給母視窗 (Login.vue)
+        // 回傳一個包含 sub, kh_profile 等欄位的物件
+        const userData = jwtDecode(idToken);
+
+        // 依照後端 Swagger 要求格式組合資料
+        const postData = {
+          sub: userData.sub,
+          kh_profile: userData.kh_profile,
+          kh_titles: userData.kh_titles,
+          kh_classes: userData.kh_classes
+        };
+
+        // 發送給後端 API 進行登入/註冊
+        const response = await api.post('students/oidc/oidclogin/', postData);
+
         this.sendToOpener({
           type: 'OIDC_LOGIN_SUCCESS',
-          payload: response.data // 包含 token, role, first_login 等
+          payload: response.data
         });
       } catch (error) {
+        console.error('解碼或登入失敗:', error);
         this.sendToOpener({
           type: 'OIDC_LOGIN_ERROR',
-          error: error.response?.data?.detail || '兌換資料失敗'
+          error: error.response?.data?.detail || '同步資料至系統失敗'
         });
       }
     } else {
-      this.sendToOpener({ type: 'OIDC_LOGIN_ERROR', error: '未取得授權碼 (Code)' });
+      this.sendToOpener({ type: 'OIDC_LOGIN_ERROR', error: '未取得憑證' });
     }
   },
   methods: {
     sendToOpener(data) {
       if (window.opener) {
-        // 使用 postMessage 跨視窗通訊
         window.opener.postMessage(data, window.location.origin);
       }
-      window.close(); // 任務完成，關閉小視窗
+      window.close();
     }
   }
 }
