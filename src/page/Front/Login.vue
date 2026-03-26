@@ -402,7 +402,7 @@ export default {
   },
   methods: {
     // 觸發 OIDC 彈出視窗登入
-  handleOidcLogin() {
+handleOidcLogin() {
   if (!this.studentForm.account) {
     alert('請先輸入學生帳號');
     return;
@@ -419,8 +419,7 @@ export default {
   const scope = encodeURIComponent('openid email kh_profile kh_classes kh_titles');
   const loginHint = encodeURIComponent(this.studentForm.account);
 
-  // response_type 使用 id_token+token 是為了讓前端能直接拿到資料
-  const authUrl = `https://oidc.kh.edu.tw/oauth2/auth?response_type=id_token+token&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}&nonce=${nonce}&login_hint=${loginHint}`;
+  const authUrl = `https://oidc.kh.edu.tw/oauth2/auth?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}&nonce=${nonce}&login_hint=${loginHint}`;
 
   const width = 600;
   const height = 650;
