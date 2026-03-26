@@ -376,18 +376,29 @@ export default {
     });
   });
 
+  console.log('=== [mounted] 頁面載入 ===');
+  console.log('[mounted] 目前完整網址:', window.location.href);
+  console.log('[mounted] search 參數:', window.location.search);
 
-    // OIDC 攔截
-    const urlParams = new URLSearchParams(window.location.search);
-    const oidcCode = urlParams.get('code');
+  const urlParams = new URLSearchParams(window.location.search);
+  const oidcCode = urlParams.get('code');
+  const errorParam = urlParams.get('error');
 
-    // 如果網址有 code，代表是從教育局「跳轉回來」的
-    if (oidcCode) {
-      console.log('=== [Step 1] 偵測到教育局回傳的 Code ===', oidcCode);
-      this.isOidcLoading = true; // 切換成載入畫面
-      this.processOidcFromUrl(oidcCode); // 執行登入交換
-      return; // 提早結束，不跑後面的邏輯
-    }
+  console.log('[mounted] 偵測到的 code:', oidcCode);
+  console.log('[mounted] 偵測到的 error:', errorParam);
+
+  if (errorParam) {
+    console.error('[mounted] 教育局回傳錯誤:', errorParam, urlParams.get('error_description'));
+  }
+
+  if (oidcCode) {
+    console.log('[mounted] ✅ 有 code，進入 OIDC 流程');
+    this.isOidcLoading = true;
+    this.processOidcFromUrl(oidcCode);
+    return;
+  }
+
+  console.log('[mounted] ❌ 沒有 code，停在登入頁');
 
   const fullPath = window.location.href;
   if (fullPath.includes('/login/')) {
@@ -419,51 +430,58 @@ export default {
   },
   methods: {
 async processOidcFromUrl(code) {
-      try {
-        console.log('=== [Step 2] 開始向教育局交換 Token ===');
-        const params = new URLSearchParams();
-        params.append('grant_type', 'authorization_code');
-        params.append('code', code);
-        params.append('redirect_uri', `${window.location.origin}/api/oidccallback/`);
-        params.append('client_id', 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42');
-        params.append('client_secret', '38efe712ebe3b6af5d7365441cf2e4d5b6d3c9dc07aa977f74d8f1c8e6c134d1');
+  console.log('=== [processOidcFromUrl] 開始 ===', code);
+  try {
+    const params = new URLSearchParams();
+    params.append('grant_type', 'authorization_code');
+    params.append('code', code);
+    params.append('redirect_uri', `${window.location.origin}/api/oidccallback/`);
+    params.append('client_id', 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42');
+    params.append('client_secret', '38efe712ebe3b6af5d7365441cf2e4d5b6d3c9dc07aa977f74d8f1c8e6c134d1');
 
-        const tokenResponse = await axios.post('https://oidc.kh.edu.tw/oauth2/token', params, {
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-        });
+    console.log('[Step 2] 準備打 token endpoint，redirect_uri:', `${window.location.origin}/api/oidccallback/`);
 
-        const idToken = tokenResponse.data.id_token;
-        const decodedUser = jwtDecode(idToken);
-        console.log("=== [Step 3] 解析學生資料 ===", decodedUser);
+    const tokenResponse = await axios.post('https://oidc.kh.edu.tw/oauth2/token', params, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    });
 
-        const postData = {
-          sub: decodedUser.sub,
-          kh_profile: {
-            fullname: decodedUser.kh_profile?.fullname || '未知姓名',
-            email: decodedUser.kh_profile?.email || ''
-          },
-          kh_titles: decodedUser.kh_titles || {},
-          kh_classes: decodedUser.kh_classes || {}
-        };
+    console.log('[Step 2] ✅ Token 取得成功:', tokenResponse.data);
 
-        console.log("=== [Step 4] 發給後端登入 ===", postData);
-        const loginResponse = await api.post('students/oidc/oidclogin/', postData);
-        
-        // 登入成功，直接跳轉大廳！
-        const realRole = loginResponse.data.role || 'student';
-        const targetPath = (realRole === 'student') ? '/home' : '/dashboard';
-        
-        // 清理網址，把很長的 code 藏起來
-        window.history.replaceState({}, document.title, '/login');
-        
-        this.performLogin(loginResponse.data, targetPath);
+    const idToken = tokenResponse.data.id_token;
+    const decodedUser = jwtDecode(idToken);
+    console.log('[Step 3] ✅ 解析學生資料:', decodedUser);
 
-      } catch (error) {
-        console.error("OIDC 登入失敗:", error);
-        this.isOidcLoading = false; // 失敗就變回登入畫面
-        this.$message.error('教育局授權失敗，請重新登入');
-      }
-    },
+    const postData = {
+      sub: decodedUser.sub,
+      kh_profile: {
+        fullname: decodedUser.kh_profile?.fullname || '未知姓名',
+        email: decodedUser.kh_profile?.email || ''
+      },
+      kh_titles: decodedUser.kh_titles || {},
+      kh_classes: decodedUser.kh_classes || {}
+    };
+
+    console.log('[Step 4] 準備打後端登入 API，資料:', postData);
+
+    const loginResponse = await api.post('students/oidc/oidclogin/', postData);
+    console.log('[Step 4] ✅ 後端登入成功:', loginResponse.data);
+
+    const realRole = loginResponse.data.role || 'student';
+    const targetPath = (realRole === 'student') ? '/home' : '/dashboard';
+
+    window.history.replaceState({}, document.title, '/login');
+    this.performLogin(loginResponse.data, targetPath);
+
+  } catch (error) {
+    console.error('=== [processOidcFromUrl] ❌ 失敗 ===');
+    console.error('錯誤訊息:', error.message);
+    console.error('錯誤詳細:', error.response?.data);
+    console.error('錯誤狀態碼:', error.response?.status);
+    console.error('完整 error 物件:', error);
+    this.isOidcLoading = false;
+    this.$message.error('教育局授權失敗，請重新登入');
+  }
+},
     // 觸發 OIDC 彈出視窗登入
   handleOidcLogin() {
       if (!this.studentForm.account) {
