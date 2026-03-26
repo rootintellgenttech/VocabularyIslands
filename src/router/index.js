@@ -215,6 +215,13 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('accessToken');
   
+  // 有 code 參數就一定放行，不管路徑是什麼
+  if (to.query.code) {
+    console.log('[RouterGuard] 偵測到 code，放行:', to.fullPath);
+    next();
+    return;
+  }
+  
   if (to.name === 'Login' || to.path.includes('/api/oidccallback')) {
     next();
   } else if (!token) {

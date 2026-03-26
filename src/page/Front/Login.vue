@@ -367,6 +367,7 @@ export default {
     };
   },
  mounted() {
+  console.log('=== FULL URL ===', window.location.href, '| pathname:', window.location.pathname, '| search:', window.location.search);
   this.$nextTick(() => {
     const scrollInputs = this.$el.querySelectorAll('.announcement-card input');
     scrollInputs.forEach((input, index) => {
@@ -381,7 +382,7 @@ export default {
   console.log('[mounted] search 參數:', window.location.search);
 
   const urlParams = new URLSearchParams(window.location.search);
-  const oidcCode = urlParams.get('code');
+const oidcCode = this.$route.query.code || urlParams.get('code');
   const errorParam = urlParams.get('error');
 
   console.log('[mounted] 偵測到的 code:', oidcCode);
