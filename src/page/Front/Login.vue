@@ -432,35 +432,6 @@ export default {
         `width=${width},height=${height},top=${top},left=${left},toolbar=no,menubar=no,scrollbars=yes,resizable=no`
       );
     },
-    // 接收來自彈出視窗 (後端回傳) 的 Token 訊息
-    // handleOidcMessage(event) {
-    //   //  安全驗證：確保訊息來自的後端網域
-    //   const allowedOrigins = [
-    //     'https://www.elr.kh.edu.tw', 
-    //     'https://englishability.rootadviser.com',
-    //     'http://localhost:8080'
-    //   ];
-    //   if (!allowedOrigins.includes(event.origin)) return;
-
-    //   // 解析資料
-    //   const message = event.data;
-    //   if (message && message.type === 'OIDC_LOGIN_SUCCESS') {
-    //     // 關閉小視窗
-    //     if (this.oidcWindow) this.oidcWindow.close();
-
-    //     const loginData = message.payload; 
-
-    //     // 判斷登入身分與導向路徑
-    //     let targetPath = (loginData.role === 'student') ? '/home' : '/dashboard';
-
-    //     // 執行既有的登入機制 (存 Token、啟動 Refresh timer)
-    //     this.performLogin(loginData, targetPath);
-
-    //   } else if (message && message.type === 'OIDC_LOGIN_ERROR') {
-    //     if (this.oidcWindow) this.oidcWindow.close();
-    //     alert('教育局單一簽入失敗：' + (message.error || '未知錯誤'));
-    //   }
-    // },
     handleOidcMessage(event) {
       if (event.origin !== window.location.origin) return;
 

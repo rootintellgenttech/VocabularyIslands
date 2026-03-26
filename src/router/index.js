@@ -8,8 +8,9 @@ const routes = [{
     path: '/',
     redirect: '/login'
   },
-  {
-    path: '/api/oidccallback/',
+ {
+    path: '/api/oidccallback',
+    alias: '/api/oidccallback/', 
     name: 'OidcCallback',
     component: () => import('../page/Front/OidcCallback.vue')
   },
