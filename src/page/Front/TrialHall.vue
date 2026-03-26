@@ -447,7 +447,7 @@ export default {
 
             } catch (error) {
                 console.error('God Mode Error:', error);
-                this.genProgress = `❌ 錯誤: ${error.message}`;
+                this.genProgress = ` 錯誤: ${error.message}`;
             } finally {
                 this.isGenerating = false;
             }

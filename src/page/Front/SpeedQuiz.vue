@@ -69,7 +69,7 @@
             <div class="dialog-content">
                 <h3 class="title exam-warning-title"><i class="fas fa-exclamation-circle"></i> 確定要離開嗎？</h3>
                 <p class="description" style="color:#AA1F0F; font-weight: bold;">
-                    ⚠️ 注意：中途離開將會自動將剩餘題目視為「未填寫」並立即結算。
+                     注意：中途離開將會自動將剩餘題目視為「未填寫」並立即結算。
                 </p>
             </div>
             <span slot="footer" class="dialog-footer">

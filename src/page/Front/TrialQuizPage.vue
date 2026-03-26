@@ -144,7 +144,7 @@
             <div class="dialog-content">
                 <h3 class="title exam-warning-title"><i class="fas fa-exclamation-circle"></i> 確定要離開考試嗎？</h3>
                 <p class="description" style="color:#AA1F0F; font-weight: bold;">
-                    ⚠️ 注意：中途離開將會自動將剩餘題目視為「未填寫」並直接提交試卷，這將導致得分大幅降低或為零分。
+                     注意：中途離開將會自動將剩餘題目視為「未填寫」並直接提交試卷，這將導致得分大幅降低或為零分。
                 </p>
             </div>
             <span slot="footer" class="dialog-footer">

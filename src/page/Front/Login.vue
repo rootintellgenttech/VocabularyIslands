@@ -367,20 +367,20 @@ export default {
     };
   },
 mounted() {
-    console.log('=== [mounted] 頁面載入 ===');
-    console.log('🔍 [偵錯] 1. 目前完整網址:', window.location.href);
-    console.log('🔍 [偵錯] 2. Vue Router query:', this.$route.query);
+    // console.log('=== [mounted] 頁面載入 ===');
+    // console.log('🔍 [偵錯] 1. 目前完整網址:', window.location.href);
+    // console.log('🔍 [偵錯] 2. Vue Router query:', this.$route.query);
 
     try {
       // 1. 嘗試解析網址參數
       const urlParams = new URLSearchParams(window.location.search);
       const oidcCode = this.$route.query.code || urlParams.get('code');
-      console.log('🔍 [偵錯] 3. 最終抓到的 code:', oidcCode);
+      // console.log('🔍 [偵錯] 3. 最終抓到的 code:', oidcCode);
 
       // 判斷是否有錯誤參數 (例如使用者按取消)
       const errorParam = urlParams.get('error') || this.$route.query.error;
       if (errorParam) {
-        console.error('❌ [偵錯] 教育局回傳錯誤:', errorParam);
+        console.error(' [偵錯] 教育局回傳錯誤:', errorParam);
         this.$message.error('教育局授權失敗');
         window.history.replaceState({}, document.title, '/login');
         return;
@@ -388,23 +388,23 @@ mounted() {
 
       // 2. 如果有 code，準備發送 API
       if (oidcCode) {
-        console.log('✅ [偵錯] 4. 準備執行 processOidcFromUrl');
+        // console.log('✅ [偵錯] 4. 準備執行 processOidcFromUrl');
         this.isOidcLoading = true;
 
         // 防呆檢查：確認 processOidcFromUrl 方法是否真的存在
         if (typeof this.processOidcFromUrl !== 'function') {
-          console.error('❌ [嚴重錯誤] 找不到 processOidcFromUrl！請檢查它是不是沒放在 methods: { ... } 裡面？');
+          console.error(' [嚴重錯誤] 找不到 processOidcFromUrl！請檢查它是不是沒放在 methods: { ... } 裡面？');
           return;
         }
 
         // 呼叫方法
         this.processOidcFromUrl(oidcCode);
       } else {
-        console.log('⚠️ [偵錯] 4. 沒有抓到 code，停留在一般密碼登入畫面');
+        console.log(' [偵錯] 4. 沒有抓到 code，停留在一般密碼登入畫面');
       }
 
     } catch (error) {
-      console.error('❌ [偵錯] mounted 執行過程發生例外錯誤:', error);
+      console.error(' [偵錯] mounted 執行過程發生例外錯誤:', error);
     }
   },
   beforeDestroy() {
@@ -468,8 +468,8 @@ mounted() {
     const decodedUser = jwtDecode(idToken);
     console.log('✅ [Step 3 成功] 解析使用者資料:', decodedUser);
 
-    // [Step 4] 把解析完的資料，丟給你自家的後端 API 做登入
-    console.log('🚀 [Step 4] 準備打自家後端登入...');
+    // [Step 4] 把解析完的資料，丟給你的後端 API 做登入
+    console.log('🚀 [Step 4] 準備後端登入...');
     const postData = {
       sub: decodedUser.sub,
       kh_profile: decodedUser.kh_profile || {},
@@ -479,7 +479,7 @@ mounted() {
 
     const loginResponse = await api.post('students/oidc/oidclogin/', postData);
     
-    console.log('✅ [Step 4 成功] 自家系統已認證:', loginResponse.data);
+    console.log('✅ [Step 4 成功] 系統已認證:', loginResponse.data);
 
     // 成功後清理網址並跳轉
     window.history.replaceState({}, document.title, '/login');
@@ -487,7 +487,7 @@ mounted() {
     this.performLogin(loginResponse.data, targetPath);
 
   } catch (error) {
-    console.error('❌ 流程中斷，錯誤原因:', error.response?.data || error.message);
+    console.error(' 流程中斷，錯誤原因:', error.response?.data || error.message);
     this.isOidcLoading = false;
     this.$message.error('驗證失敗，請檢查 Console');
   }
