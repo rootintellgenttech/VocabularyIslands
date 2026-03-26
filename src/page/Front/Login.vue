@@ -414,7 +414,8 @@ export default {
 
       const clientId = 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42';
 
-      const redirectUri = encodeURIComponent('https://englishability.rootadviser.com/api/oidccallback/');
+      const currentOrigin = window.location.origin;
+      const redirectUri = encodeURIComponent(`${currentOrigin}/api/oidccallback/`);
 
       const scope = encodeURIComponent('openid email kh_profile kh_classes kh_titles');
       const loginHint = encodeURIComponent(this.studentForm.account);
@@ -437,23 +438,19 @@ export default {
 
       const message = event.data;
       if (message.type === 'OIDC_LOGIN_SUCCESS') {
-        const loginData = message.payload; // 後端「兌換」完後回傳的 JSON
+        const loginData = message.payload;
 
-        // 1. 取得真實角色 (例如: 'student', 'teacher', 'admin')
-        const realRole = loginData.role;
+        // 加上預設值 'student'，避免後端沒給 role 時導致誤判
+        const realRole = loginData.role || 'student';
 
-        // 2. 決定跳轉路徑
         let targetPath = '';
         if (realRole === 'student') {
           targetPath = '/home';
         } else {
-          // 老師、管理員、召集人等非學生身分，一律去後台
           targetPath = '/dashboard';
         }
 
-        // 3. 執行正式登入 (儲存 Token 並跳轉)
         this.performLogin(loginData, targetPath);
-
       } else if (message.type === 'OIDC_LOGIN_ERROR') {
         alert('登入失敗: ' + message.error);
       }
@@ -561,9 +558,9 @@ export default {
     ,
 
     async performLogin(loginData, path) {
-      const token = loginData.token || loginData.access;
-      const refresh = loginData.refresh;
-      const role = loginData.role;
+      const token = loginData.token || loginData.access || loginData.access_token;
+      const refresh = loginData.refresh || loginData.refresh_token;
+      const role = loginData.role || 'student';
 
       localStorage.setItem('userRole', role);
       localStorage.setItem('accessToken', token);

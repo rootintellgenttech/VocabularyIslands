@@ -33,9 +33,9 @@ export default {
       const params = new URLSearchParams();
       params.append('grant_type', 'authorization_code');
       params.append('code', code);
-      params.append('redirect_uri', 'https://englishability.rootadviser.com/api/oidccallback/');
+      params.append('redirect_uri', `${window.location.origin}/api/oidccallback/`);
       
-      params.append('client_id', 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42'); 
+      params.append('client_id', 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42');
       params.append('client_secret', '38efe712ebe3b6af5d7365441cf2e4d5b6d3c9dc07aa977f74d8f1c8e6c134d1');
 
       const tokenResponse = await axios.post('https://oidc.kh.edu.tw/oauth2/token', params, {
@@ -59,7 +59,7 @@ export default {
       };
 
       console.log('=== [Step 4] 準備將資料打給後端 API 註冊/登入 ===', postData);
-      
+
       const loginResponse = await api.post('students/oidc/oidclogin/', postData);
       console.log("=== [Step 5] 後端 API 回應成功！ ===", loginResponse.data);
 
@@ -69,10 +69,10 @@ export default {
       if (window.opener) {
         window.opener.postMessage({
           type: 'OIDC_LOGIN_SUCCESS',
-          payload: loginResponse.data 
+          payload: loginResponse.data
         }, window.location.origin);
       }
-      
+
       // 關閉小視窗
       window.close();
 
