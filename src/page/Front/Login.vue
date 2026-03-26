@@ -447,7 +447,7 @@ mounted() {
    async processOidcFromUrl(code) {
   try {
     this.isOidcLoading = true;
-    console.log('🚀 [Step 2] 準備兌換 OIDC Token (插件已開啟)');
+    console.log(' [Step 2] 準備兌換 OIDC Token (插件已開啟)');
 
     const params = new URLSearchParams();
     params.append('grant_type', 'authorization_code');
@@ -461,15 +461,15 @@ mounted() {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     });
 
-    console.log('✅ [Step 2 成功] 拿到 Token:', tokenRes.data);
+    // console.log('✅ [Step 2 成功] 拿到 Token:', tokenRes.data);
 
     // [Step 3] 解析 ID Token 
     const idToken = tokenRes.data.id_token;
     const decodedUser = jwtDecode(idToken);
-    console.log('✅ [Step 3 成功] 解析使用者資料:', decodedUser);
+    // console.log('✅ [Step 3 成功] 解析使用者資料:', decodedUser);
 
     // [Step 4] 把解析完的資料，丟給你的後端 API 做登入
-    console.log('🚀 [Step 4] 準備後端登入...');
+    // console.log('🚀 [Step 4] 準備後端登入...');
     const postData = {
       sub: decodedUser.sub,
       kh_profile: decodedUser.kh_profile || {},
@@ -479,7 +479,7 @@ mounted() {
 
     const loginResponse = await api.post('students/oidc/oidclogin/', postData);
     
-    console.log('✅ [Step 4 成功] 系統已認證:', loginResponse.data);
+    // console.log('✅ [Step 4 成功] 系統已認證:', loginResponse.data);
 
     // 成功後清理網址並跳轉
     window.history.replaceState({}, document.title, '/login');

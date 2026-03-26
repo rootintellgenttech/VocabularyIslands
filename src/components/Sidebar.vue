@@ -68,7 +68,7 @@
                         <i :class="getAchievementIcon(log.name)" style="color: #F56C42; font-size: 32px;"></i>
                     </div>
 
-                    <div v-if="achievementLogs.length === 0" style="color: #999; font-size: 14px; margin-top: 5px;">
+                    <div v-if="achievementLogs.length === 0" style="color: #999; font-size: 14px; margin-top: 5px;text-wrap: nowrap;">
                         尚未獲得獎章
                     </div>
                 </div>
