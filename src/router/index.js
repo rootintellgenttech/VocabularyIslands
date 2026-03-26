@@ -4,15 +4,20 @@ import Login from '../page/Front/Login.vue';
 
 Vue.use(VueRouter);
 
-const routes = [{
-    path: '/',
-    redirect: '/login'
-  },
+const routes = [
   {
     path: '/api/oidccallback',
-    alias: ['/api/oidccallback/', '/api/oidccallback/*'],
     name: 'OidcCallback',
     component: () => import('../page/Front/OidcCallback.vue')
+  },
+  {
+    path: '/api/oidccallback/', 
+    name: 'OidcCallbackSlash',
+    component: () => import('../page/Front/OidcCallback.vue')
+  },
+  {
+    path: '/',
+    redirect: '/login'
   },
   {
     path: '/login/:token?',
@@ -203,24 +208,17 @@ const routes = [{
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes,
-  scrollBehavior(_to, _from, _savedPosition) {
-    return {
-      x: 0,
-      y: 0
-    };
-  }
+  routes
 });
-
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('accessToken');
   
-  // 讓 Login 和 OidcCallback 可以無條件進入
-  if (to.name === 'Login' || to.name === 'OidcCallback') {
+  // 只要網址路徑包含 'oidccallback'，不管是哪種寫法，全部無條件放行！
+  if (to.name === 'Login' || to.path.includes('/api/oidccallback')) {
     next();
   } else if (!token) {
-    next('/login'); // 其他頁面沒 token 就踢回 login
+    next('/login'); // 其他頁面沒 token 才踢回 login
   } else {
     next();
   }

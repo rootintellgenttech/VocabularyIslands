@@ -12,6 +12,7 @@ import api from '../../config/api';
 
 export default {
   async mounted() {
+    alert('組件載入成功！');
     console.log('=== [Step 1] OidcCallback 頁面成功載入 ===');
 
     const urlParams = new URLSearchParams(window.location.search);
