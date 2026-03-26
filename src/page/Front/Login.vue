@@ -1,99 +1,95 @@
 <template>
   <div class="login-page">
-<el-row class="login-container" :gutter="40" type="flex">
-        <el-col :span="12">
+    <el-row class="login-container" :gutter="40" type="flex">
+      <el-col :span="12">
         <div class="announcement-card mobile-scroll-box">
-         <h2 class="card-title">
-    <i class="fa-solid fa-bullhorn" aria-hidden="true"></i>最新公告
-  </h2>
-<vue-custom-scrollbar 
-  :settings="scrollSettings" 
-  class="announcement-list"
-  aria-label="最新公告列表"
->
-              <div class="announcement-item">
-                <div class="item-header">
-                  <div class="news-title">
-                    <i class="fa-solid fa-star" style="color: #FFD43B;"></i>新島嶼開放
-                  </div>
-                  <div class="news-tag">
-                    <span class="tag new">活動</span>
-                  </div>
-
+          <h2 class="card-title">
+            <i class="fa-solid fa-bullhorn" aria-hidden="true"></i>最新公告
+          </h2>
+          <vue-custom-scrollbar :settings="scrollSettings" class="announcement-list" aria-label="最新公告列表">
+            <div class="announcement-item">
+              <div class="item-header">
+                <div class="news-title">
+                  <i class="fa-solid fa-star" style="color: #FFD43B;"></i>新島嶼開放
                 </div>
-                <p class="item-content">1200字節點島嶼已開放，歡迎九年級以上同學挑戰！</p>
-                <span class="item-date">2024-01-15</span>
-              </div>
-
-              <div class="announcement-item">
-                <div class="item-header">
-                  <div class="news-title">
-                    <i class="fa-solid fa-pen" style="color: #d56039;"></i>單字測驗通知
-                  </div>
-                  <div class="news-tag">
-                    <span class="tag active">活動</span>
-                  </div>
-
+                <div class="news-tag">
+                  <span class="tag new">活動</span>
                 </div>
-                <p class="item-content">本月單字學測將於11月25日舉行，請同學們準備。</p>
-                <span class="item-date">2024-01-10</span>
+
               </div>
+              <p class="item-content">1200字節點島嶼已開放，歡迎九年級以上同學挑戰！</p>
+              <span class="item-date">2024-01-15</span>
+            </div>
 
-              <div class="announcement-item">
-                <div class="item-header">
-                  <div class="news-title">
-                    <i class="fa-solid fa-rocket" style="color: #63E6BE;"></i>新功能上線
-                  </div>
-                  <div class="news-tag">
-                    <span class="tag update">資訊</span>
-                  </div>
-
+            <div class="announcement-item">
+              <div class="item-header">
+                <div class="news-title">
+                  <i class="fa-solid fa-pen" style="color: #d56039;"></i>單字測驗通知
                 </div>
-                <p class="item-content">全新語音輸入功能現已推出！讓學習更有效率。</p>
-                <span class="item-date">2024-01-20</span>
-              </div>
-
-              <div class="announcement-item">
-                <div class="item-header">
-                  <div class="news-title">
-                    <i class="fa-solid fa-triangle-exclamation" style="color: #e12323;"></i>伺服器維護
-                  </div>
-                  <div class="news-tag">
-                    <span class="tag maintain">消息</span>
-                  </div>
-
+                <div class="news-tag">
+                  <span class="tag active">活動</span>
                 </div>
-                <p class="item-content">系統將於明日凌晨2點進行維護，屆時服務將暫停約30分鐘。</p>
-                <span class="item-date">2024-01-19</span>
-              </div>
-                <div class="announcement-item">
-                <div class="item-header">
-                  <div class="news-title">
-                    <i class="fa-solid fa-triangle-exclamation" style="color: #e12323;"></i>伺服器維護
-                  </div>
-                  <div class="news-tag">
-                    <span class="tag maintain">消息</span>
-                  </div>
 
+              </div>
+              <p class="item-content">本月單字學測將於11月25日舉行，請同學們準備。</p>
+              <span class="item-date">2024-01-10</span>
+            </div>
+
+            <div class="announcement-item">
+              <div class="item-header">
+                <div class="news-title">
+                  <i class="fa-solid fa-rocket" style="color: #63E6BE;"></i>新功能上線
                 </div>
-                <p class="item-content">系統將於明日凌晨2點進行維護，屆時服務將暫停約30分鐘。</p>
-                <span class="item-date">2024-01-19</span>
-              </div>
-
-              <div class="announcement-item">
-                <div class="item-header">
-                  <div class="news-title">
-                    <i class="fa-solid fa-wrench" style="color: #74C0FC;"></i>系統更新
-                  </div>
-                  <div class="news-tag">
-                    <span class="tag update">更新</span>
-                  </div>
-
+                <div class="news-tag">
+                  <span class="tag update">資訊</span>
                 </div>
-                <p class="item-content">新增多項成就徽章，完成任務即可獲得專屬獎勵！</p>
-                <span class="item-date">2024-01-05</span>
+
               </div>
-            </vue-custom-scrollbar>
+              <p class="item-content">全新語音輸入功能現已推出！讓學習更有效率。</p>
+              <span class="item-date">2024-01-20</span>
+            </div>
+
+            <div class="announcement-item">
+              <div class="item-header">
+                <div class="news-title">
+                  <i class="fa-solid fa-triangle-exclamation" style="color: #e12323;"></i>伺服器維護
+                </div>
+                <div class="news-tag">
+                  <span class="tag maintain">消息</span>
+                </div>
+
+              </div>
+              <p class="item-content">系統將於明日凌晨2點進行維護，屆時服務將暫停約30分鐘。</p>
+              <span class="item-date">2024-01-19</span>
+            </div>
+            <div class="announcement-item">
+              <div class="item-header">
+                <div class="news-title">
+                  <i class="fa-solid fa-triangle-exclamation" style="color: #e12323;"></i>伺服器維護
+                </div>
+                <div class="news-tag">
+                  <span class="tag maintain">消息</span>
+                </div>
+
+              </div>
+              <p class="item-content">系統將於明日凌晨2點進行維護，屆時服務將暫停約30分鐘。</p>
+              <span class="item-date">2024-01-19</span>
+            </div>
+
+            <div class="announcement-item">
+              <div class="item-header">
+                <div class="news-title">
+                  <i class="fa-solid fa-wrench" style="color: #74C0FC;"></i>系統更新
+                </div>
+                <div class="news-tag">
+                  <span class="tag update">更新</span>
+                </div>
+
+              </div>
+              <p class="item-content">新增多項成就徽章，完成任務即可獲得專屬獎勵！</p>
+              <span class="item-date">2024-01-05</span>
+            </div>
+          </vue-custom-scrollbar>
         </div>
       </el-col>
       <el-col :span="12">
@@ -111,69 +107,53 @@
           </div>
 
           <p v-if="currentRole === 'teacher'" class="role-notice-text">
-  * 帳號密碼請跟主管機關索取
-</p>
-  <p v-else class="role-notice-text">* 學生登入將開啟彈出視窗</p>
+            * 帳號密碼請跟主管機關索取
+          </p>
+          <p v-else class="role-notice-text">* 學生登入將開啟彈出視窗</p>
 
-<div class="login-form-container">
-  <div v-if="currentRole === 'student'" class="student-input-zone">
-   <div class="input-group">
-    <label class="input-label" for="student-account">帳號</label>
-    <el-input 
-      id="student-account" 
-      v-model="studentForm.account" 
-      placeholder="請輸入學生帳號"
-      class="custom-input">
-    </el-input>
-  </div>
-    
-  <div class="input-group">
-    <label class="input-label" for="student-pass-disabled">密碼</label>
-    <!-- <div class="password-overlay">
+          <div class="login-form-container">
+            <div v-if="currentRole === 'student'" class="student-input-zone">
+              <div class="input-group">
+                <label class="input-label" for="student-account">帳號</label>
+                <el-input id="student-account" v-model="studentForm.account" placeholder="請輸入學生帳號" class="custom-input">
+                </el-input>
+              </div>
+
+              <div class="input-group">
+                <label class="input-label" for="student-pass-disabled">密碼</label>
+                <!-- <div class="password-overlay">
       <i class="fa-solid fa-circle-info" aria-hidden="true"></i> 密碼請於彈出視窗中輸入
     </div> -->
-    <el-input 
-      id="student-pass-disabled"
-      type="password" 
-      disabled 
-      placeholder=" 密碼請於彈出視窗中輸入 " 
-      class="custom-input">
-    </el-input>
-  </div>
+                <el-input id="student-pass-disabled" type="password" disabled placeholder=" 密碼請於彈出視窗中輸入 "
+                  class="custom-input">
+                </el-input>
+              </div>
 
-    <button class="login-submit-btn" @click="handleOidcLogin">
-      <i class="fa-solid fa-graduation-cap"></i> 學生登入
-    </button>
-  </div>
+              <button class="login-submit-btn" @click="handleOidcLogin">
+                <i class="fa-solid fa-graduation-cap"></i> 學生登入
+              </button>
+            </div>
 
-  <div v-if="currentRole === 'teacher'" class="teacher-input-zone">
-   <div class="input-group">
-    <label class="input-label" for="teacher-account">帳號</label>
-    <el-input 
-      id="teacher-account" 
-      v-model="teacherForm.account" 
-      placeholder="請輸入教職員帳號"
-      class="custom-input">
-    </el-input>
-  </div>
-   <div class="input-group">
-    <label class="input-label" for="teacher-password">密碼</label>
-    <el-input 
-      id="teacher-password"
-      type="password" 
-      v-model="teacherForm.password" 
-      show-password 
-      placeholder="請輸入密碼"
-      class="custom-input">
-    </el-input>
-  </div>
-    <button @click="handleLogin">
-      <i class="fa-solid fa-chalkboard-user"></i> 教職員登入
-    </button>
-    
-    <p class="forgot-password-link" @click="openForgetPassModal">忘記密碼</p>
-  </div>
-</div>
+            <div v-if="currentRole === 'teacher'" class="teacher-input-zone">
+              <div class="input-group">
+                <label class="input-label" for="teacher-account">帳號</label>
+                <el-input id="teacher-account" v-model="teacherForm.account" placeholder="請輸入教職員帳號"
+                  class="custom-input">
+                </el-input>
+              </div>
+              <div class="input-group">
+                <label class="input-label" for="teacher-password">密碼</label>
+                <el-input id="teacher-password" type="password" v-model="teacherForm.password" show-password
+                  placeholder="請輸入密碼" class="custom-input">
+                </el-input>
+              </div>
+              <button @click="handleLogin">
+                <i class="fa-solid fa-chalkboard-user"></i> 教職員登入
+              </button>
+
+              <p class="forgot-password-link" @click="openForgetPassModal">忘記密碼</p>
+            </div>
+          </div>
           <!-- 快速身份登錄 -->
           <!-- <div class="dev-test-zone">
             <p class="dev-title">🛠️ 開發測試快速通道 (點擊直接登入)</p>
@@ -188,7 +168,7 @@
         </div>
       </el-col>
     </el-row>
-    
+
     <el-dialog custom-class="confirm-pw-modal" :visible.sync="showFirstLoginDialog" width="600px" center
       :close-on-click-modal="false" :show-close="false">
       <div class="dialog-content">
@@ -290,59 +270,59 @@ import api from '../../config/api';
 export default {
   name: 'Login',
   props: {
-   scrollSettings: {
-            suppressScrollY: false,
-  suppressScrollX: true,  
-  wheelPropagation: false
-        }
+    scrollSettings: {
+      suppressScrollY: false,
+      suppressScrollX: true,
+      wheelPropagation: false
+    }
   },
   data() {
     return {
       currentRole: 'student',
-    studentForm: {
-      account: '',
-    },
-    teacherForm: {
-      account: '',
-      password: '',
-    },
+      studentForm: {
+        account: '',
+      },
+      teacherForm: {
+        account: '',
+        password: '',
+      },
       alertMessage: '',
       alertType: 'error', // success, info, warning, error
       showAlert: false,
-testRoles: [
-  { 
-    key: 'student', 
-    name: '1. 學生 (God Mode)', 
-    path: '/home', 
-    class: 'btn-student', 
-    account: 'chinyimin11@gmail.com',
-    password: '123456min'
-  },
-  { 
-    key: 'school_admin', 
-    name: '2. 學校管理員', 
-    path: '/dashboard', 
-    class: 'btn-admin',
-    account: 'school_admin@example.com',
-    password: 'ENpassword123'
-  },
-  { 
-    key: 'union_leader', 
-    name: '3. 聯盟召集人', 
-    path: '/dashboard', 
-    class: 'btn-admin',
-    account: 'union_leader@example.com',
-  password: 'ENpassword123'
-  },
-  { 
-    key: 'global_leader', 
-    name: '4. 總召集人/教育部', 
-    path: '/dashboard', 
-    class: 'btn-top',
-    account: 'global_leader@example.com',
-     password: 'ENpassword123'
-  }
-],
+      testRoles: [
+        {
+          key: 'student',
+          name: '1. 學生 (God Mode)',
+          path: '/home',
+          class: 'btn-student',
+          account: 'chinyimin11@gmail.com',
+          password: '123456min'
+        },
+        {
+          key: 'school_admin',
+          name: '2. 學校管理員',
+          path: '/dashboard',
+          class: 'btn-admin',
+          account: 'school_admin@example.com',
+          password: 'ENpassword123'
+        },
+        {
+          key: 'union_leader',
+          name: '3. 聯盟召集人',
+          path: '/dashboard',
+          class: 'btn-admin',
+          account: 'union_leader@example.com',
+          password: 'ENpassword123'
+        },
+        {
+          key: 'global_leader',
+          name: '4. 總召集人/教育部',
+          path: '/dashboard',
+          class: 'btn-top',
+          account: 'global_leader@example.com',
+          password: 'ENpassword123'
+        }
+      ],
       // defaultBackendTokens: {
       //   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY1ODY3NDc0LCJpYXQiOjE3NjU4NjU2NzQsImp0aSI6ImU2YTc4OTVhZDRlNzQ1NzBhMmEyMmE4OTA4YjM1ZDBjIiwidXNlcl9pZCI6MzV9.lewJXA_rBur_1gPtrZqcmeai4K5etxhSN27X7P4FU0",
       //   "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2NjQ3MDQ3NCwiaWF0IjoxNzY1ODY1Njc0LCJqdGkiOiIxNTc3MDU0YWQ0NzI0NmEyOGY0OGVhNDhiMDM1ODNkMyIsInVzZXJfaWQiOjM1fQ.E_wvI9MgdA0rNC9XCRRYGFpggsl1N6djXj9zfMM2BeI",
@@ -381,14 +361,14 @@ testRoles: [
   },
   mounted() {
     this.$nextTick(() => {
-    // 尋找該公告卡片內所有可能漏掉 label 的 input (通常是滾動條元件產生的)
-    const scrollInputs = this.$el.querySelectorAll('.announcement-card input');
-    scrollInputs.forEach((input, index) => {
-      if (!input.getAttribute('aria-label')) {
-        input.setAttribute('aria-label', `公告列表滾動控制 ${index + 1}`);
-      }
+      // 尋找該公告卡片內所有可能漏掉 label 的 input (通常是滾動條元件產生的)
+      const scrollInputs = this.$el.querySelectorAll('.announcement-card input');
+      scrollInputs.forEach((input, index) => {
+        if (!input.getAttribute('aria-label')) {
+          input.setAttribute('aria-label', `公告列表滾動控制 ${index + 1}`);
+        }
+      });
     });
-  });
     const fullPath = window.location.href;
     // 尋找 login 字樣後的內容
     if (fullPath.includes('/login/')) {
@@ -404,12 +384,12 @@ testRoles: [
       }
     }
     // 監聽跨視窗通訊
-  window.addEventListener('message', this.handleOidcMessage);
+    window.addEventListener('message', this.handleOidcMessage);
   },
-  beforeDestroy() { 
-  // 移除監聽器
-  window.removeEventListener('message', this.handleOidcMessage);
-},
+  beforeDestroy() {
+    // 移除監聽器
+    window.removeEventListener('message', this.handleOidcMessage);
+  },
   computed: {
     rolePlaceholder() {
       return this.currentRole === 'student'
@@ -417,99 +397,96 @@ testRoles: [
         : { account: '輸入教職員帳號', password: '輸入密碼' };
     },
     submitButtonText() {
-    return this.currentRole === 'teacher' ? '教職員登入' : '學生登入';
-  }
+      return this.currentRole === 'teacher' ? '教職員登入' : '學生登入';
+    }
   },
   methods: {
     // 觸發 OIDC 彈出視窗登入
- handleOidcLogin() {
- if (!this.studentForm.account) {
-      alert('請先輸入學生帳號');
-      return;
-    }
+    handleOidcLogin() {
+      if (!this.studentForm.account) {
+        alert('請先輸入學生帳號');
+        return;
+      }
 
-  const state = Math.random().toString(36).substring(2, 15);
-  const nonce = Math.random().toString(36).substring(2, 15);
-  sessionStorage.setItem('oidc_state', state);
+      const state = Math.random().toString(36).substring(2, 15);
+      const nonce = Math.random().toString(36).substring(2, 15);
+      sessionStorage.setItem('oidc_state', state);
 
-  const clientId = 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42';
-  const redirectUri = encodeURIComponent('https://englishability.rootadviser.com/api/oidccallback/'); 
-  const scope = encodeURIComponent('openid email kh_profile kh_classes kh_titles');
-  
-  // 加入 login_hint 參數(帶入賬號)
-const loginHint = encodeURIComponent(this.studentForm.account);
+      const clientId = 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42';
 
-  // 組合授權網址
-  const authUrl = `https://oidc.kh.edu.tw/oauth2/auth?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}&nonce=${nonce}&login_hint=${loginHint}`;
+      const redirectUri = encodeURIComponent('https://englishability.rootadviser.com/oidccallback');
 
-  const width = 600;
-  const height = 650;
-  const left = window.screen.width / 2 - width / 2;
-  const top = window.screen.height / 2 - height / 2;
+      const scope = encodeURIComponent('openid email kh_profile kh_classes kh_titles');
+      const loginHint = encodeURIComponent(this.studentForm.account);
 
-  this.oidcWindow = window.open(
-    authUrl,
-    'OIDC_Login',
-    `width=${width},height=${height},top=${top},left=${left},toolbar=no,menubar=no,scrollbars=yes,resizable=no`
-  );
-},
-  // 接收來自彈出視窗 (後端回傳) 的 Token 訊息
-  // handleOidcMessage(event) {
-  //   //  安全驗證：確保訊息來自的後端網域
-  //   const allowedOrigins = [
-  //     'https://www.elr.kh.edu.tw', 
-  //     'https://englishability.rootadviser.com',
-  //     'http://localhost:8080'
-  //   ];
-  //   if (!allowedOrigins.includes(event.origin)) return;
+      const authUrl = `https://oidc.kh.edu.tw/oauth2/auth?response_type=id_token+token&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}&nonce=${nonce}&login_hint=${loginHint}`;
 
-  //   // 解析資料
-  //   const message = event.data;
-  //   if (message && message.type === 'OIDC_LOGIN_SUCCESS') {
-  //     // 關閉小視窗
-  //     if (this.oidcWindow) this.oidcWindow.close();
-      
-  //     const loginData = message.payload; 
-      
-  //     // 判斷登入身分與導向路徑
-  //     let targetPath = (loginData.role === 'student') ? '/home' : '/dashboard';
-      
-  //     // 執行既有的登入機制 (存 Token、啟動 Refresh timer)
-  //     this.performLogin(loginData, targetPath);
+      const width = 600;
+      const height = 650;
+      const left = window.screen.width / 2 - width / 2;
+      const top = window.screen.height / 2 - height / 2;
 
-  //   } else if (message && message.type === 'OIDC_LOGIN_ERROR') {
-  //     if (this.oidcWindow) this.oidcWindow.close();
-  //     alert('教育局單一簽入失敗：' + (message.error || '未知錯誤'));
-  //   }
-  // },
-  handleOidcMessage(event) {
-  if (event.origin !== window.location.origin) return;
+      this.oidcWindow = window.open(
+        authUrl,
+        'OIDC_Login',
+        `width=${width},height=${height},top=${top},left=${left},toolbar=no,menubar=no,scrollbars=yes,resizable=no`
+      );
+    },
+    // 接收來自彈出視窗 (後端回傳) 的 Token 訊息
+    // handleOidcMessage(event) {
+    //   //  安全驗證：確保訊息來自的後端網域
+    //   const allowedOrigins = [
+    //     'https://www.elr.kh.edu.tw', 
+    //     'https://englishability.rootadviser.com',
+    //     'http://localhost:8080'
+    //   ];
+    //   if (!allowedOrigins.includes(event.origin)) return;
 
-  const message = event.data;
-  if (message.type === 'OIDC_LOGIN_SUCCESS') {
-    const loginData = message.payload; // 這就是後端「兌換」完後回傳的 JSON
+    //   // 解析資料
+    //   const message = event.data;
+    //   if (message && message.type === 'OIDC_LOGIN_SUCCESS') {
+    //     // 關閉小視窗
+    //     if (this.oidcWindow) this.oidcWindow.close();
 
-    // --- 這裡就是您要求的：判斷各自抵達的頁面 ---
-    
-    // 1. 取得真實角色 (例如: 'student', 'teacher', 'admin')
-    const realRole = loginData.role; 
+    //     const loginData = message.payload; 
 
-    // 2. 決定跳轉路徑
-    let targetPath = '';
-    if (realRole === 'student') {
-      targetPath = '/home';
-    } else {
-      // 老師、管理員、召集人等非學生身分，一律去後台
-      targetPath = '/dashboard';
-    }
+    //     // 判斷登入身分與導向路徑
+    //     let targetPath = (loginData.role === 'student') ? '/home' : '/dashboard';
 
-    // 3. 執行正式登入 (儲存 Token 並跳轉)
-    this.performLogin(loginData, targetPath);
+    //     // 執行既有的登入機制 (存 Token、啟動 Refresh timer)
+    //     this.performLogin(loginData, targetPath);
 
-  } else if (message.type === 'OIDC_LOGIN_ERROR') {
-    alert('登入失敗: ' + message.error);
-  }
-},
+    //   } else if (message && message.type === 'OIDC_LOGIN_ERROR') {
+    //     if (this.oidcWindow) this.oidcWindow.close();
+    //     alert('教育局單一簽入失敗：' + (message.error || '未知錯誤'));
+    //   }
+    // },
+    handleOidcMessage(event) {
+      if (event.origin !== window.location.origin) return;
+
+      const message = event.data;
+      if (message.type === 'OIDC_LOGIN_SUCCESS') {
+        const loginData = message.payload; // 後端「兌換」完後回傳的 JSON
+
+        // 1. 取得真實角色 (例如: 'student', 'teacher', 'admin')
+        const realRole = loginData.role;
+
+        // 2. 決定跳轉路徑
+        let targetPath = '';
+        if (realRole === 'student') {
+          targetPath = '/home';
+        } else {
+          // 老師、管理員、召集人等非學生身分，一律去後台
+          targetPath = '/dashboard';
+        }
+
+        // 3. 執行正式登入 (儲存 Token 並跳轉)
+        this.performLogin(loginData, targetPath);
+
+      } else if (message.type === 'OIDC_LOGIN_ERROR') {
+        alert('登入失敗: ' + message.error);
+      }
+    },
     //  觸發忘記密碼彈窗
     openForgetPassModal() {
       this.showForgetPassDialog = true;
@@ -534,23 +511,23 @@ const loginHint = encodeURIComponent(this.studentForm.account);
         }
       });
     },
-// 教職員點擊按鈕觸發這個
- async handleLogin() {
-    if (!this.teacherForm.account || !this.teacherForm.password) {
-      alert('請輸入帳號和密碼');
-      return;
-    }
+    // 教職員點擊按鈕觸發這個
+    async handleLogin() {
+      if (!this.teacherForm.account || !this.teacherForm.password) {
+        alert('請輸入帳號和密碼');
+        return;
+      }
 
-    try {
-      const response = await api.post('students/login/', {
-        username: this.teacherForm.account, 
-        password: this.teacherForm.password,
-      });
-      this.performLogin(response.data, '/dashboard');
-    } catch (error) {
-      alert(error.response?.data?.detail || '登入失敗');
-    }
-  },
+      try {
+        const response = await api.post('students/login/', {
+          username: this.teacherForm.account,
+          password: this.teacherForm.password,
+        });
+        this.performLogin(response.data, '/dashboard');
+      } catch (error) {
+        alert(error.response?.data?.detail || '登入失敗');
+      }
+    },
     // 沿用舊密碼：回傳 skip_change: true
     async handleKeepOldPassword() {
       this.performLogin(this.tempLoginData, null); // 需先存 Token
@@ -637,34 +614,34 @@ const loginHint = encodeURIComponent(this.studentForm.account);
       }
     },
 
-// 測試帳號快捷登入：自動填入並執行 API 登入
-async handleTestLogin(role) {
-  this.currentRole = (role.key === 'student') ? 'student' : 'teacher';
-  
-  const loginPayload = {
-    username: role.account,
-    password: role.password || 'ENpassword123' // 如果 role 沒寫密碼則用預設
-  };
+    // 測試帳號快捷登入：自動填入並執行 API 登入
+    async handleTestLogin(role) {
+      this.currentRole = (role.key === 'student') ? 'student' : 'teacher';
 
-  try {
-    console.log(`[GodMode] 正在以 ${role.name} 身分登入...`);
-    
-    // 直接呼叫原本的教職員/帳密登入 API，繞過 OIDC
-    const response = await api.post('students/login/', loginPayload);
-    
-    // 執行登入成功後的 token 存儲與跳轉
-    // 如果是學生 role.path 通常是 /home，管理員則是 /dashboard
-    this.performLogin(response.data, role.path);
-    
-    this.$message({
-      message: `${role.name} 快速登入成功`,
-      type: 'success'
-    });
-  } catch (error) {
-    console.error('[GodMode] 登入失敗:', error);
-    alert(role.name + ' 自動登入失敗：' + (error.response?.data?.detail || '網路錯誤'));
-  }
-},
+      const loginPayload = {
+        username: role.account,
+        password: role.password || 'ENpassword123' // 如果 role 沒寫密碼則用預設
+      };
+
+      try {
+        console.log(`[GodMode] 正在以 ${role.name} 身分登入...`);
+
+        // 直接呼叫原本的教職員/帳密登入 API，繞過 OIDC
+        const response = await api.post('students/login/', loginPayload);
+
+        // 執行登入成功後的 token 存儲與跳轉
+        // 如果是學生 role.path 通常是 /home，管理員則是 /dashboard
+        this.performLogin(response.data, role.path);
+
+        this.$message({
+          message: `${role.name} 快速登入成功`,
+          type: 'success'
+        });
+      } catch (error) {
+        console.error('[GodMode] 登入失敗:', error);
+        alert(role.name + ' 自動登入失敗：' + (error.response?.data?.detail || '網路錯誤'));
+      }
+    },
     //Token 刷新計時器
     async startTokenRefreshTimer() {
       if (this.refreshTimer) return;
@@ -724,8 +701,9 @@ $bg-path: "~@/assets/image/login-bg.jpg";
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
-justify-content: center;
-@include flex-center;
+  justify-content: center;
+  @include flex-center;
+
   i {
     margin-right: 4px;
   }
@@ -771,135 +749,144 @@ justify-content: center;
 
 .login-container {
   width: 100vw;
-    padding: 4% 18%;
+  padding: 4% 18%;
+
   .el-col {
     display: flex;
-    flex-direction: column; 
+    flex-direction: column;
   }
+
   .oidc-guide-box {
-  text-align: center;
+    text-align: center;
 
-  .guide-text {
-    color: #666;
-  }
+    .guide-text {
+      color: #666;
+    }
 
-  .oidc-btn {
-    @include flex-center;
-    justify-content: center;
-    gap: 10px;
-    background: linear-gradient(135deg, #4ABCB1 0%, #38bdf8 100%) !important;
-    color: white !important;
-    border-radius: 12px;
-    
-    &:hover {
-      filter: brightness(1.1);
+    .oidc-btn {
+      @include flex-center;
+      justify-content: center;
+      gap: 10px;
+      background: linear-gradient(135deg, #4ABCB1 0%, #38bdf8 100%) !important;
+      color: white !important;
+      border-radius: 12px;
+
+      &:hover {
+        filter: brightness(1.1);
+      }
     }
   }
-}
 
-.announcement-card,
+  .announcement-card,
   .login-card {
-    height:600px;         
+    height: 600px;
     display: flex;
     flex-direction: column;
     background-color: $card-bg;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     border-radius: 11px;
     padding: 24px;
-    box-sizing: border-box; 
+    box-sizing: border-box;
   }
 
   .announcement-list {
-    flex: 1; 
+    flex: 1;
     margin-top: 8px;
-    overflow-y: auto; 
+    overflow-y: auto;
   }
 
   .role-notice-text {
-  font-size: 14px;
-  color: #ad5910; 
-  margin-top: -20px; 
-  margin-bottom: 20px;
-  text-align: center;
-  font-weight: 500;
-  animation: fadeIn 0.3s ease; 
-}
+    font-size: 14px;
+    color: #ad5910;
+    margin-top: -20px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 500;
+    animation: fadeIn 0.3s ease;
+  }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-5px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 
   .announcement-card {
     position: relative;
     z-index: 10;
 
-.announcement-list {
-    flex: 1;
-    margin-top: 8px;
-    overflow-y: auto;    
-    min-height: 0;      
-  }
-
- .announcement-item {
-  padding: 12px;
-  border-radius: 16px;
-  margin: 12px 0;
-  background-color: #F0F3F580;
-  transition: transform 0.3s ease; 
-
-  &:hover {
- background-color: #f0f3f5d7;
-}
-
-  &:last-child {
-    border-bottom: none;
-  }
-
-  .item-header {
-    font-weight: bold;
-    color: $main-black-text;
-    margin-bottom: 5px;
-    @include flex-center;
-    gap: 10px;
-    justify-content: space-between;
-  }
-
-  .tag {
-    font-size: 14px;
-    padding: 6px 10px;
-    border-radius: 4px;
-    color:$main-black-text;
-
-    &.new {
-      background-color: $primary-color;
+    .announcement-list {
+      flex: 1;
+      margin-top: 8px;
+      overflow-y: auto;
+      min-height: 0;
     }
 
-    &.active {
-      background-color: #f97316;
+    .announcement-item {
+      padding: 12px;
+      border-radius: 16px;
+      margin: 12px 0;
+      background-color: #F0F3F580;
+      transition: transform 0.3s ease;
+
+      &:hover {
+        background-color: #f0f3f5d7;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .item-header {
+        font-weight: bold;
+        color: $main-black-text;
+        margin-bottom: 5px;
+        @include flex-center;
+        gap: 10px;
+        justify-content: space-between;
+      }
+
+      .tag {
+        font-size: 14px;
+        padding: 6px 10px;
+        border-radius: 4px;
+        color: $main-black-text;
+
+        &.new {
+          background-color: $primary-color;
+        }
+
+        &.active {
+          background-color: #f97316;
+        }
+
+        &.update {
+          background-color: #9a9bf8;
+        }
+
+        &.maintain {
+          background-color: #4caf9f;
+        }
+      }
+
+      .item-content {
+        font-size: 16px;
+        color: $main-grey-text;
+        margin: 5px 0;
+      }
+
+      .item-date {
+        display: block;
+        font-size: 12px;
+        color: $main-grey-text;
+      }
     }
-
-    &.update {
-      background-color: #9a9bf8;
-    }
-
-    &.maintain {
-      background-color: #4caf9f;
-    }
-  }
-
-  .item-content {
-    font-size: 16px;
-    color: $main-grey-text;
-    margin: 5px 0;
-  }
-
-  .item-date {
-    display: block;
-    font-size: 12px;
-    color: $main-grey-text;
-  }
-}
   }
 
   .card-title {
@@ -912,25 +899,28 @@ justify-content: center;
 
   .login-card {
     text-align: center;
-    .fade-transform-enter-active,
-.fade-transform-leave-active {
-  transition: all 0.3s ease;
-}
-.fade-transform-enter-from {
-  opacity: 0;
-  transform: translateX(10px);
-}
-.fade-transform-leave-to {
-  opacity: 0;
-  transform: translateX(-10px);
-}
 
-.login-form-container {
-  min-height: 280px;
-  display: flex;
-  flex-direction: column;
-  // justify-content: center;
-  text-align: left;
+    .fade-transform-enter-active,
+    .fade-transform-leave-active {
+      transition: all 0.3s ease;
+    }
+
+    .fade-transform-enter-from {
+      opacity: 0;
+      transform: translateX(10px);
+    }
+
+    .fade-transform-leave-to {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+
+    .login-form-container {
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+      // justify-content: center;
+      text-align: left;
 
       .forgot-password-link {
         color: $main-dark-blue;
@@ -938,37 +928,39 @@ justify-content: center;
         justify-content: center;
         cursor: pointer;
         margin-top: 16px;
-        &:hover{
-         color: $main-blue-text; 
+
+        &:hover {
+          color: $main-blue-text;
         }
       }
     }
 
     .input-group {
       margin-bottom: 20px;
-.password-overlay {
-      position: absolute;
-      top: 32px; 
-      left: 0;
-      width: 100%;
-      height: 40px; 
-      background: rgba(240, 250, 255, 0.8);
-      z-index: 10;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #666;
-      font-size: 14px;
-      font-weight: 500;
-      pointer-events: none;
-      border: 1px dashed $primary-color;
-      
-      i {
-        margin-right: 6px;
-        color: $primary-color;
+
+      .password-overlay {
+        position: absolute;
+        top: 32px;
+        left: 0;
+        width: 100%;
+        height: 40px;
+        background: rgba(240, 250, 255, 0.8);
+        z-index: 10;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+        font-size: 14px;
+        font-weight: 500;
+        pointer-events: none;
+        border: 1px dashed $primary-color;
+
+        i {
+          margin-right: 6px;
+          color: $primary-color;
+        }
       }
-    }
 
       .input-label {
         display: block;
@@ -1137,7 +1129,7 @@ justify-content: center;
 
 @media (orientation: landscape) and (max-height: 1199.98px) and (pointer: coarse) {
   .login-container {
-padding: 0;
+    padding: 0;
   }
 
   .login-page {
@@ -1147,7 +1139,7 @@ padding: 0;
 
 @media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
   .login-container {
-padding: 0;
+    padding: 0;
   }
 
   .mobile-scroll-box {
