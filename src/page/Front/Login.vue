@@ -10,90 +10,28 @@
           <h2 class="card-title">
             <i class="fa-solid fa-bullhorn" aria-hidden="true"></i>最新公告
           </h2>
-          <vue-custom-scrollbar :settings="scrollSettings" class="announcement-list" aria-label="最新公告列表">
-            <div class="announcement-item">
-              <div class="item-header">
-                <div class="news-title">
-                  <i class="fa-solid fa-star" style="color: #FFD43B;"></i>新島嶼開放
-                </div>
-                <div class="news-tag">
-                  <span class="tag new">活動</span>
-                </div>
+        <vue-custom-scrollbar :settings="scrollSettings" class="announcement-list" aria-label="最新公告列表">
+  <div v-if="loadingNews" style="text-align: center; padding: 20px; color: #999;">
+    <i class="fa-solid fa-spinner fa-spin"></i> 公告載入中...
+  </div>
 
-              </div>
-              <p class="item-content">1200字節點島嶼已開放，歡迎九年級以上同學挑戰！</p>
-              <span class="item-date">2024-01-15</span>
-            </div>
-
-            <div class="announcement-item">
-              <div class="item-header">
-                <div class="news-title">
-                  <i class="fa-solid fa-pen" style="color: #d56039;"></i>單字測驗通知
-                </div>
-                <div class="news-tag">
-                  <span class="tag active">活動</span>
-                </div>
-
-              </div>
-              <p class="item-content">本月單字學測將於11月25日舉行，請同學們準備。</p>
-              <span class="item-date">2024-01-10</span>
-            </div>
-
-            <div class="announcement-item">
-              <div class="item-header">
-                <div class="news-title">
-                  <i class="fa-solid fa-rocket" style="color: #63E6BE;"></i>新功能上線
-                </div>
-                <div class="news-tag">
-                  <span class="tag update">資訊</span>
-                </div>
-
-              </div>
-              <p class="item-content">全新語音輸入功能現已推出！讓學習更有效率。</p>
-              <span class="item-date">2024-01-20</span>
-            </div>
-
-            <div class="announcement-item">
-              <div class="item-header">
-                <div class="news-title">
-                  <i class="fa-solid fa-triangle-exclamation" style="color: #e12323;"></i>伺服器維護
-                </div>
-                <div class="news-tag">
-                  <span class="tag maintain">消息</span>
-                </div>
-
-              </div>
-              <p class="item-content">系統將於明日凌晨2點進行維護，屆時服務將暫停約30分鐘。</p>
-              <span class="item-date">2024-01-19</span>
-            </div>
-            <div class="announcement-item">
-              <div class="item-header">
-                <div class="news-title">
-                  <i class="fa-solid fa-triangle-exclamation" style="color: #e12323;"></i>伺服器維護
-                </div>
-                <div class="news-tag">
-                  <span class="tag maintain">消息</span>
-                </div>
-
-              </div>
-              <p class="item-content">系統將於明日凌晨2點進行維護，屆時服務將暫停約30分鐘。</p>
-              <span class="item-date">2024-01-19</span>
-            </div>
-
-            <div class="announcement-item">
-              <div class="item-header">
-                <div class="news-title">
-                  <i class="fa-solid fa-wrench" style="color: #74C0FC;"></i>系統更新
-                </div>
-                <div class="news-tag">
-                  <span class="tag update">更新</span>
-                </div>
-
-              </div>
-              <p class="item-content">新增多項成就徽章，完成任務即可獲得專屬獎勵！</p>
-              <span class="item-date">2024-01-05</span>
-            </div>
-          </vue-custom-scrollbar>
+  <div v-else-if="announcements.length === 0" style="text-align: center; padding: 20px; color: #999;">
+    目前尚無公告
+  </div>
+<div v-for="(item, index) in announcements" :key="item.id" class="announcement-item">
+  <div class="item-header">
+    <div class="news-title">
+      <i class="fa-solid fa-bullhorn" style="color: #FFD43B;"></i>
+      {{ item.title }}
+    </div>
+    <div v-if="item.category" class="news-tag">
+      <span class="tag new">{{ item.category }}</span>
+    </div>
+  </div>
+  <p class="item-content">{{ item.content }}</p>
+  <span class="item-date">{{ item.date }}</span>
+</div>
+</vue-custom-scrollbar>
         </div>
       </el-col>
       <el-col :span="12">
@@ -284,6 +222,8 @@ export default {
   },
   data() {
     return {
+      loadingNews: false, 
+      announcements: [],
       isOidcLoading: false,
       currentRole: 'student',
       studentForm: {
@@ -400,12 +340,13 @@ mounted() {
         // 呼叫方法
         this.processOidcFromUrl(oidcCode);
       } else {
-        console.log(' [偵錯] 4. 沒有抓到 code，停留在一般密碼登入畫面');
+        // console.log(' [偵錯] 4. 沒有抓到 code，停留在一般密碼登入畫面');
       }
 
     } catch (error) {
       console.error(' [偵錯] mounted 執行過程發生例外錯誤:', error);
     }
+    this.fetchNews();
   },
   beforeDestroy() {
     // 移除監聽器
@@ -522,7 +463,6 @@ mounted() {
         this.$refs.forgetForm.resetFields();
       }
     },
-
     //  忘記密碼提交
     async handleForgetPassword() {
       this.$refs.forgetForm.validate(async (valid) => {
@@ -556,6 +496,17 @@ mounted() {
         alert(error.response?.data?.detail || '登入失敗');
       }
     },
+    async fetchNews() {
+  this.loadingNews = true;
+  try {
+    const response = await api.get('students/news/list');
+    this.announcements = response.data; 
+  } catch (error) {
+    console.error('獲取公告失敗:', error);
+  } finally {
+    this.loadingNews = false;
+  }
+},
     // 沿用舊密碼：回傳 skip_change: true
     async handleKeepOldPassword() {
       this.performLogin(this.tempLoginData, null); // 需先存 Token
@@ -821,6 +772,14 @@ $bg-path: "~@/assets/image/login-bg.jpg";
     flex: 1;
     margin-top: 8px;
     overflow-y: auto;
+   .news-title,.item-content {
+  flex: 1; 
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: auto; 
+  min-width: 0; 
+}
   }
 
   .role-notice-text {
@@ -885,7 +844,8 @@ $bg-path: "~@/assets/image/login-bg.jpg";
         padding: 6px 10px;
         border-radius: 4px;
         color: $main-black-text;
-
+    text-wrap: nowrap;
+    flex-shrink: 0;
         &.new {
           background-color: $primary-color;
         }
@@ -906,7 +866,7 @@ $bg-path: "~@/assets/image/login-bg.jpg";
       .item-content {
         font-size: 16px;
         color: $main-grey-text;
-        margin: 5px 0;
+        margin: 8px 0;
       }
 
       .item-date {

@@ -8,8 +8,14 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
+    // 定義不需要帶 Token 的 API 路徑
+    const whiteList = ['students/news/list'];
+    const isWhiteListed = whiteList.some(path => config.url.includes(path));
+
     const accessToken = localStorage.getItem('accessToken');
-    if (accessToken) {
+    
+    // 只有不在白名單且有 token 時才加上標頭
+    if (accessToken && !isWhiteListed) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
     return config;
