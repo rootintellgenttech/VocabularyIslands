@@ -210,14 +210,17 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes
 });
-
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('accessToken');
   
-  if (to.name === 'Login' || to.path.includes('/oidc/callback')) {
+  if (
+    to.name === 'Login' || 
+    to.path.includes('/oidc/callback') || 
+    to.path.includes('/api/oidccallback')
+  ) {
     next();
   } else if (!token) {
-    next('/login');
+    next('/login'); 
   } else {
     next();
   }
