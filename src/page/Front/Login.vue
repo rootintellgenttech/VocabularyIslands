@@ -500,6 +500,7 @@ async processOidcFromUrl(code) {
 
       window.location.href = authUrl; 
     },
+    
 
     handleOidcMessage(event) {
       if (event.origin !== window.location.origin) return;
