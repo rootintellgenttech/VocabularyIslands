@@ -1,5 +1,6 @@
-import Vue from 'vue'
-import App from './App.vue'
+import Vue from 'vue';
+import App from './App.vue';
+import store from './store';
 import router from './router';
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
@@ -24,7 +25,9 @@ const customLocale = {
   }
 };
 Vue.use(VueApexCharts)
-Vue.use(ElementUI, { locale: customLocale });
+Vue.use(ElementUI, {
+  locale: customLocale
+});
 Vue.use(VueLuckyCanvas);
 Vue.component('apexchart', VueApexCharts)
 
@@ -34,5 +37,6 @@ Vue.config.productionTip = false;
 // 4. 初始化 Vue
 new Vue({
   router,
+  store,
   render: h => h(App),
 }).$mount('#app');

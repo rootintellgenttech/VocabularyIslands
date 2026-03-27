@@ -208,7 +208,7 @@
 
 <script>
 import api from '../../config/api';
-import { jwtDecode } from 'jwt-decode';
+import { mapActions } from 'vuex-oidc';
 import axios from 'axios';
 
 export default {
@@ -363,12 +363,24 @@ export default {
     }
   },
   methods: {
+
+    ...mapActions('oidcStore', ['authenticateOidc']),
+
     // 觸發 OIDC 彈出/跳轉登入
-    handleOidcLogin() {
+    async handleOidcLogin() {
       if (!this.studentForm.account) {
-        alert('請先輸入學生帳號');
+        this.$message.warning('請輸入學生帳號');
         return;
       }
+
+      console.log('啟動教育局 OIDC 登入...');
+      // 插件會自動生成隨機的 State, Nonce 並導向教育局
+      this.authenticateOidc({
+        extraQueryParams: {
+          'login_hint': this.studentForm.account // 帶入帳號
+        }
+      });
+
       const state = Math.random().toString(36).substring(2, 15);
       const nonce = Math.random().toString(36).substring(2, 15);
       const clientId = 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42';
