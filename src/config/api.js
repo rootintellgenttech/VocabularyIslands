@@ -8,10 +8,17 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    // 定義不需要帶 Token 的 API 路徑
-    const whiteList = ['students/news/list'];
+    //白名單：這些路徑不需要 (也不應該) 帶舊的 Token
+    const whiteList = [
+      'students/news/list',
+      'students/oidc/token/',          
+      'students/oidc/oidclogin/',     
+      'students/login/',             
+      'students/forget-password/',     
+      'students/reset-password/'     
+    ];
+    
     const isWhiteListed = whiteList.some(path => config.url.includes(path));
-
     const accessToken = localStorage.getItem('accessToken');
 
     // 只有不在白名單且有 token 時才加上標頭

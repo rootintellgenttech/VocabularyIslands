@@ -304,40 +304,60 @@ export default {
 
     };
   },
- async mounted() {
+async mounted() {
   const urlParams = new URLSearchParams(window.location.search);
+  // 同時檢查 Vue Router 與原生 URL 參數
   const code = this.$route.query.code || urlParams.get('code');
+  const errorParam = this.$route.query.error || urlParams.get('error');
+
+  // 如果這不是回調 (Callback) 狀態，代表是用戶「第一次」進來登入頁
+  if (!code && !errorParam) {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('userRole');
+    console.log('[系統] 偵測為全新登入，已清空舊有 Token 緩存');
+  }
+
+  //  如果偵測到教育局回傳錯誤 (例如使用者按取消)
+  if (errorParam) {
+    console.error('教育局回傳錯誤:', errorParam);
+    this.$message.error('教育局授權失敗或取消');
+    window.history.replaceState({}, document.title, '/login');
+    this.fetchNews();
+    return;
+  }
 
   if (code) {
-    // console.log('[Step 2] 偵測到 Code，由後端執行 Token 兌換...');
+    console.log('🚀 [Step 2] 偵測到 Code，發送至後端進行兌換...');
     this.isOidcLoading = true;
     
     try {
       const res = await api.post('/students/oidc/token/', {
         code: code,
-       redirect_uri: `${window.location.origin}/api/oidccallback/`
+        redirect_uri: `${window.location.origin}/api/oidccallback/`
       }, { timeout: 60000 });
 
-      // console.log('[Step 3] 後端兌換成功，拿到系統資料:', res.data);
+      console.log(' [Step 3] 後端兌換成功！');
 
-      // 清理網址
-      window.history.replaceState({}, document.title, '/login');
-
-      // 執行登入 (這裡 res.data 應該包含 token/access, refresh, role 等)
       const targetPath = (res.data.role === 'student') ? '/home' : '/dashboard';
       this.performLogin(res.data, targetPath);
 
+      // 成功後清理網址參數
+      window.history.replaceState({}, document.title, '/login');
+
     } catch (error) {
-      console.error(' OIDC 後端兌換失敗:', error.response?.data || error.message);
+      console.error('❌ OIDC 後端兌換失敗:', error.response?.data || error.message);
       this.isOidcLoading = false;
       this.$message.error('教育局驗證失敗，請重新登入');
       window.history.replaceState({}, document.title, '/login');
     }
-    return;
+    return; // OIDC 流程結束
   }
 
+  // 💡 一般登入頁面載入流程
   this.fetchNews();
 },
+
   beforeDestroy() {
     // 移除監聽器
     window.removeEventListener('message', this.handleOidcMessage);
