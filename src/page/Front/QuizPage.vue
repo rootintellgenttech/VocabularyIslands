@@ -237,7 +237,7 @@ export default {
                 // 邏輯分流 A：ABC 字母島模式
                 // =========================================================
                 if (isAbcUnit) {
-                    console.log('✅ 執行 ABC 模式');
+                    console.log('執行 ABC 模式');
                     let dynamicCount = 26;
                     const rangeMatch = this.stageLabel.match(/([A-Z])-([A-Z])/);
                     if (rangeMatch) {
@@ -267,7 +267,7 @@ export default {
                 // 邏輯分流 B：300/800/1200 複習模式 (特定複習單元)
                 // =========================================================
                 else if (isReviewMode) {
-                    console.log('✅ 執行複習模式');
+                    console.log('執行複習模式');
                     sliceCount = 20;
                     const islandLabels = ['300字複習', '300單字島', '800字複習', '800單字島', '1200字複習', '1200單字島', '超級總複習', '1200單字複習'];
                     let p1 = { "題數": 10, "題型": "英翻中", "include_answer": true };
@@ -287,7 +287,7 @@ export default {
                 // 邏輯分流 C：聽力海灣
                 // =========================================================
                 else if (isListeningBay) {
-                    console.log('✅ 執行聽力海灣雙呼叫模式');
+                    console.log('執行聽力海灣雙呼叫模式');
                     sliceCount = 20;
 
                     // 兩個 Payload：分別取英翻中與中翻英
@@ -320,7 +320,7 @@ export default {
                 // 邏輯分流 D：一般單元練習 ( 針對 300/800/1200 島嶼管卡)
                 // =========================================================
                 else {
-                    console.log('✅ 執行普通單元模式 (啟蒙小木屋 ~ 黎光秘境島)');
+                    console.log('執行普通單元模式 (啟蒙小木屋 ~ 黎光秘境島)');
 
                     // 1. 決定動態題數上限
                     let dynamicLimit = 1200;

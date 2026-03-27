@@ -115,7 +115,7 @@ export default {
                 }
 
                 if (isAbcRequest) {
-                    console.log('✅ 執行 ABC 學習模式請求');
+                    console.log('執行 ABC 學習模式請求');
                     if (this.unitId === 'final' || this.stageLabel === 'A-Z') {
                         // ABC 總複習
                         payload = {

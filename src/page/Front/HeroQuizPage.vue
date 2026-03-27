@@ -194,7 +194,7 @@ export default {
 
                 // 判斷當前標籤是否在清單內
                 if (fullIslandLabels.includes(this.stageName)) {
-                    console.log(`✅ 進入會考大殿堂特殊複習模式: ${this.stageName}`);
+                    console.log(`進入會考大殿堂特殊複習模式: ${this.stageName}`);
                     payload = {
                         "島嶼": "1200字島",   // 強制指定 1200字島 (包含所有國中題)
                         "題型": "克漏字",      // 固定題型
@@ -203,7 +203,7 @@ export default {
                     };
                 } else {
                     //  一般關卡 (霧靄之境、永恆圖書館等) 
-                    console.log(`✅ 進入會考大殿堂一般單元模式: ${this.stageName}`);
+                    console.log(`進入會考大殿堂一般單元模式: ${this.stageName}`);
                     payload = {
                         "單元": this.stageName,
                         "題型": "克漏字",

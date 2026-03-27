@@ -309,17 +309,16 @@ export default {
   const code = this.$route.query.code || urlParams.get('code');
 
   if (code) {
-    console.log('🚀 [Step 2] 偵測到 Code，由後端執行 Token 兌換...');
+    // console.log('[Step 2] 偵測到 Code，由後端執行 Token 兌換...');
     this.isOidcLoading = true;
     
     try {
-      // 傳入 code 和當時跳轉用的 redirect_uri (必須與第一步完全一致)
       const res = await api.post('/students/oidc/token/', {
         code: code,
        redirect_uri: `${window.location.origin}/api/oidccallback/`
       }, { timeout: 60000 });
 
-      console.log('✅ [Step 3] 後端兌換成功，拿到系統資料:', res.data);
+      // console.log('[Step 3] 後端兌換成功，拿到系統資料:', res.data);
 
       // 清理網址
       window.history.replaceState({}, document.title, '/login');
@@ -329,7 +328,7 @@ export default {
       this.performLogin(res.data, targetPath);
 
     } catch (error) {
-      console.error('❌ OIDC 後端兌換失敗:', error.response?.data || error.message);
+      console.error(' OIDC 後端兌換失敗:', error.response?.data || error.message);
       this.isOidcLoading = false;
       this.$message.error('教育局驗證失敗，請重新登入');
       window.history.replaceState({}, document.title, '/login');
@@ -361,7 +360,7 @@ export default {
 
     // 觸發 OIDC 彈出/跳轉登入 (學生專用)
 async handleOidcLogin() {
-      console.log('🚀 啟動教育局 OIDC 登入跳轉...');
+      console.log('啟動教育局 OIDC 登入跳轉...');
       this.isOidcLoading = true;
       
       const redirectUri = `${window.location.origin}/api/oidccallback/`;
@@ -507,7 +506,7 @@ async handleOidcLogin() {
     }
     ,
 
-    async performLogin(loginData, path) {
+ async performLogin(loginData, path) {
       const token = loginData.token || loginData.access || loginData.access_token;
       const refresh = loginData.refresh || loginData.refresh_token;
       const role = loginData.role || 'student';
@@ -516,16 +515,22 @@ async handleOidcLogin() {
       localStorage.setItem('accessToken', token);
       localStorage.setItem('refreshToken', refresh);
 
-      this.startTokenRefreshTimer();
+      if (token) {
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      }
 
       // 只有真正的學生才執行簽到
       if (role === 'student') {
         try {
           await api.post('students/attendance/');
+          console.log('自動簽到成功');
         } catch (err) {
-          console.warn('[系統] 簽到提示');
+          console.warn('[系統] 簽到提示或已簽到');
         }
       }
+
+      // 啟動刷新計時器
+      this.startTokenRefreshTimer();
 
       if (path) {
         this.$router.push(path);
@@ -544,7 +549,6 @@ async handleOidcLogin() {
       try {
         console.log(`[GodMode] 正在以 ${role.name} 身分登入...`);
 
-        // 直接呼叫原本的教職員/帳密登入 API，繞過 OIDC
         const response = await api.post('students/login/', loginPayload);
 
         // 執行登入成功後的 token 存儲與跳轉
