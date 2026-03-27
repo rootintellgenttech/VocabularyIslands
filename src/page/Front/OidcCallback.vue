@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex-oidc';
+import { mapGetters, mapActions } from 'vuex';
 import api from '../../config/api';
 
 export default {

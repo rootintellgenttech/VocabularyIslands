@@ -208,7 +208,7 @@
 
 <script>
 import api from '../../config/api';
-import { mapActions } from 'vuex-oidc';
+import { mapActions } from 'vuex';
 import axios from 'axios';
 
 export default {
@@ -363,8 +363,7 @@ export default {
     }
   },
   methods: {
-
-    ...mapActions('oidcStore', ['authenticateOidc']),
+...mapActions('oidcStore', ['authenticateOidc']),
 
     // 觸發 OIDC 彈出/跳轉登入
     async handleOidcLogin() {
@@ -373,27 +372,19 @@ export default {
         return;
       }
 
-      console.log('啟動教育局 OIDC 登入...');
-      // 插件會自動生成隨機的 State, Nonce 並導向教育局
-      this.authenticateOidc({
-        extraQueryParams: {
-          'login_hint': this.studentForm.account // 帶入帳號
-        }
-      });
+      console.log('🚀 啟動教育局 OIDC 插件登入...');
 
-      const state = Math.random().toString(36).substring(2, 15);
-      const nonce = Math.random().toString(36).substring(2, 15);
-      const clientId = 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42';
-
-
-      const redirectUri = encodeURIComponent(`${window.location.origin}/api/oidccallback/`);
-      const scope = encodeURIComponent('openid email kh_profile kh_classes kh_titles');
-      const loginHint = encodeURIComponent(this.studentForm.account);
-
-      const authUrl = `https://oidc.kh.edu.tw/oauth2/auth?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}&nonce=${nonce}&login_hint=${loginHint}`;
-
-      // 直接跳轉
-      window.location.href = authUrl;
+      try {
+        // 插件會自動幫你計算 state, nonce 並處理 redirect_uri 和跳轉
+        await this.authenticateOidc({
+          extraQueryParams: {
+            'login_hint': this.studentForm.account // 自動帶入帳號到教育局登入頁
+          }
+        });
+      } catch (err) {
+        console.error('OIDC 啟動失敗:', err);
+        this.$message.error('無法連線至教育局登入系統');
+      }
     },
 
     // 前端拿 Code 去跟教育局換 Token
@@ -675,8 +666,6 @@ export default {
       });
     }
   },
-
-
 }
 </script>
 
