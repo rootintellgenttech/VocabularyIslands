@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 import api from '../../config/api';
 
 export default {
@@ -14,25 +14,25 @@ export default {
   computed: {
     ...mapGetters('oidcStore', ['oidcUser', 'oidcIsAuthenticated'])
   },
-  watch: {
-    // 監聽插件是否已經成功抓到使用者資料
-    oidcUser(newUser) {
-      if (newUser && this.oidcIsAuthenticated) {
-        this.processSystemLogin(newUser);
-      }
+ async mounted() {
+  try {
+    const user = await this.oidcSignInCallback(); 
+    if (user) {
+      this.processSystemLogin(user);
     }
-  },
-  mounted() {
-    // 如果進入頁面時資料已經在那了，直接執行
-    if (this.oidcIsAuthenticated && this.oidcUser) {
+  } catch (err) {
+    console.error('OIDC 兌換失敗', err);
+    if (this.oidcIsAuthenticated) {
       this.processSystemLogin(this.oidcUser);
     }
-  },
+  }
+},
   methods: {
+    ...mapActions('oidcStore', ['oidcSignInCallback']),
+
     async processSystemLogin(user) {
       try {
-        console.log('[插件解析成功] 使用者資料：', user);
-
+        // 整理後端要的格式 
         const postData = {
           sub: user.sub,
           kh_profile: user.kh_profile || {
@@ -43,26 +43,26 @@ export default {
           kh_classes: user.kh_classes || {}
         };
 
-        console.log('[Step 4] 發送至後端進行登入驗證...');
-
+        console.log(' [Step 4] 資料獲取完畢，發送給自家後端 API...', postData);
+        
         const loginResponse = await api.post('students/oidc/oidclogin/', postData, {
-          timeout: 60000
+          timeout: 60000 
         });
 
-        console.log('登入完全成功！');
+        console.log('=== [Step 5] 後端登入成功！===');
 
         // 存儲系統 Token
         const token = loginResponse.data.token || loginResponse.data.access;
         localStorage.setItem('accessToken', token);
         localStorage.setItem('userRole', loginResponse.data.role || 'student');
 
-        // 跳轉到首頁
+        // 清理網址參數並跳轉
         this.$router.push('/home');
 
       } catch (error) {
-        console.error('後端驗證失敗:', error);
-        this.$message.error('系統登入失敗，正在返回登入頁');
-        setTimeout(() => this.$router.push('/login'), 2000);
+        console.error("=== 自家後端登入發生錯誤 ===", error);
+        this.$message.error('系統內部驗證失敗');
+        this.$router.push('/login');
       }
     }
   }

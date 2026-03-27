@@ -376,11 +376,12 @@ export default {
 
       try {
         // 插件會自動幫你計算 state, nonce 並處理 redirect_uri 和跳轉
-        await this.authenticateOidc({
-          extraQueryParams: {
-            'login_hint': this.studentForm.account // 自動帶入帳號到教育局登入頁
-          }
-        });
+      await this.authenticateOidc({
+  extraQueryParams: {
+    'login_hint': this.studentForm.account,
+    'username': this.studentForm.account  
+  }
+});
       } catch (err) {
         console.error('OIDC 啟動失敗:', err);
         this.$message.error('無法連線至教育局登入系統');
@@ -396,7 +397,7 @@ export default {
         const params = new URLSearchParams();
         params.append('grant_type', 'authorization_code');
         params.append('code', code);
-        params.append('redirect_uri', `https://englishability.rootadviser.com/api/oidccallback/`);
+        params.append('redirect_uri', `https://www.elr.kh.edu.tw/api/oidccallback/`);
         params.append('client_id', 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42');
         params.append('client_secret', '38efe712ebe3b6af5d7365441cf2e4d5b6d3c9dc07aa977f74d8f1c8e6c134d1');
 
