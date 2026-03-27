@@ -5,8 +5,8 @@ export const oidcSettings = {
   // 使用 PKCE 時，前端可以不傳 client_secret 
   // 若教育局強制要求，則保留：
   client_secret: '38efe712ebe3b6af5d7365441cf2e4d5b6d3c9dc07aa977f74d8f1c8e6c134d1',
-  
-  redirect_uri: 'https://www.elr.kh.edu.tw/api/oidccallback/',
+  redirect_uri: 'https://englishability.rootadviser.com/api/oidccallback/',
+  // redirect_uri: 'https://www.elr.kh.edu.tw/api/oidccallback/',
   response_type: 'code', //  設為 code，插件會自動執行 PKCE (產生 code_challenge)
   scope: 'openid email kh_profile kh_classes kh_titles',
   
