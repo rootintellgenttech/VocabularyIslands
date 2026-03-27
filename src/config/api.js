@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://www.elr.kh.edu.tw/api/',
+  baseURL: 'https://englishability.rootadviser.com/api/',
+  // https://englishability.rootadviser.com/api/
   timeout: 50000,
 });
 

@@ -304,64 +304,41 @@ export default {
 
     };
   },
-  async mounted() {
-    // 攔截 OIDC 跳轉回來的 Code 
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = this.$route.query.code || urlParams.get('code');
-    const errorParam = this.$route.query.error || urlParams.get('error');
+ async mounted() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const code = this.$route.query.code || urlParams.get('code');
 
-    if (errorParam) {
-      this.$message.error('教育局授權失敗或取消');
+  if (code) {
+    console.log('🚀 [Step 2] 偵測到 Code，由後端執行 Token 兌換...');
+    this.isOidcLoading = true;
+    
+    try {
+      // 傳入 code 和當時跳轉用的 redirect_uri (必須與第一步完全一致)
+      const res = await api.post('/students/oidc/token/', {
+        code: code,
+        redirect_uri: `${window.location.origin}/login` // 這裡需視你第一步跳轉時設定的網址而定
+      }, { timeout: 60000 });
+
+      console.log('✅ [Step 3] 後端兌換成功，拿到系統資料:', res.data);
+
+      // 清理網址
       window.history.replaceState({}, document.title, '/login');
-    } else if (code) {
-      console.log('🚀 [OIDC 攔截] 發現 Code，交給插件自動換 Token...');
-      this.isOidcLoading = true;
 
-      try {
-        // 自動拿 Code 去換 Token 並解析出 UserInfo
-        await this.oidcSignInCallback();
+      // 執行登入 (這裡 res.data 應該包含 token/access, refresh, role 等)
+      const targetPath = (res.data.role === 'student') ? '/home' : '/dashboard';
+      this.performLogin(res.data, targetPath);
 
-        console.log('✅ [插件成功] 解析到的教育局資料:', this.oidcUser);
-
-        // 整理給自家後端的格式
-        const postData = {
-          sub: this.oidcUser.sub,
-          kh_profile: this.oidcUser.kh_profile || {},
-          kh_titles: this.oidcUser.kh_titles || {},
-          kh_classes: this.oidcUser.kh_classes || {}
-        };
-
-        console.log('🚀準備打自家後端登入...');
-        const loginResponse = await api.post('students/oidc/oidclogin/', postData, { timeout: 60000 });
-
-        // 清理網址，讓網址列變乾淨
-        window.history.replaceState({}, document.title, '/login');
-
-        const targetPath = (loginResponse.data.role === 'student') ? '/home' : '/dashboard';
-        this.performLogin(loginResponse.data, targetPath);
-
-      } catch (error) {
-        console.error('❌ OIDC 登入中斷:', error);
-        this.isOidcLoading = false;
-        this.$message.error('教育局驗證失敗，請重新登入');
-        window.history.replaceState({}, document.title, '/login');
-      }
-      return; // 如果是 OIDC 流程，就停在這裡不要往下跑了
+    } catch (error) {
+      console.error('❌ OIDC 後端兌換失敗:', error.response?.data || error.message);
+      this.isOidcLoading = false;
+      this.$message.error('教育局驗證失敗，請重新登入');
+      window.history.replaceState({}, document.title, '/login');
     }
+    return;
+  }
 
-    //  處理原本的密碼重設
-    const fullPath = window.location.href;
-    if (fullPath.includes('/login/')) {
-      let rawToken = fullPath.split('/login/')[1];
-      const token = rawToken.split('?')[0].replace(/\/+$/, "");
-      if (token && token.length > 50) {
-        this.resetPassToken = token;
-        this.showResetPassDialog = true;
-      }
-    }
-
-    this.fetchNews();
-  },
+  this.fetchNews();
+},
   beforeDestroy() {
     // 移除監聽器
     window.removeEventListener('message', this.handleOidcMessage);
@@ -383,18 +360,20 @@ export default {
     ...mapActions('oidcStore', ['authenticateOidc', 'oidcSignInCallback']),
 
     // 觸發 OIDC 彈出/跳轉登入 (學生專用)
-    async handleOidcLogin() {
-      console.log('啟動教育局 OIDC 插件登入...');
-      this.isOidcLoading = true;
-      try {
-        // 插件會自動幫你計算 state, nonce, PKCE 並跳轉
-        await this.authenticateOidc();
-      } catch (err) {
-        console.error('OIDC 啟動失敗:', err);
-        this.isOidcLoading = false;
-        this.$message.error('無法連線至教育局登入系統');
-      }
-    },
+   async handleOidcLogin() {
+  console.log('🚀 啟動教育局 OIDC 登入跳轉...');
+  this.isOidcLoading = true;
+  
+  //  定義清晰的跳轉網址
+  const redirectUri = `${window.location.origin}/login`;
+  const clientId = 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42';
+  const state = Math.random().toString(36).substring(7);
+  
+  // 如果你不想用插件手寫也可以，這是最保險的手寫方式：
+  const authUrl = `https://oidc.kh.edu.tw/oauth2/auth?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=openid%20email%20kh_profile%20kh_classes%20kh_titles&state=${state}`;
+
+  window.location.href = authUrl;
+},
     handleOidcMessage(event) {
       if (event.origin !== window.location.origin) return;
 
