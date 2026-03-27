@@ -316,7 +316,7 @@ export default {
       // 傳入 code 和當時跳轉用的 redirect_uri (必須與第一步完全一致)
       const res = await api.post('/students/oidc/token/', {
         code: code,
-        redirect_uri: `${window.location.origin}/login` // 這裡需視你第一步跳轉時設定的網址而定
+       redirect_uri: `${window.location.origin}/api/oidccallback/`
       }, { timeout: 60000 });
 
       console.log('✅ [Step 3] 後端兌換成功，拿到系統資料:', res.data);
@@ -360,20 +360,19 @@ export default {
     ...mapActions('oidcStore', ['authenticateOidc', 'oidcSignInCallback']),
 
     // 觸發 OIDC 彈出/跳轉登入 (學生專用)
-   async handleOidcLogin() {
-  console.log('🚀 啟動教育局 OIDC 登入跳轉...');
-  this.isOidcLoading = true;
-  
-  //  定義清晰的跳轉網址
-  const redirectUri = `${window.location.origin}/api/oidccallback/`;
-  const clientId = 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42';
-  const state = Math.random().toString(36).substring(7);
-  
-  // 如果你不想用插件手寫也可以，這是最保險的手寫方式：
-  const authUrl = `https://oidc.kh.edu.tw/oauth2/auth?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=openid%20email%20kh_profile%20kh_classes%20kh_titles&state=${state}`;
+async handleOidcLogin() {
+      console.log('🚀 啟動教育局 OIDC 登入跳轉...');
+      this.isOidcLoading = true;
+      
+      const redirectUri = `${window.location.origin}/api/oidccallback/`;
+      const clientId = 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42';
+      
+      const state = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      
+      const authUrl = `https://oidc.kh.edu.tw/oauth2/auth?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=openid%20email%20kh_profile%20kh_classes%20kh_titles&state=${state}`;
 
-  window.location.href = authUrl;
-},
+      window.location.href = authUrl;
+    },
     handleOidcMessage(event) {
       if (event.origin !== window.location.origin) return;
 
