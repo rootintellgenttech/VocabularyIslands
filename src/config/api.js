@@ -1,9 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  // baseURL: 'https://www.elr.kh.edu.tw/api/',
-    baseURL: 'https://englishability.rootadviser.com/api/',
-  // baseURL:'http://192.168.3.50:9005/api/',
+  baseURL: 'https://www.elr.kh.edu.tw/api/',
   timeout: 50000,
 });
 
@@ -14,7 +12,7 @@ api.interceptors.request.use(
     const isWhiteListed = whiteList.some(path => config.url.includes(path));
 
     const accessToken = localStorage.getItem('accessToken');
-    
+
     // 只有不在白名單且有 token 時才加上標頭
     if (accessToken && !isWhiteListed) {
       config.headers.Authorization = `Bearer ${accessToken}`;
@@ -48,8 +46,11 @@ api.interceptors.response.use(
 
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        })
+            failedQueue.push({
+              resolve,
+              reject
+            });
+          })
           .then(token => {
             originalRequest.headers.Authorization = `Bearer ${token}`;
             return api(originalRequest);

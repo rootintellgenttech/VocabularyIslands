@@ -10,28 +10,28 @@
           <h2 class="card-title">
             <i class="fa-solid fa-bullhorn" aria-hidden="true"></i>最新公告
           </h2>
-        <vue-custom-scrollbar :settings="scrollSettings" class="announcement-list" aria-label="最新公告列表">
-  <div v-if="loadingNews" style="text-align: center; padding: 20px; color: #999;">
-    <i class="fa-solid fa-spinner fa-spin"></i> 公告載入中...
-  </div>
+          <vue-custom-scrollbar :settings="scrollSettings" class="announcement-list" aria-label="最新公告列表">
+            <div v-if="loadingNews" style="text-align: center; padding: 20px; color: #999;">
+              <i class="fa-solid fa-spinner fa-spin"></i> 公告載入中...
+            </div>
 
-  <div v-else-if="announcements.length === 0" style="text-align: center; padding: 20px; color: #999;">
-    目前尚無公告
-  </div>
-<div v-for="(item, index) in announcements" :key="item.id" class="announcement-item">
-  <div class="item-header">
-    <div class="news-title">
-      <i class="fa-solid fa-bullhorn" style="color: #FFD43B;"></i>
-      {{ item.title }}
-    </div>
-    <div v-if="item.category" class="news-tag">
-      <span class="tag new">{{ item.category }}</span>
-    </div>
-  </div>
-  <p class="item-content">{{ item.content }}</p>
-  <span class="item-date">{{ item.date }}</span>
-</div>
-</vue-custom-scrollbar>
+            <div v-else-if="announcements.length === 0" style="text-align: center; padding: 20px; color: #999;">
+              目前尚無公告
+            </div>
+            <div v-for="(item, index) in announcements" :key="item.id" class="announcement-item">
+              <div class="item-header">
+                <div class="news-title">
+                  <i class="fa-solid fa-bullhorn" style="color: #FFD43B;"></i>
+                  {{ item.title }}
+                </div>
+                <div v-if="item.category" class="news-tag">
+                  <span class="tag new">{{ item.category }}</span>
+                </div>
+              </div>
+              <p class="item-content">{{ item.content }}</p>
+              <span class="item-date">{{ item.date }}</span>
+            </div>
+          </vue-custom-scrollbar>
         </div>
       </el-col>
       <el-col :span="12">
@@ -51,7 +51,7 @@
           <p v-if="currentRole === 'teacher'" class="role-notice-text">
             * 帳號密碼請跟主管機關索取
           </p>
-          <p v-else class="role-notice-text">* 學生登入將開啟彈出視窗</p>
+          <p v-else class="role-notice-text">* 學生登入將自動前往另一頁面</p>
 
           <div class="login-form-container">
             <div v-if="currentRole === 'student'" class="student-input-zone">
@@ -66,7 +66,7 @@
                 <!-- <div class="password-overlay">
       <i class="fa-solid fa-circle-info" aria-hidden="true"></i> 密碼請於彈出視窗中輸入
     </div> -->
-                <el-input id="student-pass-disabled" type="password" disabled placeholder=" 密碼請於彈出視窗中輸入 "
+                <el-input id="student-pass-disabled" type="password" disabled placeholder=" 密碼請於另一頁面中輸入 "
                   class="custom-input">
                 </el-input>
               </div>
@@ -222,7 +222,7 @@ export default {
   },
   data() {
     return {
-      loadingNews: false, 
+      loadingNews: false,
       announcements: [],
       isOidcLoading: false,
       currentRole: 'student',
@@ -306,7 +306,7 @@ export default {
 
     };
   },
-mounted() {
+  mounted() {
     // console.log('=== [mounted] 頁面載入 ===');
     // console.log('🔍 [偵錯] 1. 目前完整網址:', window.location.href);
     // console.log('🔍 [偵錯] 2. Vue Router query:', this.$route.query);
@@ -363,7 +363,7 @@ mounted() {
     }
   },
   methods: {
-// 觸發 OIDC 彈出/跳轉登入
+    // 觸發 OIDC 彈出/跳轉登入
     handleOidcLogin() {
       if (!this.studentForm.account) {
         alert('請先輸入學生帳號');
@@ -372,8 +372,8 @@ mounted() {
       const state = Math.random().toString(36).substring(2, 15);
       const nonce = Math.random().toString(36).substring(2, 15);
       const clientId = 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42';
-      
-    
+
+
       const redirectUri = encodeURIComponent(`${window.location.origin}/api/oidccallback/`);
       const scope = encodeURIComponent('openid email kh_profile kh_classes kh_titles');
       const loginHint = encodeURIComponent(this.studentForm.account);
@@ -381,58 +381,58 @@ mounted() {
       const authUrl = `https://oidc.kh.edu.tw/oauth2/auth?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}&nonce=${nonce}&login_hint=${loginHint}`;
 
       // 直接跳轉
-      window.location.href = authUrl; 
+      window.location.href = authUrl;
     },
 
     // 前端拿 Code 去跟教育局換 Token
-   async processOidcFromUrl(code) {
-  try {
-    this.isOidcLoading = true;
-    console.log(' [Step 2] 準備兌換 OIDC Token (插件已開啟)');
+    async processOidcFromUrl(code) {
+      try {
+        this.isOidcLoading = true;
+        console.log(' [Step 2] 準備兌換 OIDC Token (插件已開啟)');
 
-    const params = new URLSearchParams();
-    params.append('grant_type', 'authorization_code');
-    params.append('code', code);
-    params.append('redirect_uri', `https://englishability.rootadviser.com/api/oidccallback/`); 
-    params.append('client_id', 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42');
-    params.append('client_secret', '38efe712ebe3b6af5d7365441cf2e4d5b6d3c9dc07aa977f74d8f1c8e6c134d1');
+        const params = new URLSearchParams();
+        params.append('grant_type', 'authorization_code');
+        params.append('code', code);
+        params.append('redirect_uri', `https://englishability.rootadviser.com/api/oidccallback/`);
+        params.append('client_id', 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42');
+        params.append('client_secret', '38efe712ebe3b6af5d7365441cf2e4d5b6d3c9dc07aa977f74d8f1c8e6c134d1');
 
-    // 打教育局 Token Endpoint
-    const tokenRes = await axios.post('https://oidc.kh.edu.tw/oauth2/token', params, {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-    });
+        // 打教育局 Token Endpoint
+        const tokenRes = await axios.post('https://oidc.kh.edu.tw/oauth2/token', params, {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
 
-    // console.log('✅ [Step 2 成功] 拿到 Token:', tokenRes.data);
+        // console.log('✅ [Step 2 成功] 拿到 Token:', tokenRes.data);
 
-    // [Step 3] 解析 ID Token 
-    const idToken = tokenRes.data.id_token;
-    const decodedUser = jwtDecode(idToken);
-    // console.log('✅ [Step 3 成功] 解析使用者資料:', decodedUser);
+        // [Step 3] 解析 ID Token 
+        const idToken = tokenRes.data.id_token;
+        const decodedUser = jwtDecode(idToken);
+        // console.log('✅ [Step 3 成功] 解析使用者資料:', decodedUser);
 
-    // [Step 4] 把解析完的資料，丟給你的後端 API 做登入
-    // console.log('🚀 [Step 4] 準備後端登入...');
-    const postData = {
-      sub: decodedUser.sub,
-      kh_profile: decodedUser.kh_profile || {},
-      kh_titles: decodedUser.kh_titles || {},
-      kh_classes: decodedUser.kh_classes || {}
-    };
+        // [Step 4] 把解析完的資料，丟給你的後端 API 做登入
+        // console.log('🚀 [Step 4] 準備後端登入...');
+        const postData = {
+          sub: decodedUser.sub,
+          kh_profile: decodedUser.kh_profile || {},
+          kh_titles: decodedUser.kh_titles || {},
+          kh_classes: decodedUser.kh_classes || {}
+        };
 
-    const loginResponse = await api.post('students/oidc/oidclogin/', postData);
-    
-    // console.log('✅ [Step 4 成功] 系統已認證:', loginResponse.data);
+        const loginResponse = await api.post('students/oidc/oidclogin/', postData);
 
-    // 成功後清理網址並跳轉
-    window.history.replaceState({}, document.title, '/login');
-    const targetPath = (loginResponse.data.role === 'student') ? '/home' : '/dashboard';
-    this.performLogin(loginResponse.data, targetPath);
+        // console.log('✅ [Step 4 成功] 系統已認證:', loginResponse.data);
 
-  } catch (error) {
-    console.error(' 流程中斷，錯誤原因:', error.response?.data || error.message);
-    this.isOidcLoading = false;
-    this.$message.error('驗證失敗，請檢查 Console');
-  }
-},
+        // 成功後清理網址並跳轉
+        window.history.replaceState({}, document.title, '/login');
+        const targetPath = (loginResponse.data.role === 'student') ? '/home' : '/dashboard';
+        this.performLogin(loginResponse.data, targetPath);
+
+      } catch (error) {
+        console.error(' 流程中斷，錯誤原因:', error.response?.data || error.message);
+        this.isOidcLoading = false;
+        this.$message.error('驗證失敗，請檢查 Console');
+      }
+    },
 
     handleOidcMessage(event) {
       if (event.origin !== window.location.origin) return;
@@ -497,16 +497,16 @@ mounted() {
       }
     },
     async fetchNews() {
-  this.loadingNews = true;
-  try {
-    const response = await api.get('students/news/list');
-    this.announcements = response.data; 
-  } catch (error) {
-    console.error('獲取公告失敗:', error);
-  } finally {
-    this.loadingNews = false;
-  }
-},
+      this.loadingNews = true;
+      try {
+        const response = await api.get('students/news/list');
+        this.announcements = response.data;
+      } catch (error) {
+        console.error('獲取公告失敗:', error);
+      } finally {
+        this.loadingNews = false;
+      }
+    },
     // 沿用舊密碼：回傳 skip_change: true
     async handleKeepOldPassword() {
       this.performLogin(this.tempLoginData, null); // 需先存 Token
@@ -730,6 +730,16 @@ $bg-path: "~@/assets/image/login-bg.jpg";
   width: 100vw;
   padding: 4% 18%;
 
+
+  #student-pass-disabled,
+  #student-account,
+  #teacher-account,
+  #teacher-password {
+    &::placeholder {
+      color: #000;
+    }
+  }
+
   .el-col {
     display: flex;
     flex-direction: column;
@@ -772,14 +782,16 @@ $bg-path: "~@/assets/image/login-bg.jpg";
     flex: 1;
     margin-top: 8px;
     overflow-y: auto;
-   .news-title,.item-content {
-  flex: 1; 
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: auto; 
-  min-width: 0; 
-}
+
+    .news-title,
+    .item-content {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: auto;
+      min-width: 0;
+    }
   }
 
   .role-notice-text {
@@ -844,8 +856,9 @@ $bg-path: "~@/assets/image/login-bg.jpg";
         padding: 6px 10px;
         border-radius: 4px;
         color: $main-black-text;
-    text-wrap: nowrap;
-    flex-shrink: 0;
+        text-wrap: nowrap;
+        flex-shrink: 0;
+
         &.new {
           background-color: $primary-color;
         }
@@ -960,9 +973,7 @@ $bg-path: "~@/assets/image/login-bg.jpg";
 
       .custom-input {
         width: 100%;
-
         outline: none;
-
         color: $main-black-text;
         transition: box-shadow 0.2s;
 
@@ -972,12 +983,11 @@ $bg-path: "~@/assets/image/login-bg.jpg";
           border-radius: 12px;
           background-color: #F0FAFF;
         }
-
-        &::placeholder {
-          color: #AAB8C2;
-        }
+      }
 
 
+      .el-input__inner {
+        color: $main-black-text;
       }
     }
 
