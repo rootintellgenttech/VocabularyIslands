@@ -207,6 +207,7 @@
 <script>
 import api from '../../config/api';
 import { mapActions, mapGetters } from 'vuex';
+import { jwtDecode } from 'jwt-decode';
 
 export default {
   name: 'Login',
@@ -328,27 +329,50 @@ async mounted() {
   }
 
   if (code) {
-    console.log('🚀 [Step 2] 偵測到 Code，發送至後端進行兌換...');
+    console.log(' [Step 2] 偵測到 Code，發送至後端進行兌換...');
     this.isOidcLoading = true;
     
-    try {
-      const res = await api.post('/students/oidc/token/', {
+  try {
+      console.log(' [Step 2] 向後端請求，換取【教育局門票】...');
+      //  換取教育局 Token
+      const resOidc = await api.post('/students/oidc/token/', {
         code: code,
         redirect_uri: `${window.location.origin}/api/oidccallback/`
       }, { timeout: 60000 });
 
-      console.log(' [Step 3] 後端兌換成功！');
+      console.log(' [Step 3] 拿到教育局門票，準備解析...');
 
-      const targetPath = (res.data.role === 'student') ? '/home' : '/dashboard';
-      this.performLogin(res.data, targetPath);
+      //  解析教育局的 id_token，取出裡面的學生身分資料
+      const idToken = resOidc.data.id_token;
+      if (!idToken) throw new Error("沒有收到 id_token");
+      const decodedUser = jwtDecode(idToken);
 
-      // 成功後清理網址參數
+      //  整理資料，準備給自家系統註冊/登入
+      const postData = {
+        sub: decodedUser.sub,
+        kh_profile: decodedUser.kh_profile || {},
+        kh_titles: decodedUser.kh_titles || {},
+        kh_classes: decodedUser.kh_classes || {}
+      };
+
+      console.log(' [Step 4] 拿著學生資料，向自家系統換取【真正的系統 Token】...', postData);
+
+      // 使用原有的 API，換取系統專屬 Token
+      const loginResponse = await api.post('students/oidc/oidclogin/', postData, { timeout: 60000 });
+
+      console.log(' [Step 5] 拿到自家系統 Token！系統登入成功！');
+
+      // 清理網址
       window.history.replaceState({}, document.title, '/login');
 
+      //  執行登入 (這裡是傳入 loginResponse.data，不是教育局的資料)
+      const targetPath = (loginResponse.data.role === 'student') ? '/home' : '/dashboard';
+      this.performLogin(loginResponse.data, targetPath);
+
     } catch (error) {
-      console.error('❌ OIDC 後端兌換失敗:', error.response?.data || error.message);
+      console.error(' OIDC 登入流程徹底失敗:', error.response?.data || error.message);
       this.isOidcLoading = false;
-      this.$message.error('教育局驗證失敗，請重新登入');
+      this.$message.error('系統登入失敗，請重新操作');
       window.history.replaceState({}, document.title, '/login');
     }
     return; // OIDC 流程結束
