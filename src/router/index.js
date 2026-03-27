@@ -15,6 +15,7 @@ const routes = [
     name: 'OidcCallbackSlash',
     component: Login
   },
+  
   {
     path: '/',
     redirect: '/login'
