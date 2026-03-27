@@ -365,7 +365,7 @@ export default {
   this.isOidcLoading = true;
   
   //  定義清晰的跳轉網址
-  const redirectUri = `${window.location.origin}/login`;
+  const redirectUri = `${window.location.origin}/api/oidccallback/`;
   const clientId = 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42';
   const state = Math.random().toString(36).substring(7);
   
