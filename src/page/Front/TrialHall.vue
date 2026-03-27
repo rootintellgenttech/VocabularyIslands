@@ -46,7 +46,7 @@
                                         <div class="exam-details">
                                             <p class="detail-item">
                                                 <i class="far fa-clock"></i>
-                                                檢測期程: 即日起 ~ 2025-12-31
+                                                檢測期程: 2026-05-01 ~ 2026-06-02
                                             </p>
 
                                             <p class="detail-item">
@@ -110,24 +110,17 @@
         </div>
         <el-dialog custom-class="challenge-confirm-modal" :visible.sync="examDialogVisible" width="550px" center
             :close-on-click-modal="false" :show-close="false">
-
             <div class="dialog-content">
-                <h3 class="title exam-warning-title">
-                    <i class="fas fa-exclamation-circle"></i> 注意
-                </h3>
-
+                <h3 class="title exam-warning-title"><i class="fas fa-exclamation-circle"></i> 注意</h3>
                 <p class="description">請確認您已準備好再開始作答。</p>
-
                 <p class="description exam-checklist-title">為避免影響您的測驗結果，請務必確認：</p>
                 <ul class="exam-checklist">
                     <li>網路連線穩定</li>
                     <li>裝置有足夠電量</li>
-                    <li>已預留足夠作答時間</li>
+                    <li>已預留足夠作答時間 ({{ totalExamTime }} 分鐘)</li>
                 </ul>
-
                 <p class="description final-question">是否確定要開始考試？</p>
             </div>
-
             <span slot="footer" class="dialog-footer">
                 <el-button class="start-exam-btn" @click="confirmStartExam">開始考試</el-button>
             </span>
@@ -140,20 +133,20 @@
 import api from '@/config/api';
 
 const EXAM_MASTER_SETTINGS = {
-    // 總共35分鐘
+    // 國小：總共 15+15+5 = 35 分鐘
     'ps-2': {
         'EngToChi': { time: 15 },
         'ChiToEng': { time: 15 },
         'Listening': { time: 5 }
     },
-    // 總共40分鐘
+    // 7年級：總共 10+10+5+15 = 40 分鐘
     'ms7-2': {
         'EngToChi': { time: 10 },
         'ChiToEng': { time: 10 },
         'Listening': { time: 5 },
         'ContextFill': { time: 15 }
     },
-    // 總共40分鐘
+    // 8年級：總共 10+10+5+15 = 40 分鐘
     'ms8-2': {
         'EngToChi': { time: 10 },
         'ChiToEng': { time: 10 },
@@ -180,9 +173,30 @@ export default {
             isGenerating: false,
             genProgress: '',
             examTargets: [
-                { stage: 2, id: 'ps-2', name: '國小英語單字檢測-2', level: 'primary', words: 300, parts: ['EngToChi', 'ChiToEng', 'Listening'] },
-                { stage: 2, id: 'ms7-2', name: '7年級英語單字檢測-2', level: 'secondary-7', words: 800, parts: ['EngToChi', 'ChiToEng', 'Listening', 'ContextFill'] },
-                { stage: 2, id: 'ms8-2', name: '8年級英語單字檢測-2', level: 'secondary-8', words: 1200, parts: ['EngToChi', 'ChiToEng', 'Listening', 'ContextFill'] }
+                {
+                    stage: 2,
+                    id: 'ps-2',
+                    name: '國小英語單字檢測-2',
+                    level: 'primary',
+                    words: 300,
+                    parts: ['EngToChi', 'ChiToEng', 'Listening']
+                },
+                {
+                    stage: 2,
+                    id: 'ms7-2',
+                    name: '7年級英語單字檢測-2',
+                    level: 'secondary-7',
+                    words: 800,
+                    parts: ['EngToChi', 'ChiToEng', 'Listening', 'ContextFill']
+                },
+                {
+                    stage: 2,
+                    id: 'ms8-2',
+                    name: '8年級英語單字檢測-2',
+                    level: 'secondary-8',
+                    words: 1200,
+                    parts: ['EngToChi', 'ChiToEng', 'Listening', 'ContextFill']
+                }
             ],
             historyList: [],
             isLoadingHistory: false,
@@ -282,14 +296,22 @@ export default {
 
         // 確保點擊「瞭解」後執行正式流程
         async confirmStartExam() {
+            const now = new Date();
+            const startTime = new Date('2026-05-01T00:00:00');
+            const endTime = new Date('2026-06-02T23:59:59');
+
+            if (now < startTime || now > endTime) {
+                this.$message.warning('目前非考試開放時段（開放時間：2026-05-01 至 2026-06-02）');
+                this.examDialogVisible = false;
+                return;
+            }
+
             this.examDialogVisible = false;
             if (!this.selectedExamTarget) return;
 
-            this.isGenerating = true;
             try {
                 const response = await api.get('/students/exam-papers/', { params: { code: this.selectedExamTarget.id } });
                 let examData = response.data;
-
                 const storageKey = `exam_progress_${this.selectedExamTarget.id}`;
                 const savedData = localStorage.getItem(storageKey);
 
@@ -297,30 +319,14 @@ export default {
                 let accumulatedAnswers = [];
 
                 if (savedData) {
-                    // 恢復進度：使用存檔資料
                     const progress = JSON.parse(savedData);
                     targetPartId = progress.currentExamId;
                     accumulatedAnswers = progress.userAnswers || [];
-                    if (progress.fullExamData) {
-                        examData = progress.fullExamData;
-                    }
-                    console.log(`[系統] 偵測到斷點，恢復進度`);
+                    examData = progress.fullExamData || examData;
                 } else {
-                    // 全新考試：只負責洗牌，不負責存檔
-                    if (examData && examData.parts) {
-                        Object.keys(examData.parts).forEach(pKey => {
-                            examData.parts[pKey] = examData.parts[pKey].sort(() => Math.random() - 0.5);
-                            examData.parts[pKey].forEach(q => {
-                                if (q.options) q.options = q.options.sort(() => Math.random() - 0.5);
-                            });
-                        });
-                    }
-                    // 定義單元的標準優先級
                     const partPriority = ['EngToChi', 'ChiToEng', 'Listening', 'ContextFill'];
-                    // 從優先級中找到這份試卷包含的第一個單元
-                    const firstAvailableKey = partPriority.find(key => examData.parts[key] && examData.parts[key].length > 0) || Object.keys(examData.parts)[0];
+                    const firstAvailableKey = partPriority.find(key => examData.parts[key] && examData.parts[key].length > 0);
                     targetPartId = this.getPartIdByApiMode(firstAvailableKey);
-                    console.log('起始單元:', targetPartId)
                 }
 
                 this.$router.push({
@@ -333,12 +339,8 @@ export default {
                         accumulatedAnswers: accumulatedAnswers
                     }
                 });
-
             } catch (err) {
-                console.error('[系統] 啟動考試失敗:', err);
                 this.$message.error('無法載入考試資料');
-            } finally {
-                this.isGenerating = false;
             }
         },
         // God Mode 專用選擇函式
@@ -462,18 +464,17 @@ export default {
             downloadAnchorNode.click();
             downloadAnchorNode.remove();
         },
-        formatExamName(apiName) {
-            if (!apiName) return '未知名稱';
-
-            // 名稱映射表
+        formatExamName(nameOrId) {
+            // 建立一個對照表，同時支援 ID 和 API 可能回傳的名稱
             const nameMap = {
-                '國小英文測驗 2': '國小英語單字檢測-2',
-                '7年級英語單字檢測-2': '7年級英語單字檢測-2',
-                '8年級英語單字檢測-2': '8年級英語單字檢測-2'
+                'ps-2': '國小英語單字檢測-2',
+                'ms7-2': '7年級英語單字檢測-2',
+                'ms8-2': '8年級英語單字檢測-2',
+                // 為了相容 API 舊數據，也可以加上可能的舊名稱
+                '國小英文測驗 2': '國小英語單字檢測-2'
             };
 
-            // 如果 API 回傳的名稱在映射表中，則回傳對應的正式名稱，否則回傳原始名稱
-            return nameMap[apiName.trim()] || apiName;
+            return nameMap[nameOrId] || nameMap[nameOrId.trim()] || nameOrId;
         },
         goToHistoryDetail(record) {
             console.log("原始 API 紀錄:", record);

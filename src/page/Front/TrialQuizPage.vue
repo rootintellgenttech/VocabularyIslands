@@ -3,11 +3,11 @@
         <div v-if="currentPhase === 'quiz'" :class="['main-card']">
 
             <!-- 一鍵完成考試 -->
-            <div v-if="isDevelopment" class="test-god-toolbar"
+            <!-- <div v-if="isDevelopment" class="test-god-toolbar"
                 style="padding: 10px; background: #fff3cd; border-bottom: 1px solid #ffeeba; display: flex; gap: 10px; justify-content: center;">
                 <el-button type="warning" size="mini" @click="godModeSkipCurrentPart">⏩ 跳過本階段</el-button>
                 <el-button type="danger" size="mini" @click="godModeCompleteWholeExam">🔥 一鍵全卷交卷</el-button>
-            </div>
+            </div> -->
 
             <template v-if="currentPhase === 'quiz' && currentQuestion">
                 <div class="header-wrap">
