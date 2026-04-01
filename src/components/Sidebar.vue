@@ -1030,6 +1030,7 @@ export default {
         background-color: #F0FAFF;
         box-shadow: 2px 0 6px rgba(0, 0, 0, 0.3);
         position: fixed;
+        z-index: 9999;
 
         .bottom-menu {
             padding-bottom: 0;
