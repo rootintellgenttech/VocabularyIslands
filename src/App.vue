@@ -320,7 +320,8 @@ body {
 .confirm-change-pw-modal,
 .settings-modal,
 .mails-modal,
-.exit-confirm-modal {
+.exit-confirm-modal,
+.password-modal {
   border: 6px solid var(--btn-g, #4ABCB1);
   border-radius: 16px !important;
   padding-bottom: 24px;

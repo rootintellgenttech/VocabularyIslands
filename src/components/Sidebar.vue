@@ -68,7 +68,8 @@
                         <i :class="getAchievementIcon(log.name)" style="color: #F56C42; font-size: 32px;"></i>
                     </div>
 
-                    <div v-if="achievementLogs.length === 0" style="color: #999; font-size: 14px; margin-top: 5px;text-wrap: nowrap;">
+                    <div v-if="achievementLogs.length === 0"
+                        style="color: #999; font-size: 14px; margin-top: 5px;text-wrap: nowrap;">
                         尚未獲得獎章
                     </div>
                 </div>
@@ -77,6 +78,12 @@
 
 
         <div class="bottom-menu">
+
+            <div v-if="!isStudent" class="menu-item" @click="passwordDialogVisible = true">
+                <i class="fas fa-key"></i>
+                <span v-if="isMenuExpanded">修改密碼</span>
+            </div>
+
             <div class="menu-item" @click="contactDialogVisible = true">
                 <i class="fa-solid fa-envelope"></i>
                 <span v-if="isMenuExpanded">聯絡我們</span>
@@ -152,6 +159,26 @@
                 <span v-if="isMenuExpanded">登出</span>
             </div>
         </div>
+
+        <el-dialog :visible.sync="passwordDialogVisible" width="400px" center custom-class="password-modal"
+            append-to-body>
+            <h3 class="title">修改密碼</h3>
+            <div class="setting-item-box">
+                <div class="input-group">
+                    <label>新密碼</label>
+                    <el-input v-model="newPassword" type="password" show-password placeholder="請輸入新密碼"></el-input>
+                </div>
+                <div class="input-group" style="margin-top: 15px;">
+                    <label>確認新密碼</label>
+                    <el-input v-model="confirmPassword" type="password" show-password placeholder="請再次輸入新密碼"></el-input>
+                </div>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="passwordDialogVisible = false" class="btn-cancel">取消</el-button>
+                <el-button type="primary" @click="submitPasswordChange" :loading="passwordLoading"
+                    class="btn-submit-pwd">確認修改</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 
@@ -230,6 +257,10 @@ export default {
             achievementLogs: [],
             settingsDialogVisible: false,
             contactDialogVisible: false,
+            passwordDialogVisible: false,
+            passwordLoading: false,
+            newPassword: '',
+            confirmPassword: '',
         };
     },
 
@@ -290,11 +321,50 @@ export default {
             this.playAppropriateMusic(this.$route.path);
         }
     },
-
     beforeDestroy() {
         document.removeEventListener('click', this.handleOutsideClick);
     },
     methods: {
+        async submitPasswordChange() {
+            if (!this.newPassword) {
+                this.$message.warning('請輸入新密碼');
+                return;
+            }
+            if (this.newPassword !== this.confirmPassword) {
+                this.$message.error('兩次輸入的密碼不一致');
+                return;
+            }
+            if (this.newPassword.length < 6) {
+                this.$message.warning('密碼長度建議至少 6 位');
+                return;
+            }
+
+            this.passwordLoading = true;
+            try {
+                await api.post('/students/first-change-password/', {
+                    skip_change: false, // 固定為 false
+                    new_password: this.newPassword
+                });
+
+                this.$message({
+                    message: '密碼修改成功，請使用新密碼重新登入',
+                    type: 'success',
+                    duration: 2000
+                });
+
+                // 修改成功後自動登出
+                setTimeout(() => {
+                    this.handleLogout();
+                }, 1500);
+
+            } catch (err) {
+                console.error('修改密碼失敗:', err);
+                const errorMsg = err.response?.data?.message || '修改失敗，請稍後再試';
+                this.$message.error(errorMsg);
+            } finally {
+                this.passwordLoading = false;
+            }
+        },
         isItemActive(item) {
             // 如果當前路徑完全等於選單路徑
             if (this.currentPath === item.path) return true;
@@ -514,6 +584,10 @@ export default {
             font-weight: 600;
         }
     }
+}
+
+.password-modal .el-input {
+    margin-top: 10px;
 }
 
 .sidebar {
