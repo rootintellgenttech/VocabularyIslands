@@ -336,6 +336,8 @@ export default {
                 const res = await api.get('/students/list/');
                 const PERSONAL_MAX_STARS = 205;
                 let finalData = [];
+                const results = res.data.results || [];
+
 
                 if (res.data.level === 'league' && this.userRole === 'global_leader') {
                     finalData = res.data.results.map(league => {
@@ -367,34 +369,46 @@ export default {
                             schools: schools
                         };
                     });
-                } else {
-                    finalData = (res.data.results || []).map(item => {
-                        const isSchool = res.data.level === 'school';
-                        return {
-                            grade: isSchool ? null : `${item.grade}年`,
-                            classroom: isSchool ? null : `${item.classroom}班`,
-                            schoolName: isSchool ? item.school_name : null,
-                            studentCount: item.student_total || 0,
-                            loginRate: item.student_total > 0
-                                ? Math.round((item.today_participation / item.student_total) * 100) + '%'
-                                : '0%',
-                            completionRate: (item.student_total * PERSONAL_MAX_STARS) > 0
-                                ? ((item.total_stars / (item.student_total * PERSONAL_MAX_STARS)) * 100).toFixed(1) + '%'
-                                : '0.0%'
-                        };
-                    });
+                } else if (this.userRole === 'union_leader') {
+                    // 召集人
+                    const source = res.data.level === 'league' ? results[0].schools : results;
+
+                    finalData = results.map(s => ({
+                        schoolName: s.school_name,
+                        studentCount: s.student_total || 0,
+                        loginRate: s.student_total > 0
+                            ? Math.round((s.today_participation / s.student_total) * 100) + '%'
+                            : '0%',
+                        completionRate: (s.student_total * PERSONAL_MAX_STARS) > 0
+                            ? ((s.total_stars / (s.student_total * PERSONAL_MAX_STARS)) * 100).toFixed(1) + '%'
+                            : '0.0%'
+                    }));
+                }
+                else {
+                    // 學校管理員/老師
+                    finalData = results.map(item => ({
+                        grade: item.grade ? `${item.grade}年` : null,
+                        classroom: item.classroom ? `${item.classroom}班` : null,
+                        studentCount: item.student_total || 0,
+                        loginRate: item.student_total > 0
+                            ? Math.round((item.today_participation / item.student_total) * 100) + '%'
+                            : '0%',
+                        completionRate: (item.student_total * PERSONAL_MAX_STARS) > 0
+                            ? ((item.total_stars / (item.student_total * PERSONAL_MAX_STARS)) * 100).toFixed(1) + '%'
+                            : '0.0%'
+                    }));
                 }
                 this.learningData = finalData;
             } catch (err) {
                 console.error('學習成效獲取失敗', err);
             }
         },
-
         //  獲取考試概況表格
         async fetchExamData() {
             try {
                 const res = await api.get('/students/list/');
                 let finalData = [];
+                const results = res.data.results || [];
 
                 if (res.data.level === 'league' && this.userRole === 'global_leader') {
                     // 總召專用：彙總聯盟數據
@@ -416,12 +430,19 @@ export default {
                             schools: schoolsData
                         };
                     });
-                } else {
-                    // 行政或老師
-                    finalData = (res.data.results || []).map(item => ({
+                } else if (this.userRole === 'union_leader') {
+                    // 縂召集人
+                    finalData = results.map(s => ({
+                        schoolName: s.school_name,
+                        studentCount: s.student_total || 0,
+                        examCompleteCount: s.today_competition_participants || 0
+                    }));
+                }
+                else {
+                    // 老師模式
+                    finalData = results.map(item => ({
                         grade: item.grade ? `${item.grade}年` : null,
                         classroom: item.classroom ? `${item.classroom}班` : null,
-                        schoolName: item.school_name || null,
                         studentCount: item.student_total || 0,
                         examCompleteCount: item.today_competition_participants || 0
                     }));
