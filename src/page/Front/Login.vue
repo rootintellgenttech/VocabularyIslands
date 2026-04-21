@@ -323,40 +323,40 @@ export default {
 
     };
   },
-  async mounted() {
-    // --- Freego 專用：強制寫入 Token 門票 ---
-    if (window.location.hostname === 'localhost') {
-      const freegoAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc2NzUxMzc5LCJpYXQiOjE3NzY3NDc1MDcsImp0aSI6ImJhNmU5NjA0NGRlNjQxYTk5OTkwYjc4ZmI3MGI0YmY3IiwidXNlcl9pZCI6MX0.QXphexuwAe-ffva4SjUW_0ynG8E7_k0fQz7hWj2YeK8";
-      const freegoRefreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc3NzM1NDM3OSwiaWF0IjoxNzc2NzQ5NTc5LCJqdGkiOiJhMTBiZTIwMzlmYmQ0OWMzOTllYThmNTJhODI3YThkZiIsInVzZXJfaWQiOjF9.t56wOOT3OYS-JTe3K2meRAmRPKEyaBNLG8IQaRLNzrY";
+ async mounted() {
+  const urlParams = new URLSearchParams(window.location.search);
+  // 取得暗號
+  const isDebugMode = urlParams.get('debug_mode') === 'min_special';
 
-      console.log('[Freego 應援] 正在強制注入測試 Token...');
+  // --- 1. Freego/Debug 專用 ---
+  if (isDebugMode) {
+    const freegoAccessToken = "你的Token..."; 
+    const freegoRefreshToken = "你的RefreshToken...";
 
-      localStorage.setItem('accessToken', freegoAccessToken);
-      localStorage.setItem('refreshToken', freegoRefreshToken);
-      localStorage.setItem('userRole', 'student');
+    console.log('[Freego 應援] 偵測到暗號，正在強制注入 Token...');
 
-      // 同步設定 API header，確保接下來的請求都帶 Token
-      api.defaults.headers.common['Authorization'] = `Bearer ${freegoAccessToken}`;
+    localStorage.setItem('accessToken', freegoAccessToken);
+    localStorage.setItem('refreshToken', freegoRefreshToken);
+    localStorage.setItem('userRole', 'student');
 
-      // 如果目前在 login 頁面，強制跳轉到 home，讓 Freego 開始測內部頁面
-      if (this.$route.path === '/login' || this.$route.path === '/') {
-        console.log('[Freego 應援] Token 注入成功，正在跳轉至 Home...');
-        this.$router.push('/home');
-        return;
-      }
+    api.defaults.headers.common['Authorization'] = `Bearer ${freegoAccessToken}`;
+
+    if (this.$route.path === '/login' || this.$route.path === '/') {
+      this.$router.push('/home');
+      return; // 注入成功後直接跳轉並結束，不執行後面的清空邏輯
     }
-    const urlParams = new URLSearchParams(window.location.search);
-    // 同時檢查 Vue Router 與原生 URL 參數
-    const code = this.$route.query.code || urlParams.get('code');
-    const errorParam = this.$route.query.error || urlParams.get('error');
+  }
 
-    // 如果這不是回調 (Callback) 狀態，代表是用戶「第一次」進來登入頁
-    if (!code && !errorParam) {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('userRole');
-      console.log('[系統] 偵測為全新登入，已清空舊有 Token 緩存');
-    }
+  // --- 2. 正常 OIDC 判斷 ---
+  const code = this.$route.query.code || urlParams.get('code');
+  const errorParam = this.$route.query.error || urlParams.get('error');
+
+  if (!code && !errorParam && !isDebugMode) {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('userRole');
+    console.log('[系統] 偵測為全新登入，已清空舊有 Token 緩存');
+  }
 
     //  如果偵測到教育局回傳錯誤 (例如使用者按取消)
     if (errorParam) {
