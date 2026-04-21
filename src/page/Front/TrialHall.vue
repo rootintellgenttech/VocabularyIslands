@@ -4,8 +4,8 @@
             <i class="fas fa-angle-left"></i> 返回
         </div>
         <!-- <div v-if="isDevelopment" class="god-mode-selection">
-            <p style="color: #666; font-size: 14px; margin-bottom: 10px;">🛠️ God Mode: 直接選擇試卷測試串接</p>
-            <div class="god-btns" style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <p style="color: #666; font-size: .875rem; margin-bottom: .625rem;">🛠️ God Mode: 直接選擇試卷測試串接</p>
+            <div class="god-btns" style="display: flex; gap: .625rem; flex-wrap: wrap;">
                 <el-button v-for="target in examTargets" :key="target.id" type="info" plain size="small"
                     @click="selectExamFromGodMode(target)">
                     {{ target.name }} ({{ target.id }})
@@ -99,7 +99,7 @@
             </div>
         </div>
 
-        <el-dialog custom-class="challenge-confirm-modal" :visible.sync="examDialogVisible" width="600px" center
+        <el-dialog custom-class="challenge-confirm-modal" :visible.sync="examDialogVisible" width="37.5rem" center
             :close-on-click-modal="false" append-to-body @close="dialogStep = 1">
 
             <div v-if="dialogStep === 1" class="dialog-content-custom">
@@ -591,7 +591,7 @@ export default {
 
 <style lang="scss" scoped>
 .trial-hall-page {
-    padding-left: 100px;
+    padding-left: 6.25rem;
 
 }
 
@@ -601,34 +601,34 @@ export default {
         display: flex;
         align-items: baseline;
         justify-content: center;
-        gap: 0 10px;
+        gap: 0 .625rem;
 
         .main-title,
         i {
-            margin: 0 0 20px;
+            margin: 0 0 1.25rem;
             color: $main-black-text;
         }
 
         i {
-            font-size: 20px;
+            font-size: 1.25rem;
         }
     }
 
 
     .rule-box,
     .checklist-section {
-        padding: 0 16px;
+        padding: 0 1rem;
 
         .rule-text,
         .checklist-title,
         .exam-checklist-v2 {
-            font-size: 16px;
-            margin: 8px 0 0;
+            font-size: 1rem;
+            margin: .5rem 0 0;
         }
 
         .rule-warn {
-            font-size: 16px;
-            margin: 0 0 12px;
+            font-size: 1rem;
+            margin: 0 0 .75rem;
             color: $main-black-text;
             font-weight: 600;
         }
@@ -636,7 +636,7 @@ export default {
 
     .dialog-content-warn-step {
         text-align: center;
-        padding: 20px 0;
+        padding: 1.25rem 0;
 
         .warn-img-wrapper {
             .step2-warn-img {
@@ -648,15 +648,15 @@ export default {
         .warn-highlight,
         .warn-text-content {
             text-align: left;
-            font-size: 16px;
+            font-size: 1rem;
             color: $main-black-text;
-            padding: 0 16px;
+            padding: 0 1rem;
         }
 
         .warn-highlight,
         .warn-desc {
-            font-size: 18px;
-            padding: 0 16px;
+            font-size: 1.125rem;
+            padding: 0 1rem;
             margin: 0;
         }
     }
@@ -665,7 +665,7 @@ export default {
     .exam-checklist {
         display: inline;
         align-self: flex-start;
-        margin: 4px 0;
+        margin: .25rem 0;
         padding-left: 8%;
         text-align: left;
     }
@@ -676,70 +676,63 @@ export default {
     }
 
     .final-question {
-        margin-top: 16px;
+        margin-top: 1rem;
     }
 }
 
 .page-title {
     @include page-main-title;
-    margin-bottom: 28px;
+    margin-bottom: 1.75rem;
 }
 
 
-.main-card {
+.trial-hall-page .main-card {
     @include main-card;
-    min-width: 900px;
-    padding: 4% 50px;
+    min-width: 56.25rem;
+    padding: 4% 3.125rem;
 
     .history-area {
-        height: 200px;
+        height: 12.5rem;
         flex-grow: 1;
         display: flex;
         flex-direction: column;
-        gap: 16px 0;
+        gap: 1rem 0;
 
         .no-data-info {
             color: $main-grey-text;
-            margin-top: 24px;
-            font-size: 18px
+            margin-top: 1.5rem;
+            font-size: 1.125rem
         }
     }
 
     .card-header-content {
         @include flex-center;
 
-        .right-section {
-            min-width: 600px;
+        .right-section { 
+            min-width: 37.5rem;
         }
 
 
         img {
-            width: 100%;
-            min-width: 250px;
+            width: auto;
         }
 
         .description-area {
             display: flex;
             align-items: center;
 
-            .hall-avatar {
-                width: 150px;
-                height: 150px;
-                object-fit: contain;
-                margin-right: 20px;
-            }
 
             .text-group {
                 .card-title {
-                    font-size: 32px;
+                    font-size: 2rem;
                     font-weight: bold;
                     color: $main-black-text;
-                    margin-bottom: 5px;
+                    margin-bottom: .3125rem;
                     text-align: left;
                 }
 
                 .card-desc {
-                    font-size: 20px;
+                    font-size: 1.25rem;
                     margin: 0;
                     color: $main-grey-text;
                 }
@@ -749,25 +742,25 @@ export default {
         .tabs-control {
             display: flex;
             background-color: #F0F3F5;
-            border-radius: 10px;
-            margin: 16px 0;
-            padding: 5px;
+            border-radius: .625rem;
+            margin: 1rem 0;
+            padding: .3125rem;
             height: fit-content;
 
             .tab-btn {
-                padding: 10px 15px;
-                font-size: 16px;
+                padding: .625rem .9375rem;
+                font-size: 1rem;
                 font-weight: 600;
                 border: none;
                 background: transparent;
-                border-radius: 8px;
+                border-radius: .5rem;
                 width: 100%;
                 cursor: pointer;
                 transition: background-color 0.2s, color 0.2s;
                 color: $main-blue-text;
 
                 i {
-                    margin-right: 8px;
+                    margin-right: .5rem;
                 }
 
                 &.is-active {
@@ -780,7 +773,7 @@ export default {
     }
 
     .card-body-content {
-        padding: 4px;
+        padding: .25rem;
         display: flex;
         flex-direction: column;
         overflow: hidden;
@@ -799,7 +792,7 @@ export default {
 
     .exam-info-box .exam-info {
         justify-content: center;
-        padding: 24px 0;
+        padding: 1.5rem 0;
     }
 
     .score-info-box .exam-info {
@@ -812,18 +805,18 @@ export default {
         justify-content: space-between;
         align-items: stretch;
         padding-right: 0;
-        padding-left: 24px;
-        border: 3px solid #C7D3D1;
-        border-radius: 16px;
-        box-shadow: 0px 4px 4px 0px #00000040;
+        padding-left: 1.5rem;
+        border: .1875rem solid #C7D3D1;
+        border-radius: 1rem;
+        box-shadow: 0rem .25rem .25rem 0rem #00000040;
 
         .exam-info {
             display: flex;
-            gap: 12px 0;
+            gap: .75rem 0;
             flex-direction: column;
 
             .exam-title {
-                font-size: 40px;
+                font-size: 2.5rem;
                 font-weight: bold;
                 margin: 0;
                 text-align: left;
@@ -834,8 +827,8 @@ export default {
                 display: flex;
                 flex-direction: column;
                 align-items: start;
-                font-size: 16px;
-                gap: 8px 0;
+                font-size: 1rem;
+                gap: .5rem 0;
                 color: $main-grey-text;
 
                 .detail-item {
@@ -843,13 +836,13 @@ export default {
                     margin: 0;
 
                     i {
-                        margin-right: 8px;
+                        margin-right: .5rem;
                         color: #5D9CEC;
                     }
                 }
 
                 .detail-summary {
-                    margin-top: 4px;
+                    margin-top: .25rem;
                 }
             }
 
@@ -860,8 +853,8 @@ export default {
             height: auto;
             text-wrap: nowrap;
             @include common-btn;
-            border-radius: 0 16px 16px 0;
-            font-size: 20px;
+            border-radius: 0 1rem 1rem 0;
+            font-size: 1.25rem;
             transition: background-color 0.2s;
 
             &.is-disabled {
@@ -884,13 +877,13 @@ export default {
     }
 
     .score-info-box {
-        margin: 4px;
-        padding: 16px 24px;
+        margin: .25rem;
+        padding: 1rem 1.5rem;
 
         .display-final-score {
             @include flex-center;
             flex-direction: column;
-            font-size: 18px;
+            font-size: 1.125rem;
             color: $main-blue-text;
 
             p {
@@ -899,7 +892,7 @@ export default {
 
 
             .final-score {
-                font-size: 32px;
+                font-size: 2rem;
                 color: $main-black-text;
                 font-weight: 600;
             }
@@ -910,7 +903,7 @@ export default {
 
 
 
-@media (min-width: 768px) and (pointer: coarse) {
+@media (max-width: 48rem) and (orientation: landscape) {
     .trial-hall-page {
         padding: 6%;
 
@@ -923,7 +916,7 @@ export default {
 
             .start-exam-btn {
                 text-wrap: nowrap;
-                margin-left: 8px;
+                margin-left: .5rem;
             }
 
             .exam-info {
@@ -932,16 +925,16 @@ export default {
                 }
 
                 .exam-title {
-                    font-size: 24px;
+                    font-size: 1.5rem;
                 }
             }
         }
 
-        .card-header-content {
-            padding: 8px;
+        .main-card .card-header-content {
+            padding: .5rem;
 
             img {
-                width: 150px;
+                width: 50%;
             }
 
             .right-section {
@@ -952,12 +945,12 @@ export default {
     }
 }
 
-@media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
+@media (orientation: landscape) and (max-height: 31.25rem) {
     .trial-hall-page {
-        padding: 24px 8%;
+        padding: 1.5rem 8%;
 
         .page-title {
-            margin-top: 16px;
+            margin-top: 1rem;
         }
     }
 
@@ -972,7 +965,7 @@ export default {
         .score-info-box .exam-info {
 
             .exam-title {
-                font-size: 24px;
+                font-size: 1.5rem;
             }
         }
 
@@ -982,19 +975,21 @@ export default {
         }
 
         .score-info-box {
-            padding: 16px;
+            padding: 1rem;
         }
 
-        .card-header-content {
-            padding: 8px;
 
-            img {
-                width: 200px;
-            }
+    }
 
-            .right-section {
-                min-width: unset;
-            }
+    .trial-hall-page .main-card .card-header-content {
+        padding: .5rem;
+
+        img {
+            width: 12.5rem;
+        }
+
+        .right-section {
+            min-width: unset;
         }
     }
 

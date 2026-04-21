@@ -103,7 +103,7 @@ export default {
     align-items: end;
     gap: 0 8%;
     margin-top: calc(8% - 5%);
-    padding: 0 32px 24px;
+    padding: 0 2rem 1.5rem;
 
     .action-section {
         display: flex;
@@ -113,7 +113,7 @@ export default {
     }
 
     .island-container {
-        width: 300px;
+        width: 18.75rem;
         text-align: center;
         position: relative;
         transition: transform 0.3s ease;
@@ -122,7 +122,7 @@ export default {
         @include flex-center;
 
         &:hover {
-            transform: translateY(-10px) scale(1.05);
+            transform: translateY(-0.625rem) scale(1.05);
         }
 
 
@@ -137,32 +137,32 @@ export default {
 }
 
 
-@media (orientation: landscape) and (max-height: 1199.98px) and (pointer: coarse) {
+@media (orientation: landscape) and (max-height: 74.9988rem) and (pointer: coarse) {
 
     .island-map-container {
         gap: 0 12%;
-        padding: 0 8% 24px;
+        padding: 0 8% 1.5rem;
     }
 
     .island-container {
-        width: 200px;
+        width: 12.5rem;
     }
 
 }
 
 
-@media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
+@media (orientation: landscape) and (max-height: 47.9988rem) and (pointer: coarse) {
 
     .islands-scroll-container {
-        margin: 0 20px 20px;
+        margin: 0 1.25rem 1.25rem;
     }
 
     .island-map-container {
         gap: 0 5%;
-        padding: 0 0 40px;
+        padding: 0 0 2.5rem;
 
         .island-card img {
-            width: 150px;
+            width: 9.375rem;
         }
 
     }

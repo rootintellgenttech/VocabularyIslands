@@ -231,18 +231,18 @@ export default {
 
 <style lang="scss" scoped>
 .achievement-island-page {
-  padding-left: 100px;
+  padding-left: 6.25rem;
 }
 
 .main-content-wrap {
-  width: 1200px;
+  width: 75rem;
   margin: 4% auto;
 
   .header-section,
   .main-content {
     background: white;
-    border-radius: 14px;
-    padding: 30px;
+    border-radius: .875rem;
+    padding: 1.875rem;
   }
 }
 
@@ -251,13 +251,13 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 30px;
+  margin-bottom: 1.875rem;
 }
 
 .header-main {
   display: flex;
   width: 100%;
-  gap: 30px;
+  gap: 1.875rem;
 
   .header-text {
     color: $main-black-text;
@@ -267,100 +267,100 @@ export default {
 .main-content {
   .group-title {
     color: $main-black-text;
-    margin-bottom: 12px;
+    margin-bottom: .75rem;
   }
 }
 
 .lighthouse-img {
-  width: 200px;
+  width: 12.5rem;
   object-fit: contain;
 }
 
 
 .pinned-cards-wrapper {
   display: flex;
-  gap: 15px;
-  padding: 5px;
-  min-height: 200px;
-  margin-top: 16px;
-  width: 700px;
+  gap: .9375rem;
+  padding: .3125rem;
+  min-height: 12.5rem;
+  margin-top: 1rem;
+  width: 43.75rem;
 }
 
 /* 讓釘選卡片維持固定寬度，不會被擠壓 */
 .is-pinned-style {
   flex-shrink: 0;
-  width: 180px;
-  height: 220px;
+  width: 11.25rem;
+  height: 13.75rem;
   background: #fdfdfd;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, 0.05);
 }
 
 
 .page-title {
-  font-size: 32px;
+  font-size: 2rem;
   color: $main-black-text;
-  margin: 0 0 10px 0;
+  margin: 0 0 .625rem 0;
 }
 
 .page-desc {
   margin: 0;
-  font-size: 20px;
+  font-size: 1.25rem;
 }
 
 // .page-desc{
-//     border-bottom: 1px solid rgb(134, 131, 131);
-//     padding-bottom: 12px;
-//     width: 400px;
+//     border-bottom: .0625rem solid rgb(134, 131, 131);
+//     padding-bottom: .75rem;
+//     width: 25rem;
 // }
 
 .pinned-grid {
   display: flex;
-  gap: 15px;
-  margin-top: 24px;
+  gap: .9375rem;
+  margin-top: 1.5rem;
 }
 
 .card-title {
-  margin-top: 4px;
-  font-size: 22px;
+  margin-top: .25rem;
+  font-size: 1.375rem;
 }
 
 .mini-card {
   background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 10px;
-  padding: 10px 15px;
+  border: .0625rem solid #e0e0e0;
+  border-radius: .625rem;
+  padding: .625rem .9375rem;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: .75rem;
   position: relative;
-  min-width: 180px;
+  min-width: 11.25rem;
 }
 
 .achievement-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
+  gap: 1.25rem;
 }
 
 .achievement-card {
   background: white;
-  height: 220px;
+  height: 13.75rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  border-radius: 16px;
-  padding: 25px 15px;
+  border-radius: 1rem;
+  padding: 1.5625rem .9375rem;
   text-align: center;
   position: relative;
-  border: 1px solid #eef2f2;
+  border: .0625rem solid #eef2f2;
   transition: transform 0.2s;
 
   .card-icon-wrap i {
-    font-size: 32px;
+    font-size: 2rem;
   }
 
   .card-title {
-    margin: 16px 0 8px;
+    margin: 1rem 0 .5rem;
     color: $main-black-text;
   }
 
@@ -379,26 +379,26 @@ export default {
   .first-row {
     display: flex;
     justify-content: space-between;
-    gap: 0 20px;
+    gap: 0 1.25rem;
 
   }
 
   .second-row {
     .section-label {
-      margin-top: 24px;
+      margin-top: 1.5rem;
     }
   }
 
   .stats-badge {
     @include flex-center;
-    gap: 0 12px;
+    gap: 0 .75rem;
     background: #18AC9D;
-    padding: 12px 20px;
-    border-radius: 8px;
+    padding: .75rem 1.25rem;
+    border-radius: .5rem;
     color: #000000;
 
     i {
-      font-size: 32px;
+      font-size: 2rem;
     }
 
     .stats-text {
@@ -406,7 +406,7 @@ export default {
       flex-direction: column;
 
       .count {
-        font-size: 20px;
+        font-size: 1.25rem;
         font-weight: 600;
       }
     }
@@ -434,7 +434,7 @@ export default {
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.4);
-  border-radius: 14px;
+  border-radius: .875rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -445,20 +445,20 @@ export default {
 
 .status-icon {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: .75rem;
+  right: .75rem;
   z-index: 10;
 }
 
 .check-icon {
   color: white;
-  font-size: 20px;
+  font-size: 1.25rem;
 }
 
 .pin-btn {
   cursor: pointer;
   color: #ccc;
-  font-size: 18px;
+  font-size: 1.125rem;
   pointer-events: auto;
 }
 
@@ -468,7 +468,7 @@ export default {
 
 
 .achievement-card.can-claim {
-  border: 2px solid #f1c40f;
+  border: .125rem solid #f1c40f;
   cursor: pointer;
   animation: pulse 2s infinite;
 
@@ -481,24 +481,24 @@ export default {
   }
 
   .claim-text {
-    font-size: 20px;
+    font-size: 1.25rem;
     color: white;
-    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 0 .625rem rgba(0, 0, 0, 0.5);
     font-weight: 800;
 
   }
 }
 
 .progress-info {
-  font-size: 16px;
+  font-size: 1rem;
   color: #706868;
-  margin-top: 4px;
+  margin-top: .25rem;
   z-index: 1;
 }
 
 .gift-icon {
   color: #f1c40f;
-  font-size: 24px;
+  font-size: 1.5rem;
   animation: bounce 1s infinite;
 }
 
@@ -508,7 +508,7 @@ export default {
   }
 
   70% {
-    box-shadow: 0 0 0 15px rgba(241, 196, 15, 0);
+    box-shadow: 0 0 0 .9375rem rgba(241, 196, 15, 0);
   }
 
   100% {
@@ -524,11 +524,11 @@ export default {
   }
 
   50% {
-    transform: translateY(-5px);
+    transform: translateY(-0.3125rem);
   }
 }
 
-@media (orientation: landscape) and (max-height: 1199.98px) and (pointer: coarse) {
+@media (orientation: landscape) and (max-height: 74.9988rem) and (pointer: coarse) {
   .achievement-island-page {
     padding: 0 6% 0 12%;
 
@@ -538,7 +538,7 @@ export default {
   }
 }
 
-@media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
+@media (orientation: landscape) and (max-height: 47.9988rem) and (pointer: coarse) {
   .achievement-island-page {
     padding: 0 8% !important;
 
@@ -547,7 +547,7 @@ export default {
 
       .top-info-wrap .first-row {
         flex-direction: column;
-        gap: 24px 0;
+        gap: 1.5rem 0;
       }
     }
   }

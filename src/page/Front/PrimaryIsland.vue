@@ -178,13 +178,13 @@ export default {
 }
 
 
-@media (orientation: landscape) and (max-height: 1199.98px) and (pointer: coarse) {
+@media (orientation: landscape) and (max-height: 74.9988rem) and (pointer: coarse) {
     .primary-page .islands-grid {
         @include md-island-layout
     }
 }
 
-@media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
+@media (orientation: landscape) and (max-height: 47.9988rem) and (pointer: coarse) {
     .primary-page {
         @include sm-island-layout
     }

@@ -34,11 +34,6 @@ const routes = [
     component: () => import('../page/Back/TeacherDashboard.vue')
   },
   {
-    path: '/learning-overview',
-    name: 'LearningOverview',
-    component: () => import('../page/Back/_LearningOverview.vue')
-  },
-  {
     path: '/island-analysis',
     name: 'IslandAnalysis',
     component: () => import('../page/Back/IslandAnalysis.vue')

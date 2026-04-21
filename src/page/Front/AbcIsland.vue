@@ -143,25 +143,25 @@ export default {
     @include island-design;
 
     &:not(.is-up) {
-        transform: translateY(-80px);
+        transform: translateY(-5rem);
 
         &:has(.enter-btn:hover) {
-            transform: translateY(-117px);
+            transform: translateY(-7.3125rem);
 
             .enter-btn {
-                transform: translateY(37px);
+                transform: translateY(2.3125rem);
             }
         }
     }
 
     &.is-up {
-        transform: translateY(-120px);
+        transform: translateY(-7.5rem);
 
         &:has(.enter-btn:hover) {
-            transform: translateY(-160px);
+            transform: translateY(-10rem);
 
             .enter-btn {
-                transform: translateY(40px);
+                transform: translateY(2.5rem);
             }
         }
     }
@@ -186,18 +186,18 @@ export default {
     margin-top: 5%;
 }
 
-@media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
+@media (orientation: landscape) and (max-height: 47.9988rem) and (pointer: coarse) {
     .abc-page {
         .island-map-container {
             .island-card img {
-                width: 150px;
+                width: 9.375rem;
             }
 
             .unit-card-container {
-                padding-top: 48px;
+                padding-top: 3rem;
 
                 .back-to-island .return-btn {
-                    padding: 8px 16px;
+                    padding: .5rem 1rem;
                 }
             }
         }

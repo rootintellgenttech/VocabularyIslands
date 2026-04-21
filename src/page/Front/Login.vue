@@ -69,8 +69,10 @@
               </div>
 
               <div class="input-group" style="opacity: 0.6;">
-                <label class="input-label" for="student-account">帳號 / 密碼</label>
-                <el-input placeholder="請於跳轉後的教育局頁面輸入" disabled class="custom-input">
+                <label class="input-label" for="student-account-placeholder">帳號 / 密碼</label>
+
+                <el-input id="student-account-placeholder" placeholder="請於跳轉後的教育局頁面輸入" disabled class="custom-input"
+                  title="帳號密碼輸入說明：請於跳轉後的教育局頁面輸入" aria-label="帳號密碼輸入說明：請於跳轉後的教育局頁面輸入">
                 </el-input>
               </div>
 
@@ -322,6 +324,27 @@ export default {
     };
   },
   async mounted() {
+    // --- Freego 專用：強制寫入 Token 門票 ---
+    if (window.location.hostname === 'localhost') {
+      const freegoAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc2NzUxMzc5LCJpYXQiOjE3NzY3NDc1MDcsImp0aSI6ImJhNmU5NjA0NGRlNjQxYTk5OTkwYjc4ZmI3MGI0YmY3IiwidXNlcl9pZCI6MX0.QXphexuwAe-ffva4SjUW_0ynG8E7_k0fQz7hWj2YeK8";
+      const freegoRefreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc3NzM1NDM3OSwiaWF0IjoxNzc2NzQ5NTc5LCJqdGkiOiJhMTBiZTIwMzlmYmQ0OWMzOTllYThmNTJhODI3YThkZiIsInVzZXJfaWQiOjF9.t56wOOT3OYS-JTe3K2meRAmRPKEyaBNLG8IQaRLNzrY";
+
+      console.log('[Freego 應援] 正在強制注入測試 Token...');
+
+      localStorage.setItem('accessToken', freegoAccessToken);
+      localStorage.setItem('refreshToken', freegoRefreshToken);
+      localStorage.setItem('userRole', 'student');
+
+      // 同步設定 API header，確保接下來的請求都帶 Token
+      api.defaults.headers.common['Authorization'] = `Bearer ${freegoAccessToken}`;
+
+      // 如果目前在 login 頁面，強制跳轉到 home，讓 Freego 開始測內部頁面
+      if (this.$route.path === '/login' || this.$route.path === '/') {
+        console.log('[Freego 應援] Token 注入成功，正在跳轉至 Home...');
+        this.$router.push('/home');
+        return;
+      }
+    }
     const urlParams = new URLSearchParams(window.location.search);
     // 同時檢查 Vue Router 與原生 URL 參數
     const code = this.$route.query.code || urlParams.get('code');
@@ -701,12 +724,12 @@ $bg-path: "~@/assets/image/login-bg.jpg";
   }
 
   i {
-    margin-right: 4px;
+    margin-right: .25rem;
   }
 }
 
 .el-dialog .title {
-  margin-bottom: 10px;
+  margin-bottom: .625rem;
 }
 
 .confirm-pw-modal {
@@ -715,7 +738,7 @@ $bg-path: "~@/assets/image/login-bg.jpg";
   .pw-checklist {
     display: inline;
     align-self: flex-start;
-    margin: 4px 0;
+    margin: .25rem 0;
     text-align: left !important;
   }
 
@@ -725,11 +748,11 @@ $bg-path: "~@/assets/image/login-bg.jpg";
   }
 
   .ask-confirm-pw {
-    margin-top: 16px;
+    margin-top: 1rem;
   }
 
   .el-dialog__footer button {
-    width: 120px
+    width: 7.5rem
   }
 }
 
@@ -739,7 +762,7 @@ $bg-path: "~@/assets/image/login-bg.jpg";
   }
 
   .input-pw-area {
-    margin-top: 24px;
+    margin-top: 1.5rem;
   }
 }
 
@@ -750,7 +773,7 @@ $bg-path: "~@/assets/image/login-bg.jpg";
   .footer-scroll {
     justify-content: center;
     display: flex;
-    gap: 0 32px;
+    gap: 0 2rem;
   }
 }
 
@@ -782,10 +805,10 @@ $bg-path: "~@/assets/image/login-bg.jpg";
     .oidc-btn {
       @include flex-center;
       justify-content: center;
-      gap: 10px;
+      gap: .625rem;
       background: linear-gradient(135deg, #4ABCB1 0%, #38bdf8 100%) !important;
       color: white !important;
-      border-radius: 12px;
+      border-radius: .75rem;
 
       &:hover {
         filter: brightness(1.1);
@@ -795,19 +818,19 @@ $bg-path: "~@/assets/image/login-bg.jpg";
 
   .announcement-card,
   .login-card {
-    height: 600px;
+    height: 37.5rem;
     display: flex;
     flex-direction: column;
     background-color: $card-bg;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border-radius: 11px;
-    padding: 24px;
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, 0.1);
+    border-radius: .6875rem;
+    padding: 1.5rem;
     box-sizing: border-box;
   }
 
   .announcement-list {
     flex: 1;
-    margin-top: 8px;
+    margin-top: .5rem;
     overflow-y: auto;
 
     .news-title,
@@ -822,10 +845,10 @@ $bg-path: "~@/assets/image/login-bg.jpg";
   }
 
   .role-notice-text {
-    font-size: 14px;
+    font-size: 0.875rem;
     color: #ad5910;
-    margin-top: -20px;
-    margin-bottom: 20px;
+    margin-top: -1.25rem;
+    margin-bottom: 1.25rem;
     text-align: center;
     font-weight: 500;
     animation: fadeIn 0.3s ease;
@@ -834,7 +857,7 @@ $bg-path: "~@/assets/image/login-bg.jpg";
   @keyframes fadeIn {
     from {
       opacity: 0;
-      transform: translateY(-5px);
+      transform: translateY(-0.3125rem);
     }
 
     to {
@@ -849,15 +872,15 @@ $bg-path: "~@/assets/image/login-bg.jpg";
 
     .announcement-list {
       flex: 1;
-      margin-top: 8px;
+      margin-top: .5rem;
       overflow-y: auto;
       min-height: 0;
     }
 
     .announcement-item {
-      padding: 12px;
-      border-radius: 16px;
-      margin: 12px 0;
+      padding: .75rem;
+      border-radius: 1rem;
+      margin: .75rem 0;
       background-color: #F0F3F580;
       transition: transform 0.3s ease;
 
@@ -872,16 +895,16 @@ $bg-path: "~@/assets/image/login-bg.jpg";
       .item-header {
         font-weight: bold;
         color: $main-black-text;
-        margin-bottom: 5px;
+        margin-bottom: .3125rem;
         @include flex-center;
-        gap: 10px;
+        gap: .625rem;
         justify-content: space-between;
       }
 
       .tag {
-        font-size: 14px;
-        padding: 6px 10px;
-        border-radius: 4px;
+        font-size: 0.875rem;
+        padding: .375rem .625rem;
+        border-radius: .25rem;
         color: $main-black-text;
         text-wrap: nowrap;
         flex-shrink: 0;
@@ -904,14 +927,14 @@ $bg-path: "~@/assets/image/login-bg.jpg";
       }
 
       .item-content {
-        font-size: 16px;
+        font-size: 1rem;
         color: $main-grey-text;
-        margin: 8px 0;
+        margin: .5rem 0;
       }
 
       .item-date {
         display: block;
-        font-size: 12px;
+      font-size: 0.75rem;
         color: $main-grey-text;
       }
     }
@@ -919,7 +942,7 @@ $bg-path: "~@/assets/image/login-bg.jpg";
 
   .card-title {
     color: $main-blue-text;
-    font-size: 24px;
+font-size: 1.5rem;
     font-weight: bold;
     margin: 0;
     @include flex-center;
@@ -935,16 +958,16 @@ $bg-path: "~@/assets/image/login-bg.jpg";
 
     .fade-transform-enter-from {
       opacity: 0;
-      transform: translateX(10px);
+      transform: translateX(.625rem);
     }
 
     .fade-transform-leave-to {
       opacity: 0;
-      transform: translateX(-10px);
+      transform: translateX(-0.625rem);
     }
 
     .login-form-container {
-      min-height: 280px;
+      min-height: 17.5rem;
       display: flex;
       flex-direction: column;
       // justify-content: center;
@@ -955,7 +978,7 @@ $bg-path: "~@/assets/image/login-bg.jpg";
         display: flex;
         justify-content: center;
         cursor: pointer;
-        margin-top: 16px;
+        margin-top: 1rem;
 
         &:hover {
           color: $main-blue-text;
@@ -964,38 +987,38 @@ $bg-path: "~@/assets/image/login-bg.jpg";
     }
 
     .input-group {
-      margin-bottom: 20px;
+      margin-bottom: 1.25rem;
 
       .password-overlay {
         position: absolute;
-        top: 32px;
+        top: 2rem;
         left: 0;
         width: 100%;
-        height: 40px;
+        height: 2.5rem;
         background: rgba(240, 250, 255, 0.8);
         z-index: 10;
-        border-radius: 12px;
+        border-radius: .75rem;
         display: flex;
         align-items: center;
         justify-content: center;
         color: #666;
-        font-size: 14px;
+        font-size: .875rem;
         font-weight: 500;
         pointer-events: none;
-        border: 1px dashed $primary-color;
+        border: .0625rem dashed $primary-color;
 
         i {
-          margin-right: 6px;
+          margin-right: .375rem;
           color: $primary-color;
         }
       }
 
       .input-label {
         display: block;
-        font-size: 16px;
+       font-size: 1rem;
         font-weight: bold;
         color: $main-black-text;
-        margin-bottom: 8px;
+        margin-bottom: .5rem;
       }
 
       .custom-input {
@@ -1005,9 +1028,9 @@ $bg-path: "~@/assets/image/login-bg.jpg";
         transition: box-shadow 0.2s;
 
         input {
-          padding: 14px 16px;
-          border: #28A99C33 1px solid;
-          border-radius: 12px;
+          padding: .875rem 1rem;
+          border: #28A99C33 .0625rem solid;
+          border-radius: .75rem;
           background-color: #F0FAFF;
         }
       }
@@ -1020,27 +1043,27 @@ $bg-path: "~@/assets/image/login-bg.jpg";
 
     .role-switch {
       display: flex;
-      margin-bottom: 30px;
-      border: 1px solid #DAE2E7;
-      border-radius: 11px;
+      margin-bottom: 1.875rem;
+      border: .0625rem solid #DAE2E7;
+      border-radius: .6875rem;
       overflow: hidden;
-      padding: 8px;
+      padding: .5rem;
 
 
       .role-btn {
         flex: 1;
-        padding: 8px;
+        padding: .5rem;
         background-color: #F8F9FA;
-        font-size: 16px;
+        font-size: 1rem;
         transition: all 0.2s ease;
         border: none;
 
         &:nth-child(1) {
-          border-radius: 8px 0 0 8px;
+          border-radius: .5rem 0 0 .5rem;
         }
 
         &:nth-child(2) {
-          border-radius: 0 8px 8px 0;
+          border-radius: 0 .5rem .5rem 0;
         }
 
         &.active {
@@ -1063,9 +1086,9 @@ $bg-path: "~@/assets/image/login-bg.jpg";
       @include second-green-bg;
       width: 100%;
       border: none;
-      padding: 12px;
-      border-radius: 16px;
-      font-size: 16px;
+      padding: .75rem;
+      border-radius: 1rem;
+     font-size: 1rem;
       font-weight: 600;
 
       &:hover {
@@ -1079,10 +1102,10 @@ $bg-path: "~@/assets/image/login-bg.jpg";
     }
 
     .card-subtitle {
-      font-size: 1rem;
+    font-size: 1rem;
       text-align: center;
       color: #666;
-      margin-bottom: 25px;
+      margin-bottom: 1.5625rem;
     }
 
   }
@@ -1090,14 +1113,14 @@ $bg-path: "~@/assets/image/login-bg.jpg";
 }
 
 .dev-test-zone {
-  margin-top: 30px;
-  padding-top: 20px;
-  border-top: 2px dashed #eee;
+  margin-top: 1.875rem;
+  padding-top: 1.25rem;
+  border-top: .125rem dashed #eee;
 
   .dev-title {
-    font-size: 14px;
+    font-size: .875rem;
     color: #999;
-    margin-bottom: 12px;
+    margin-bottom: .75rem;
     text-align: center;
     font-weight: bold;
   }
@@ -1105,27 +1128,27 @@ $bg-path: "~@/assets/image/login-bg.jpg";
   .dev-btn-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    gap: .625rem;
   }
 
   .dev-role-btn {
     border: none;
-    padding: 8px;
-    border-radius: 8px;
-    font-size: 13px;
+    padding: .5rem;
+    border-radius: .5rem;
+    font-size: .8125rem;
     cursor: pointer;
     transition: transform 0.1s, opacity 0.2s;
     color: white;
     font-weight: 500;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 .125rem .25rem rgba(0, 0, 0, 0.1);
 
     &:hover {
       opacity: 0.9;
-      transform: translateY(-1px);
+      transform: translateY(-0.0625rem);
     }
 
     &:active {
-      transform: translateY(1px);
+      transform: translateY(.0625rem);
     }
 
     /* 不同身份不同顏色，方便識別 */
@@ -1152,7 +1175,7 @@ $bg-path: "~@/assets/image/login-bg.jpg";
   }
 }
 
-@media (orientation: landscape) and (max-height: 1199.98px) and (pointer: coarse) {
+@media (orientation: landscape) and (max-height: 74.9988rem) and (pointer: coarse) {
   .login-container {
     padding: 0;
   }
@@ -1162,12 +1185,12 @@ $bg-path: "~@/assets/image/login-bg.jpg";
   }
 }
 
-@media (orientation: landscape) and (max-height: 500px) {
+@media (orientation: landscape) and (max-height: 31.25rem) {
   .login-container {
     margin-right: 0 !important;
     margin-left: 0 !important;
     padding: 4% 6% !important;
-    gap: 0 32px;
+    gap: 0 2rem;
 
     .el-col {
       padding-right: 0 !important;
@@ -1177,23 +1200,23 @@ $bg-path: "~@/assets/image/login-bg.jpg";
 
   .mobile-scroll-box {
     -webkit-overflow-scrolling: touch;
-    margin-bottom: 20px;
+    margin-bottom: 1.25rem;
 
     &::-webkit-scrollbar {
-      width: 4px;
+      width: .25rem;
     }
 
     &::-webkit-scrollbar-thumb {
       background: #ccc;
-      border-radius: 10px;
+      border-radius: .625rem;
     }
   }
 
   .footer-scroll {
     flex-wrap: nowrap;
     overflow-x: auto;
-    gap: 20px;
-    padding: 8px 16px;
+    gap: 1.25rem;
+    padding: .5rem 1rem;
     -webkit-overflow-scrolling: touch;
   }
 
@@ -1201,7 +1224,7 @@ $bg-path: "~@/assets/image/login-bg.jpg";
     white-space: nowrap;
     flex-shrink: 0;
     margin: 0;
-    font-size: 12px;
+   font-size: 0.75rem;
   }
 
 

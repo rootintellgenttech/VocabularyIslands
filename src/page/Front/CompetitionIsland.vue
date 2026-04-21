@@ -1,6 +1,6 @@
 <template>
     <div class="competition-page">
-        <el-dialog custom-class="challenge-confirm-modal" :visible.sync="challengeDialogVisible" width="500px" center
+        <el-dialog custom-class="challenge-confirm-modal" :visible.sync="challengeDialogVisible" width="31.25rem" center
             :close-on-click-modal="false" :show-close="false">
 
             <div class="dialog-content">
@@ -203,7 +203,7 @@
                         style="background: #FEFAD0; border-color: #EAB308;">
                         <span class="player-rank-diff" style="color: #856404;">保持領先！</span>
                         <div class="player-rank-diff-score">
-                            <span style="font-size: 16px;">目前排名第一</span>
+                            <span style="font-size: 1rem;">目前排名第一</span>
                         </div>
                     </div>
                     <div class="player-score-compare" v-else>
@@ -604,9 +604,9 @@ export default {
     flex-direction: column;
     text-align: center;
     background: #F0F3F566;
-    border: 1px solid #DAE2E780;
-    border-radius: 16px;
-    padding: 16px;
+    border: .0625rem solid #DAE2E780;
+    border-radius: 1rem;
+    padding: 1rem;
     width: 100%;
 }
 
@@ -646,72 +646,72 @@ export default {
 }
 
 .competition-page {
-    padding: 0 0 80px 100px;
+    padding: 0 0 5rem 6.25rem;
     position: relative;
     overflow-y: auto;
 }
 
 .page-title {
     @include page-main-title;
-    margin-bottom: 28px;
+    margin-bottom: 1.75rem;
 }
 
 .content-wrapper {
     display: flex;
     justify-content: center;
-    gap: 30px;
+    gap: 1.875rem;
     width: 100%;
-    max-width: 1400px;
+    max-width: 87.5rem;
     margin: 0 auto 4%;
 }
 
 .main-column {
     flex: 3;
-    min-width: 600px;
+    min-width: 37.5rem;
 }
 
 .sidebar-right {
     flex: 1;
-    border-radius: 16px;
-    padding: 24px;
+    border-radius: 1rem;
+    padding: 1.5rem;
     background-color: #fff;
-    min-width: 350px;
+    min-width: 21.875rem;
     height: 100%;
 
     .my-info-card {
         padding: 0;
         position: sticky;
-        top: 20px;
+        top: 1.25rem;
 
         .card-title {
-            font-size: 20px;
-            margin-bottom: 18px;
+            font-size: 1.25rem;
+            margin-bottom: 1.125rem;
             text-align: center;
 
             i {
-                margin-right: 10px;
+                margin-right: .625rem;
             }
         }
 
     }
 
     .info-block {
-        border-radius: 12px;
-        padding: 15px;
+        border-radius: .75rem;
+        padding: .9375rem;
 
         .info-label-group {
             display: flex;
             align-items: center;
-            font-size: 16px;
+            font-size: 1rem;
 
             i {
-                margin-right: 8px;
+                margin-right: .5rem;
             }
         }
     }
 
     .info-block:nth-child(3) {
-        margin-top: 16px;
+        margin-top: 1rem;
     }
 
     .challenge-block,
@@ -724,7 +724,7 @@ export default {
 
 
         .info-value {
-            font-size: 36px;
+            font-size: 2.25rem;
             font-weight: bold;
             display: block;
         }
@@ -732,10 +732,10 @@ export default {
         .info-footer {
             display: flex;
             align-items: center;
-            margin-top: 10px;
+            margin-top: .625rem;
 
             i {
-                margin-right: 5px;
+                margin-right: .3125rem;
             }
         }
     }
@@ -747,7 +747,7 @@ export default {
             flex-direction: column;
 
             .activity-days {
-                font-size: 36px;
+                font-size: 2.25rem;
                 font-weight: 600;
             }
         }
@@ -755,22 +755,22 @@ export default {
 
     .ranking-block {
         background: linear-gradient(135deg, rgba(40, 169, 156, 0.1) 0%, rgba(40, 169, 156, 0.05) 100%);
-        border: 1px solid #28A99C4D;
+        border: .0625rem solid #28A99C4D;
 
         .ranking-details {
-            margin-top: 10px;
+            margin-top: .625rem;
             display: flex;
             flex-direction: column;
 
             .rank-number {
-                font-size: 48px;
+                font-size: 3rem;
                 font-weight: 800;
                 color: #28A99C;
                 line-height: 1;
             }
 
             .score-value {
-                font-size: 18px;
+                font-size: 1.125rem;
                 font-weight: 600;
             }
         }
@@ -778,11 +778,11 @@ export default {
         .ranking-diff {
             display: flex;
             align-items: center;
-            margin-top: 10px;
-            font-size: 14px;
+            margin-top: .625rem;
+            font-size: .875rem;
 
             i {
-                margin-right: 5px;
+                margin-right: .3125rem;
             }
 
             .diff-score {
@@ -795,17 +795,17 @@ export default {
 
 
 .arena-header-card {
-    border-radius: 16px;
-    padding: 24px;
+    border-radius: 1rem;
+    padding: 1.5rem;
     background-color: #fff;
-    border: 1px solid #28A99C4D;
+    border: .0625rem solid #28A99C4D;
 
     .header-wrap {
         @include flex-center;
-        gap: 0 16px;
+        gap: 0 1rem;
 
         img {
-            width: 90px;
+            width: 5.625rem;
             height: 100%;
         }
 
@@ -815,7 +815,7 @@ export default {
 
 
             .header-title {
-                font-size: 28px;
+                font-size: 1.75rem;
                 font-weight: bold;
             }
         }
@@ -827,21 +827,21 @@ export default {
     .stats-grid {
         display: flex;
         justify-content: space-between;
-        gap: 20px;
+        gap: 1.25rem;
 
         .stat-item {
-            margin-top: 16px;
+            margin-top: 1rem;
             @include section-card-layout;
 
             .stat-value {
-                font-size: 24px;
+                font-size: 1.5rem;
                 font-weight: 600;
-                margin: 4px 0;
+                margin: .25rem 0;
             }
 
             .stat-label {
                 i {
-                    margin-right: 8px;
+                    margin-right: .5rem;
                 }
 
             }
@@ -853,30 +853,30 @@ export default {
 
     .tabs {
         display: flex;
-        border-radius: 16px;
+        border-radius: 1rem;
         overflow: hidden;
-        margin: 28px 0;
-        padding: 12px;
+        margin: 1.75rem 0;
+        padding: .75rem;
         background: rgba(240, 243, 245, 0.8);
 
         .tab-btn {
             flex: 1;
-            padding: 8px;
-            font-size: 20px;
+            padding: .5rem;
+            font-size: 1.25rem;
             font-weight: bold;
             background-color: rgb(209 238 235);
             border: none;
             transition: background-color 0.2s, color 0.2s;
 
             span {
-                margin-right: 8px;
+                margin-right: .5rem;
             }
 
             &:first-child {
                 &.is-active {
                     background-color: rgba(9, 124, 112, 1);
                     color: white;
-                    border-radius: 8px 0 0 8px;
+                    border-radius: .5rem 0 0 .5rem;
 
                     i {
                         color: white;
@@ -884,7 +884,7 @@ export default {
                 }
 
                 &:not(.is-active):hover {
-                    border-radius: 8px 0 0 8px;
+                    border-radius: .5rem 0 0 .5rem;
                     background-color: #28A99C;
                     color: white;
 
@@ -898,7 +898,7 @@ export default {
                 &.is-active {
                     background-color: rgba(9, 124, 112, 1);
                     color: white;
-                    border-radius: 0 8px 8px 0;
+                    border-radius: 0 .5rem .5rem 0;
 
                     i {
                         color: white;
@@ -906,7 +906,7 @@ export default {
                 }
 
                 &:not(.is-active):hover {
-                    border-radius: 0 8px 8px 0;
+                    border-radius: 0 .5rem .5rem 0;
                     background-color: #28A99C;
                     color: white;
 
@@ -929,8 +929,8 @@ export default {
     }
 
     .ranking-container {
-        border-radius: 16px;
-        padding: 24px;
+        border-radius: 1rem;
+        padding: 1.5rem;
         text-align: center;
         background: #fff;
     }
@@ -938,21 +938,21 @@ export default {
     // 排行榜切換按鈕
     .ranking-toggle {
         display: flex;
-        gap: 0 12px;
+        gap: 0 .75rem;
         justify-content: center;
-        margin-bottom: 20px;
+        margin-bottom: 1.25rem;
 
         .toggle-btn {
-            padding: 8px 20px;
-            border-radius: 8px;
-            width: 200px;
-            font-size: 16px;
-            border: 1px solid #DAE2E7;
+            padding: .5rem 1.25rem;
+            border-radius: .5rem;
+            width: 12.5rem;
+            font-size: 1rem;
+            border: .0625rem solid #DAE2E7;
             background: #F0FAFF;
             font-weight: 600;
 
             span {
-                margin-right: 8px;
+                margin-right: .5rem;
             }
 
             i {
@@ -971,7 +971,7 @@ export default {
             &.is-active {
                 background-color: #095e55;
                 color: white;
-                border: 1px solid #DAE2E7;
+                border: .0625rem solid #DAE2E7;
 
                 i {
                     color: white;
@@ -981,7 +981,7 @@ export default {
     }
 
     .ps {
-        height: 500px;
+        height: 31.25rem;
     }
 
     .ranking-list {
@@ -990,13 +990,13 @@ export default {
         .player-row {
             @include flex-center;
             justify-content: space-between;
-            padding: 15px;
-            margin-bottom: 10px;
+            padding: .9375rem;
+            margin-bottom: .625rem;
             width: 100%;
-            border-radius: 10px;
+            border-radius: .625rem;
             background-color: #FFFFFF;
-            border: 2px solid #DAE2E7;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: .125rem solid #DAE2E7;
+            box-shadow: 0 .0625rem .1875rem rgba(0, 0, 0, 0.05);
 
             //  第一名樣式 
             &:nth-child(1) {
@@ -1018,11 +1018,11 @@ export default {
 
 
             .rank-number {
-                font-size: 18px;
+                font-size: 1.125rem;
                 font-weight: bold;
-                width: 30px;
+                width: 1.875rem;
                 text-align: center;
-                margin-right: 10px;
+                margin-right: .625rem;
             }
 
             .rank-icon-name {
@@ -1030,20 +1030,20 @@ export default {
 
                 .rank-icon,
                 .rank-number {
-                    width: 40px;
+                    width: 2.5rem;
                 }
 
                 .rank-icon {
-                    margin-right: 16px;
-                    width: 40px;
-                    height: 40px;
+                    margin-right: 1rem;
+                    width: 2.5rem;
+                    height: 2.5rem;
                 }
 
                 .player-info {
                     display: flex;
                     flex-direction: column;
                     align-items: flex-start;
-                    font-size: 18px;
+                    font-size: 1.125rem;
 
                     .player-name {
                         font-weight: 600;
@@ -1057,7 +1057,7 @@ export default {
                 align-items: end;
 
                 .player-score {
-                    font-size: 24px;
+                    font-size: 1.5rem;
                     font-weight: bold;
                 }
             }
@@ -1069,13 +1069,13 @@ export default {
     .game-item {
         @include flex-center;
         justify-content: space-between;
-        padding: 20px;
-        margin-bottom: 15px;
-        border-radius: 10px;
+        padding: 1.25rem;
+        margin-bottom: .9375rem;
+        border-radius: .625rem;
         background: rgba(255, 255, 255, 0.95);
-        border: 1px solid rgba(218, 226, 231, 1);
-        box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
-        backdrop-filter: blur(12px);
+        border: .0625rem solid rgba(218, 226, 231, 1);
+        box-shadow: 0rem .0625rem .125rem 0rem rgba(0, 0, 0, 0.05);
+        backdrop-filter: blur(.75rem);
 
         .game-info {
             display: flex;
@@ -1095,34 +1095,34 @@ export default {
                 .game-title {
                     font-weight: 600;
                     margin: 0;
-                    font-size: 24px;
+                    font-size: 1.5rem;
                 }
 
                 .game-info-wrap {
                     @include flex-center;
-                    gap: 0 8px;
-                    font-size: 18px;
+                    gap: 0 .5rem;
+                    font-size: 1.125rem;
 
                     .info-wrap {
                         display: flex;
-                        gap: 0 8px;
+                        gap: 0 .5rem;
                     }
 
                     .game-island {
-                        font-size: 14px;
-                        border-radius: 24px;
+                        font-size: .875rem;
+                        border-radius: 1.5rem;
                         background-color: #F8F9FA;
-                        border: 1px solid #DAE2E7;
-                        padding: 8px 16px;
+                        border: .0625rem solid #DAE2E7;
+                        padding: .5rem 1rem;
                         color: $main-blue-text;
                     }
 
                     .game-point {
-                        font-size: 14px;
-                        border-radius: 24px;
+                        font-size: .875rem;
+                        border-radius: 1.5rem;
                         background-color: rgba(205, 236, 233, 0.35);
-                        border: 1px solid rgba(218, 226, 231, 1);
-                        padding: 8px 16px;
+                        border: .0625rem solid rgba(218, 226, 231, 1);
+                        padding: .5rem 1rem;
                         color: $main-dark-blue;
                     }
                 }
@@ -1131,20 +1131,20 @@ export default {
             }
 
             .game-icon {
-                width: 60px;
-                height: 60px;
-                margin-right: 16px;
+                width: 3.75rem;
+                height: 3.75rem;
+                margin-right: 1rem;
                 object-fit: contain;
             }
         }
 
         .start-btn {
-            border-radius: 8px;
+            border-radius: .5rem;
             background-color: $main-dark-blue;
             color: white;
             border: none;
-            padding: 8px 16px;
-            font-size: 16px;
+            padding: .5rem 1rem;
+            font-size: 1rem;
 
             &.is-completed {
                 background-color: #ccc !important;
@@ -1164,47 +1164,47 @@ export default {
 .footer-fixed {
     position: fixed;
     bottom: 0;
-    left: 100px;
+    left: 6.25rem;
     right: 0;
-    min-height: 90px;
+    min-height: 5.625rem;
     z-index: 50;
     display: flex;
     justify-content: center;
-    padding-bottom: 16px;
+    padding-bottom: 1rem;
     background: linear-gradient(0deg, #F0FAFF 0%, #f8fdff2b 70%, rgba(240, 250, 255, 0) 100%);
 
 
     .player-summary {
         @include flex-center;
         justify-content: space-between;
-        gap: 20px;
-        padding: 8px 24px;
-        font-size: 16px;
+        gap: 1.25rem;
+        padding: .5rem 1.5rem;
+        font-size: 1rem;
         min-width: 80%;
-        box-shadow: 0px 25px 50px -12px rgba(0, 0, 0, 0.25);
-        backdrop-filter: blur(24px);
-        border: rgba(40, 169, 156, 1) 1px solid;
-        border-radius: 16px;
+        box-shadow: 0rem 1.5625rem 3.125rem -0.75rem rgba(0, 0, 0, 0.25);
+        backdrop-filter: blur(1.5rem);
+        border: rgba(40, 169, 156, 1) .0625rem solid;
+        border-radius: 1rem;
 
         .player-left-info {
             @include flex-center;
-            gap: 0 10px;
+            gap: 0 .625rem;
 
             .player-rank,
             .player-name {
                 font-weight: 600;
-                font-size: 20px;
+                font-size: 1.25rem;
             }
 
             .player-info-wrap {
 
                 .player-tag {
                     background: #CAEBEB;
-                    font-size: 16px;
+                    font-size: 1rem;
                     color: #01302C;
-                    padding: 4px 8px;
-                    border-radius: 8px;
-                    margin-left: 8px;
+                    padding: .25rem .5rem;
+                    border-radius: .5rem;
+                    margin-left: .5rem;
                 }
             }
 
@@ -1213,7 +1213,7 @@ export default {
 
         .player-right-info {
             @include flex-center;
-            gap: 0 16px;
+            gap: 0 1rem;
 
             .player-actual-score {
                 text-align: right;
@@ -1221,7 +1221,7 @@ export default {
                 .player-score {
                     display: flex;
                     flex-direction: column;
-                    font-size: 22px;
+                    font-size: 1.375rem;
                     color: #28A99C;
                     font-weight: 600
                 }
@@ -1231,14 +1231,14 @@ export default {
                 display: flex;
                 flex-direction: column;
                 background: #FFFDEA;
-                border: 1px solid #FFFDEA;
-                padding: 8px 16px;
-                border-radius: 16px;
+                border: .0625rem solid #FFFDEA;
+                padding: .5rem 1rem;
+                border-radius: 1rem;
 
                 .player-rank-diff-score {
                     color: #972E19;
                     font-weight: 600;
-                    font-size: 22px;
+                    font-size: 1.375rem;
                 }
             }
         }
@@ -1247,30 +1247,30 @@ export default {
     .player-score {
         display: flex;
         flex-direction: column;
-        font-size: 24px;
+        font-size: 1.5rem;
         color: #28A99C;
 
         .score-title {
-            font-size: 16px;
+            font-size: 1rem;
             font-weight: normal;
         }
     }
 }
 
-@media (min-width: 768px) and (pointer: coarse) {
+@media (min-width: 48rem) and (pointer: coarse) {
     .competition-page {
         padding: 0 4% 8% 12%;
 
         .content-wrapper {
-            width: 1000px;
+            width: 62.5rem;
         }
     }
 }
 
-@media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
+@media (orientation: landscape) and (max-height: 47.9988rem) and (pointer: coarse) {
     .competition-page {
         .page-title {
-            margin-top: 24px;
+            margin-top: 1.5rem;
         }
 
         .stat-label {
@@ -1278,7 +1278,7 @@ export default {
         }
 
         .ranking-challenge-section .game-item {
-            gap: 0 24px;
+            gap: 0 1.5rem;
         }
 
         .ranking-list {
@@ -1286,14 +1286,14 @@ export default {
         }
 
         .footer-fixed {
-            padding: 0 78px 16px;
+            padding: 0 4.875rem 1rem;
             display: unset;
             left: 0;
             right: 0;
             z-index: 0;
         }
 
-        padding:0 50px 80px !important;
+        padding:0 3.125rem 5rem !important;
 
         .content-wrapper {
             width: 100%;
@@ -1310,7 +1310,7 @@ export default {
 
         .ranking-challenge-section .game-item .game-info .game-text .game-info-wrap {
             flex-direction: column;
-            gap: 10px 0;
+            gap: .625rem 0;
             align-items: flex-start;
         }
     }

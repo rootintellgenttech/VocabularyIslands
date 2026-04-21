@@ -5,16 +5,20 @@
     </aside>
 
     <main id="main-content" role="main" class="router-view-content">
-      <!-- <a id="C" name="C" title="中央內容區塊" class="sr-only">:::</a> -->
       <router-view />
+
+      <nav v-if="isDevelopment" aria-label="開發者檢測導航" style="display: none;">
+        <a href="/home">首頁</a>
+        <a href="/primaryisland">國小島嶼</a>
+        <a href="/secondaryisland">國中島嶼</a>
+        <a href="/abc-island">ABC 小島</a>
+        <a href="/achievementisland">成就島嶼</a>
+        <a href="/competition">競賽島嶼</a>
+        <a href="/trial-hall">試煉大廳</a>
+      </nav>
     </main>
 
-    <div class="orientation-lock" aria-live="polite">
-      <div class="lock-content">
-        <i class="fas fa-mobile-alt" aria-hidden="true"></i>
-        <p>為了最佳學習體驗<br>請將平板轉為橫向</p>
-      </div>
-    </div>
+    ...
   </div>
 </template>
 
@@ -26,9 +30,11 @@ export default {
   components: {
     Sidebar
   },
-  data() {
+ data() {
     return {
-      refreshTimer: null
+      refreshTimer: null,
+      // 新增：判斷是否為本地開發環境
+      isDevelopment: window.location.hostname === 'localhost'
     };
   },
   mounted() {
@@ -110,13 +116,18 @@ body {
 }
 
 .apexcharts-legend-text {
-  top: -1px !important;
+  top: -0.0625rem !important;
 }
 
 *,
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+
+html {
+  font-size: 100%; 
 }
 
 .el-form--label-top .el-form-item__label {
@@ -127,25 +138,25 @@ body {
 
 .loading-container {
   @include flex-center;
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: 600;
   color: $main-black-text;
   justify-content: center;
   flex-direction: column;
-  gap: 10px 0
+  gap: .625rem 0
 }
 
 .result-title {
-  margin-top: 16px;
+  margin-top: 1rem;
 }
 
 .timer-bar-wrap {
   .timer-progress {
-    border: 2px solid #e1e0e0;
-    border-radius: 16px;
+    border: .125rem solid #e1e0e0;
+    border-radius: 1rem;
 
     .el-progress-bar__innerText {
-      font-size: 16px;
+      font-size: 1rem;
       font-weight: bold;
       color: black !important;
     }
@@ -163,7 +174,7 @@ body {
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: 20px;
+  padding-bottom: 1.25rem;
 
   ::v-deep .apexcharts-canvas,
   ::v-deep .apexcharts-svg {
@@ -176,11 +187,11 @@ body {
 
 
 .select-all-box {
-  padding: 5px 15px;
+  padding: .3125rem .9375rem;
   display: flex;
   justify-content: space-between;
-  border-bottom: 1px solid #eee;
-  margin-bottom: 5px;
+  border-bottom: .0625rem solid #eee;
+  margin-bottom: .3125rem;
   position: sticky;
   top: 0;
   background: white;
@@ -193,12 +204,12 @@ body {
 }
 
 .el-table .cell {
-  font-size: 16px;
+  font-size: 1rem;
 }
 
 .level-scroll-container {
-  height: 350px;
-  padding: 6px 0;
+  height: 21.875rem;
+  padding: .375rem 0;
 }
 
 .islands-scroll-container {
@@ -212,7 +223,7 @@ body {
   margin-top: 7%;
 
   .island-card img {
-    width: 300px;
+    width: 18.75rem;
     height: 100%;
   }
 }
@@ -220,16 +231,16 @@ body {
 
 .return-last-page {
   @include card-return-text;
-  padding: 16px 0 0 24px;
+  padding: 1rem 0 0 1.5rem;
 }
 
 .timer-bar {
   flex-grow: 1;
-  margin-right: 20px;
+  margin-right: 1.25rem;
 
   .timer-progress {
     .el-progress-bar__outer {
-      border: 2px solid #DAE2E7 !important;
+      border: .125rem solid #DAE2E7 !important;
       background-color: #F8F9FA;
     }
 
@@ -249,12 +260,12 @@ body {
   }
 
   .el-dialog__body {
-    padding: 30px 20px 24px !important;
+    padding: 1.875rem 1.25rem 1.5rem !important;
 
     .title {
       font-weight: 600;
-      margin: 0 0 16px;
-      font-size: 20px;
+      margin: 0 0 1rem;
+      font-size: 1.25rem;
       color: $main-black-text;
     }
   }
@@ -266,9 +277,9 @@ body {
 
     .dialog-avatar,
     .result-avatar {
-      width: 180px;
+      width: 11.25rem;
       height: auto;
-      margin-bottom: 12px;
+      margin-bottom: .75rem;
     }
 
 
@@ -276,12 +287,12 @@ body {
       margin: 0;
       text-align: center;
       color: $main-grey-text;
-      font-size: 16px;
+      font-size: 1rem;
     }
   }
 
   .el-dialog__footer button {
-    width: 100px;
+    width: 6.25rem;
   }
 
   .el-dialog--center .el-dialog__body,
@@ -290,7 +301,7 @@ body {
   }
 
   .el-dialog__footer button:nth-child(1) {
-    border: $main-grey-text solid 1px;
+    border: $main-grey-text solid .0625rem;
 
     &:hover {
       background: #67777E;
@@ -310,9 +321,9 @@ body {
 }
 
 .start-modal {
-  height: 450px;
-  border: 4px solid #DAE2E0;
-  border-radius: 16px !important;
+  height: 28.125rem;
+  border: .25rem solid #DAE2E0;
+  border-radius: 1rem !important;
 }
 
 .challenge-confirm-modal,
@@ -322,20 +333,20 @@ body {
 .mails-modal,
 .exit-confirm-modal,
 .password-modal {
-  border: 6px solid var(--btn-g, #4ABCB1);
-  border-radius: 16px !important;
-  padding-bottom: 24px;
+  border: .375rem solid var(--btn-g, #4ABCB1);
+  border-radius: 1rem !important;
+  padding-bottom: 1.5rem;
 
   .warning-text {
     color: #761C00;
     font-weight: bold;
-    margin-top: 10px;
+    margin-top: .625rem;
   }
 }
 
 
 .challenge-confirm-modal .title {
-  margin-bottom: 16px !important;
+  margin-bottom: 1rem !important;
 }
 
 
@@ -349,14 +360,14 @@ button {
 
 
 .teal-select {
-  width: 250px;
+  width: 15.625rem;
 
   .el-input__inner {
     background-color: $main-green;
     color: white;
-    border-radius: 8px;
+    border-radius: .5rem;
     border: none;
-    font-size: 14px;
+    font-size: .875rem;
 
     &::placeholder {
       color: rgba(255, 255, 255, 0.8);
@@ -370,19 +381,19 @@ button {
 
 
 .expand-table-wrapper {
-  padding: 20px;
+  padding: 1.25rem;
   background-color: #f9fbfb;
-  border-radius: 8px;
-  margin: 10px;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  border-radius: .5rem;
+  margin: .625rem;
+  box-shadow: inset 0 .125rem .25rem rgba(0, 0, 0, 0.05);
 
   .expand-title {
     margin-top: 0;
-    margin-bottom: 15px;
+    margin-bottom: .9375rem;
     color: $main-green;
-    font-size: 16px;
-    border-left: 4px solid $main-green;
-    padding-left: 10px;
+    font-size: 1rem;
+    border-left: .25rem solid $main-green;
+    padding-left: .625rem;
   }
 
   .el-table th {
@@ -393,7 +404,7 @@ button {
 .el-tag.el-tag--info {
   color: #000000 !important;
   font-weight: 600;
-  font-size: 14px;
+  font-size: .875rem;
 }
 
 
@@ -401,9 +412,9 @@ button {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 20px;
-  min-width: 600px;
-  box-shadow: 0 6px 10px -2px rgba(0, 0, 0, 0.15) !important
+  padding: 1.25rem;
+  min-width: 37.5rem;
+  box-shadow: 0 .375rem .625rem -0.125rem rgba(0, 0, 0, 0.15) !important
 }
 
 #app {
@@ -445,15 +456,15 @@ button {
     text-align: center;
 
     i {
-      font-size: 80px;
-      margin-bottom: 30px;
+      font-size: 5rem;
+      margin-bottom: 1.875rem;
       animation: rotate-device 2s infinite ease-in-out;
     }
 
     p {
-      font-size: 26px;
+      font-size: 1.625rem;
       font-weight: bold;
-      letter-spacing: 2px;
+      letter-spacing: .125rem;
       line-height: 1.6;
     }
   }
@@ -486,20 +497,20 @@ button {
   }
 }
 
-@media (orientation: landscape) and (max-height: 1199.98px) and (pointer: coarse) {
+@media (orientation: landscape) and (max-height: 74.9988rem) and (pointer: coarse) {
   .return-last-page {
-    padding: 16px 0 0 0;
+    padding: 1rem 0 0 0;
   }
 
   .main-card,
   .intro-card {
-    min-width: 500px !important;
+    min-width: 31.25rem !important;
   }
 }
 
-@media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
+@media (orientation: landscape) and (max-height: 47.9988rem) and (pointer: coarse) {
   .return-last-page {
-    padding: 16px 0 0 32px;
+    padding: 1rem 0 0 2rem;
   }
 
   .tinder-card {
@@ -508,28 +519,28 @@ button {
 
   .main-card,
   .intro-card {
-    min-width: 500px !important;
+    min-width: 31.25rem !important;
 
     .question-content {
       padding: 5% !important;
 
       .instruction-text {
-        margin: 0 0 24px;
+        margin: 0 0 1.5rem;
       }
 
       .question-title {
-        font-size: 120px !important;
+        font-size: 7.5rem !important;
       }
 
       .context-fill-title {
-        font-size: 34px !important;
+        font-size: 2.125rem !important;
       }
     }
 
   }
 
   .page-title {
-    font-size: 24px;
+    font-size: 1.5rem;
   }
 }
 </style>

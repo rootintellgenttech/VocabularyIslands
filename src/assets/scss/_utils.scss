@@ -19,7 +19,7 @@ $main-back-blue-text: #00332D;
 
 
 @mixin main-box-shadow {
-    box-shadow: 2px 5px 16px -12px #000000;
+    box-shadow: .125rem .3125rem 1rem -0.75rem #000000;
 }
 
 @mixin island-map-wrap {
@@ -38,46 +38,46 @@ $main-back-blue-text: #00332D;
 }
 
 @mixin island-design {
-    width: 300px;
+    width: 18.75rem;
     text-align: center;
     position: relative;
     transition: transform 0.3s ease;
     @include flex-center;
     flex-direction: column;
-    padding: 10px 0;
+    padding: .625rem 0;
 
     &:hover {
-        transform: translateY(-10px) scale(1.05);
+        transform: translateY(-0.625rem) scale(1.05);
     }
 
     .island-image {
-        width: 300px;
+        width: 18.75rem;
         height: auto;
         display: block;
     }
 
     .island-name {
-        font-size: 20px;
+        font-size: 1.25rem;
         font-weight: bold;
         color: $main-blue-text;
-        margin: 10px 0 16px;
+        margin: .625rem 0 1rem;
         background-color: #F0FAFF;
-        padding: 5px 16px;
-        border-radius: 16px;
+        padding: .3125rem 1rem;
+        border-radius: 1rem;
         display: inline-block;
-        width: 130px;
+        width: 8.125rem;
         @include main-box-shadow;
     }
 
     .enter-btn {
         background-color: $main-dark-blue;
         color: white;
-        border: 2px solid #DAE2E7;
-        padding: 8px 25px;
-        border-radius: 16px;
-        font-size: 14px;
+        border: .125rem solid #DAE2E7;
+        padding: .5rem 1.5625rem;
+        border-radius: 1rem;
+        font-size: .875rem;
         font-weight: bold;
-        box-shadow: 2px 5px 16px -10px #000000;
+        box-shadow: .125rem .3125rem 1rem -0.625rem #000000;
         transition: background-color 0.1s, transform 0.1s, box-shadow 0.1s;
 
         &:hover {
@@ -86,8 +86,8 @@ $main-back-blue-text: #00332D;
 
         &:active {
             background-color: #3b88b7;
-            transform: translateY(4px);
-            box-shadow: 0 0px 0 #3b88b7;
+            transform: translateY(.25rem);
+            box-shadow: 0 0rem 0 #3b88b7;
         }
     }
 }
@@ -95,14 +95,14 @@ $main-back-blue-text: #00332D;
 
 @mixin page-main-title {
     text-align: center;
-    font-size: 32px;
+    font-size: 2rem;
     color: $main-black-text;
-    margin-top: 52px;
+    margin-top: 3.25rem;
     background-color: white;
-    width: 220px;
-    padding: 4px 0;
+    width: 13.75rem;
+    padding: .25rem 0;
     display: inline-block;
-    border-radius: 16px;
+    border-radius: 1rem;
     @include main-box-shadow;
     position: relative;
     left: 50%;
@@ -111,27 +111,27 @@ $main-back-blue-text: #00332D;
 }
 
 @mixin unit-title {
-    font-size: 20px;
+    font-size: 1.25rem;
     font-weight: 800;
-    padding: 5px 20px;
-    border-radius: 16px;
+    padding: .3125rem 1.25rem;
+    border-radius: 1rem;
     color: $main-blue-text;
     width: max-content;
     background-color: #F0FAFF;
     @include main-box-shadow;
-    margin-bottom: 12px;
+    margin-bottom: .75rem;
 }
 
 @mixin enter-unit-yellow-btn {
     background-color: #FFD876;
     color: $main-black-text;
-    padding: 8px 30px;
+    padding: .5rem 1.875rem;
     border: none;
-    border-radius: 16px;
+    border-radius: 1rem;
     font-weight: bold;
     @include main-box-shadow;
     transition: all 0.1s;
-    font-size: 14px;
+    font-size: .875rem;
 
     &:hover {
         background-color: #ffecbc;
@@ -139,18 +139,18 @@ $main-back-blue-text: #00332D;
 }
 
 @mixin lesson-detail-box-one-row {
-    width: 620px;
+    width: 38.75rem;
     background-color: #fff;
-    border-radius: 20px;
+    border-radius: 1.25rem;
     @include main-box-shadow;
-    padding: 30px;
-    margin: 16px 0;
+    padding: 1.875rem;
+    margin: 1rem 0;
 
     .back-link {
         color: $main-black-text;
-        font-size: 18px;
+        font-size: 1.125rem;
         font-weight: bold;
-        margin-bottom: 16px;
+        margin-bottom: 1rem;
         cursor: pointer;
     }
 
@@ -158,20 +158,20 @@ $main-back-blue-text: #00332D;
 
     .option-label,
     .learn-text {
-        font-size: 28px;
+        font-size: 1.75rem;
         font-weight: bold;
         color: $main-black-text;
     }
 
     .card-header {
         @include flex-center;
-        margin-bottom: 30px;
+        margin-bottom: 1.875rem;
         text-align: left;
 
         .avatar-img {
-            width: 150px;
+            width: 9.375rem;
             height: 100%;
-            margin-right: 20px;
+            margin-right: 1.25rem;
         }
 
         .header-info {
@@ -179,14 +179,14 @@ $main-back-blue-text: #00332D;
         }
 
         .lesson-title {
-            font-size: 50px;
+            font-size: 3.125rem;
             font-weight: 900;
             color: $main-blue-text;
-            margin-bottom: 5px;
+            margin-bottom: .3125rem;
         }
 
         .lesson-description {
-            font-size: 20px;
+            font-size: 1.25rem;
             font-weight: 600;
             color: $main-black-text;
         }
@@ -197,11 +197,11 @@ $main-back-blue-text: #00332D;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 15px 20px;
-            margin-bottom: 15px;
+            padding: .9375rem 1.25rem;
+            margin-bottom: .9375rem;
             background-color: white;
-            border: 2px solid #C7D3D1;
-            border-radius: 15px;
+            border: .125rem solid #C7D3D1;
+            border-radius: .9375rem;
             @include main-box-shadow;
             transition: background-color 0.2s;
 
@@ -216,8 +216,8 @@ $main-back-blue-text: #00332D;
             }
 
             &:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+                transform: translateY(-0.125rem);
+                box-shadow: 0 .375rem .75rem rgba(0, 0, 0, 0.15);
             }
 
             &.is-disabled {
@@ -232,25 +232,25 @@ $main-back-blue-text: #00332D;
                 flex: 1;
 
                 .option-icon {
-                    width: 30px;
-                    height: 30px;
-                    margin-right: 15px;
+                    width: 1.875rem;
+                    height: 1.875rem;
+                    margin-right: .9375rem;
                 }
 
             }
 
 
             .star-rating {
-                margin-right: 20px;
+                margin-right: 1.25rem;
 
                 .fa-star {
-                    font-size: 20px;
-                    margin: 0 2px;
+                    font-size: 1.25rem;
+                    margin: 0 .125rem;
 
 
                     &.filled {
                         color: #ffc107;
-                        text-shadow: 1px 1px 0 #d39e00;
+                        text-shadow: .0625rem .0625rem 0 #d39e00;
                     }
 
                     &.outline {
@@ -264,18 +264,18 @@ $main-back-blue-text: #00332D;
 
 
 @mixin lesson-detail-boxs-two-row {
-    width: 620px;
+    width: 38.75rem;
     background-color: #fff;
-    border-radius: 20px;
+    border-radius: 1.25rem;
     @include main-box-shadow;
-    padding: 30px;
-    margin: 16px 0;
+    padding: 1.875rem;
+    margin: 1rem 0;
 
     .back-link {
         color: $main-black-text;
-        font-size: 18px;
+        font-size: 1.125rem;
         font-weight: bold;
-        margin-bottom: 16px;
+        margin-bottom: 1rem;
         cursor: pointer;
     }
 
@@ -283,20 +283,20 @@ $main-back-blue-text: #00332D;
 
     .option-label,
     .learn-text {
-        font-size: 28px;
+        font-size: 1.75rem;
         font-weight: bold;
         color: $main-black-text;
     }
 
     .card-header {
         @include flex-center;
-        margin-bottom: 30px;
+        margin-bottom: 1.875rem;
         text-align: left;
 
         .avatar-img {
-            width: 150px;
+            width: 9.375rem;
             height: 100%;
-            margin-right: 20px;
+            margin-right: 1.25rem;
         }
 
         .header-info {
@@ -304,14 +304,14 @@ $main-back-blue-text: #00332D;
         }
 
         .lesson-title {
-            font-size: 50px;
+            font-size: 3.125rem;
             font-weight: 900;
             color: $main-blue-text;
-            margin-bottom: 5px;
+            margin-bottom: .3125rem;
         }
 
         .lesson-description {
-            font-size: 20px;
+            font-size: 1.25rem;
             font-weight: 600;
             color: $main-black-text;
         }
@@ -321,13 +321,13 @@ $main-back-blue-text: #00332D;
         width: 100%;
         display: flex;
         flex-direction: column;
-        gap: 15px;
-        padding: 0 10px;
+        gap: .9375rem;
+        padding: 0 .625rem;
 
         .option-item {
             background-color: white;
-            border: 2px solid #C7D3D1;
-            border-radius: 15px;
+            border: .125rem solid #C7D3D1;
+            border-radius: .9375rem;
             @include main-box-shadow;
             transition: background-color 0.2s;
 
@@ -341,13 +341,13 @@ $main-back-blue-text: #00332D;
 
 
             &:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+                transform: translateY(-0.125rem);
+                box-shadow: 0 .375rem .75rem rgba(0, 0, 0, 0.15);
             }
 
             .action-text,
             .challenge-label {
-                font-size: 24px;
+                font-size: 1.5rem;
                 font-weight: bold;
                 cursor: pointer;
                 color: $main-black-text;
@@ -361,8 +361,8 @@ $main-back-blue-text: #00332D;
             .item-top {
                 @include flex-center;
                 justify-content: space-between;
-                padding: 12px 15px;
-                border-bottom: 2px solid #f0f0f0;
+                padding: .75rem .9375rem;
+                border-bottom: .125rem solid #f0f0f0;
 
 
 
@@ -371,8 +371,8 @@ $main-back-blue-text: #00332D;
 
             .main-icon,
             .fire-icon {
-                width: 32px;
-                height: 32px;
+                width: 2rem;
+                height: 2rem;
                 object-fit: contain;
 
                 &.is-bw {
@@ -386,7 +386,7 @@ $main-back-blue-text: #00332D;
             .single-left {
                 display: flex;
                 align-items: center;
-                gap: 10px;
+                gap: .625rem;
 
             }
 
@@ -394,14 +394,14 @@ $main-back-blue-text: #00332D;
             .bottom-right {
                 .star-rating {
                     @include flex-center;
-                    gap: 5px;
+                    gap: .3125rem;
 
                     i {
-                        font-size: 1.4rem;
+                   font-size: 1.4rem;
 
                         &.filled {
                             color: #ffc107;
-                            text-shadow: 1px 1px 0 #d39e00;
+                            text-shadow: .0625rem .0625rem 0 #d39e00;
                         }
 
                         &.outline {
@@ -415,9 +415,9 @@ $main-back-blue-text: #00332D;
             .item-single-row {
                 @include flex-center;
                 justify-content: space-between;
-                padding: 8px 15px;
+                padding: .5rem .9375rem;
                 cursor: pointer;
-                border-radius: 0 0 12px 12px;
+                border-radius: 0 0 .75rem .75rem;
 
                 &.is-final-mode {
                     padding: 0;
@@ -432,10 +432,10 @@ $main-back-blue-text: #00332D;
 @mixin common-btn {
     background-color: $main-dark-blue;
     color: white;
-    border: 2px solid #DAE2E7;
-    padding: 8px 25px;
-    border-radius: 16px;
-    font-size: 14px;
+    border: .125rem solid #DAE2E7;
+    padding: .5rem 1.5625rem;
+    border-radius: 1rem;
+    font-size: .875rem;
     font-weight: bold;
     @include main-box-shadow;
     transition: background-color 0.1s, transform 0.1s, box-shadow 0.1s;
@@ -449,9 +449,9 @@ $main-back-blue-text: #00332D;
     width: 100%;
     border: none;
     color: $main-black-text;
-    font-size: 24px;
+    font-size: 1.5rem;
     font-weight: bold;
-    border-radius: 20px;
+    border-radius: 1.25rem;
     transition: background-color 0.2s;
     background-color: #FAE162;
     box-shadow: none;
@@ -470,7 +470,7 @@ $main-back-blue-text: #00332D;
 
 @mixin card-return-text {
     color: $main-black-text;
-    font-size: 18px;
+    font-size: 1.125rem;
     font-weight: bold;
     text-wrap: nowrap;
     cursor: pointer;
@@ -479,17 +479,17 @@ $main-back-blue-text: #00332D;
     align-self: flex-start;
 
     // .fa-angle-left {
-    //     margin-right: 5px;
+    //     margin-right: .3125rem;
     // }
 }
 
 @mixin main-card {
     @include flex-center;
     flex-direction: column;
-    min-width: 650px;
+    min-width: 40.625rem;
     @include main-box-shadow;
-    border-radius: 20px;
-    margin: 16px 0;
+    border-radius: 1.25rem;
+    margin: 1rem 0;
     background-color: #fff;
     text-align: center;
     justify-self: center;
@@ -498,18 +498,18 @@ $main-back-blue-text: #00332D;
 
 
     .final-star {
-        font-size: 28px;
-        margin:16px 0;
+        font-size: 1.75rem;
+        margin:1rem 0;
     }
 
     .header-wrap {
-        padding: 24px 24px 0;
+        padding: 1.5rem 1.5rem 0;
         display: flex;
         justify-content: space-between;
         width: 100%;
         color: $main-black-text;
         font-weight: 600;
-        font-size: 20px
+        font-size: 1.25rem
     }
 }
 
@@ -531,12 +531,12 @@ $main-back-blue-text: #00332D;
     .question-wrap {
         display: flex;
         align-items: baseline;
-        gap: 0 16px;
-        padding: 0 24px;
+        gap: 0 1rem;
+        padding: 0 1.5rem;
         justify-content: center;
 
         .filled {
-            margin: 0 8px;
+            margin: 0 .5rem;
         }
 
 
@@ -544,16 +544,16 @@ $main-back-blue-text: #00332D;
             display: flex;
             align-items: self-end;
             color: $main-quiz-blue;
-            font-size: 120px;
+            font-size: 7.5rem;
             font-weight: 900;
-            margin: 32px 0;
-            // padding: 32px 16px;
+            margin: 2rem 0;
+            // padding: 2rem 1rem;
         }
 
         .audio-trigger {
             border-radius: 50%;
             @include flex-center;
-            font-size: 4rem;
+           font-size: 4rem;
             cursor: pointer;
             color: $main-quiz-blue;
         }
@@ -565,7 +565,7 @@ $main-back-blue-text: #00332D;
 
         i {
             margin: 40% 0 16%;
-            font-size: 10rem;
+ font-size: 10rem;
         }
 
         &:hover {
@@ -581,16 +581,16 @@ $main-back-blue-text: #00332D;
 
     .progress-bar-wrapper {
         flex-grow: 1;
-        height: 20px;
+        height: 1.25rem;
         background-color: #E0E0E0;
-        border-radius: 24px;
-        margin: 0 12px;
+        border-radius: 1.5rem;
+        margin: 0 .75rem;
         overflow: hidden;
 
         .progress-bar {
             height: 100%;
             background-color: #50C2B7;
-            border-radius: 24px;
+            border-radius: 1.5rem;
             transition: width 0.3s ease-out;
         }
     }
@@ -598,13 +598,13 @@ $main-back-blue-text: #00332D;
     .star-count {
         display: flex;
         align-items: center;
-        font-size: 20px;
+        font-size: 1.25rem;
         color: #FFC107;
         font-weight: bold;
 
         .fa-star {
-            font-size: 24px;
-            margin-right: 5px;
+            font-size: 1.5rem;
+            margin-right: .3125rem;
         }
     }
 }
@@ -612,23 +612,23 @@ $main-back-blue-text: #00332D;
 @mixin option-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+    gap: 1.25rem;
     width: 90%;
-    margin: 0 auto 30px;
+    margin: 0 auto 1.875rem;
 
     .option-btn {
         background-color: #F5FFFF;
-        border: 2px solid #C7D3D1;
+        border: .125rem solid #C7D3D1;
         color: $main-quiz-blue;
-        padding: 15px 10px;
-        border-radius: 15px;
-        font-size: 24px;
+        padding: .9375rem .625rem;
+        border-radius: .9375rem;
+        font-size: 1.5rem;
         transition: background-color 0.2s, border-color 0.2s, transform 0.1s;
         @include main-box-shadow;
 
 
         .fa-volume-up {
-            font-size: 30px;
+            font-size: 1.875rem;
         }
 
         &:hover {
@@ -646,7 +646,7 @@ $main-back-blue-text: #00332D;
 
 @mixin island-main-grid {
     overflow-y: auto;
-    padding: 20px;
+    padding: 1.25rem;
     justify-content: start;
 
     .page-title {
@@ -656,19 +656,19 @@ $main-back-blue-text: #00332D;
     .top-bar {
         @include flex-center;
         justify-content: space-between;
-        margin-bottom: 40px;
-        padding: 0 40px;
+        margin-bottom: 2.5rem;
+        padding: 0 2.5rem;
     }
 
 
     .back-btn {
         background-color: #F0FAFF;
         border: none;
-        padding: 8px 20px;
-        border-radius: 20px;
-        font-size: 18px;
+        padding: .5rem 1.25rem;
+        border-radius: 1.25rem;
+        font-size: 1.125rem;
         font-weight: bold;
-        box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1);
+        box-shadow: 0 .25rem 0 rgba(0, 0, 0, 0.1);
         transition: transform 0.1s;
 
         &:hover {
@@ -693,34 +693,34 @@ $main-back-blue-text: #00332D;
 
 @mixin island-stats-row {
     display: flex;
-    gap: 15px;
-    margin-bottom: 8px;
-    font-size: 18px;
+    gap: .9375rem;
+    margin-bottom: .5rem;
+    font-size: 1.125rem;
     color: $main-black-text;
     font-weight: bold;
 
     .stat-group {
         display: flex;
         align-items: anchor-center;
-        gap: 4px;
+        gap: .25rem;
     }
 }
 
 @mixin blue-island-title {
     background-color: #34495E;
     color: #fff;
-    padding: 5px 20px;
-    border-radius: 15px;
+    padding: .3125rem 1.25rem;
+    border-radius: .9375rem;
     font-weight: bold;
-    margin-bottom: 15px;
-    font-size: 20px;
+    margin-bottom: .9375rem;
+    font-size: 1.25rem;
     width: fit-content;
     text-align: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 .25rem .375rem rgba(0, 0, 0, 0.1);
 }
 
 @mixin md-island-layout {
-    padding: 20px 0;
+    padding: 1.25rem 0;
 
     .top-bar {
         align-items: end;
@@ -728,7 +728,7 @@ $main-back-blue-text: #00332D;
 
     .island-map {
         margin-top: 0;
-        padding: 0 8% 24px;
+        padding: 0 8% 1.5rem;
         justify-content: flex-start;
     }
 }
@@ -736,31 +736,31 @@ $main-back-blue-text: #00332D;
 @mixin sm-island-layout {
     .top-bar {
         align-items: end;
-        margin-bottom: 16px;
+        margin-bottom: 1rem;
     }
 
     .island-title {
-        font-size: 14px;
+        font-size: .875rem;
     }
 
     .stats-row {
         flex-direction: column;
         align-items: center;
-        gap: 4px;
+        gap: .25rem;
     }
 
     .islands-grid {
-        padding: 0 20px 20px;
+        padding: 0 1.25rem 1.25rem;
 
         .island-map {
             overflow-x: auto;
             flex-wrap: nowrap;
             justify-content: flex-start;
-            padding: 0 10px;
+            padding: 0 .625rem;
         }
 
         .island-map .island-container .island-image {
-            width: 150px;
+            width: 9.375rem;
         }
 
 
@@ -771,14 +771,14 @@ $main-back-blue-text: #00332D;
     .dialog-content {
         @include flex-center;
         flex-direction: column;
-        padding: 30px 20px;
+        padding: 1.875rem 1.25rem;
     }
 
     .current-score-preview {
-        font-size: 20px;
+        font-size: 1.25rem;
         font-weight: bold;
         color: #F56C6C;
-        margin-top: 8px;
+        margin-top: .5rem;
     }
 
 }
@@ -788,14 +788,14 @@ $main-back-blue-text: #00332D;
     @include flex-center;
     flex-direction: column;
     text-align: center;
-    padding: 30px;
-    border: 4px solid #38C7A7;
-    border-radius: 20px;
-    width: 350px;
-    margin-bottom: 16px;
+    padding: 1.875rem;
+    border: .25rem solid #38C7A7;
+    border-radius: 1.25rem;
+    width: 21.875rem;
+    margin-bottom: 1rem;
 
     img {
-        width: 200px;
+        width: 12.5rem;
     }
 
     .result-title,
@@ -806,16 +806,16 @@ $main-back-blue-text: #00332D;
 
 
     .result-title {
-        margin: 0 0 8px;
-        font-size: 36px;
+        margin: 0 0 .5rem;
+        font-size: 2.25rem;
     }
 
     .result-description {
-        font-size: 22px;
+        font-size: 1.375rem;
     }
 
     .result-score {
-        font-size: 20px;
+        font-size: 1.25rem;
         margin: 0;
         color: $main-dark-blue;
         font-weight: 600;
@@ -830,13 +830,13 @@ $main-back-blue-text: #00332D;
 @mixin result-back-btn {
     background-color: #38C7A7;
     color: $main-black-text;
-    padding: 12px 60px;
-    font-size: 20px;
+    padding: .75rem 3.75rem;
+    font-size: 1.25rem;
     font-weight: 600;
-    border-radius: 12px;
-    width: 350px;
+    border-radius: .75rem;
+    width: 21.875rem;
     border: none;
-    box-shadow: 0px 4px 4px 0px #00000040;
+    box-shadow: 0rem .25rem .25rem 0rem #00000040;
 
     &:hover {
         background-color: #2db698;
@@ -846,13 +846,13 @@ $main-back-blue-text: #00332D;
 
 @mixin back-system-action-btn {
     border: none;
-    border-radius: 6px;
-    padding: 8px 16px;
-    font-size: 16px;
+    border-radius: .375rem;
+    padding: .5rem 1rem;
+    font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     @include flex-center;
-    gap: 6px;
+    gap: .375rem;
     transition: opacity 0.2s;
     background-color: $main-green;
     color: white;
