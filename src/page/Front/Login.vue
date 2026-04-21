@@ -259,8 +259,8 @@ export default {
           name: '1. 學生 (God Mode)',
           path: '/home',
           class: 'btn-student',
-          account: 'chinyimin11@gmail.com',
-          password: '123456min'
+          account: 's0099999',
+          password: '0kiec354'
         },
         {
           key: 'school_admin',
@@ -323,44 +323,33 @@ export default {
 
     };
   },
- async mounted() {
-  const urlParams = new URLSearchParams(window.location.search);
-  // 取得暗號
-  const isDebugMode = urlParams.get('debug_mode') === 'min_special';
-
-  // --- 1. Freego/Debug 專用 ---
-  if (isDebugMode) {
-    const freegoAccessToken = "你的Token..."; 
-    const freegoRefreshToken = "你的RefreshToken...";
-
-    console.log('[Freego 應援] 偵測到暗號，正在強制注入 Token...');
-
-    localStorage.setItem('accessToken', freegoAccessToken);
-    localStorage.setItem('refreshToken', freegoRefreshToken);
-    localStorage.setItem('userRole', 'student');
-
-    api.defaults.headers.common['Authorization'] = `Bearer ${freegoAccessToken}`;
-
-    if (this.$route.path === '/login' || this.$route.path === '/') {
-      this.$router.push('/home');
-      return; // 注入成功後直接跳轉並結束，不執行後面的清空邏輯
+async mounted() {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    const isDebugMode = urlParams.get('debug_mode') === 'min_special';
+    
+    if (isDebugMode) {
+      console.log('[Freego 應援] 偵測到檢測暗號，準備自動登入...');
+      // 預設用第一個角色 (學生) 登入
+      const autoRole = this.testRoles[0];
+      if (autoRole) {
+        this.handleTestLogin(autoRole);
+        return; // 執行自動登入後跳出，不走後面的 OIDC 邏輯
+      }
     }
-  }
 
-  // --- 2. 正常 OIDC 判斷 ---
-  const code = this.$route.query.code || urlParams.get('code');
-  const errorParam = this.$route.query.error || urlParams.get('error');
+    const code = this.$route.query.code || urlParams.get('code');
+    const errorParam = this.$route.query.error || urlParams.get('error');
 
-  if (!code && !errorParam && !isDebugMode) {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('userRole');
-    console.log('[系統] 偵測為全新登入，已清空舊有 Token 緩存');
-  }
+    // 如果不是 OIDC 回調，也不是偵錯模式，才清空緩存
+    if (!code && !errorParam && !isDebugMode) {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('userRole');
+      console.log('[系統] 偵測為全新登入，已清空舊有緩存');
+    }
 
-    //  如果偵測到教育局回傳錯誤 (例如使用者按取消)
     if (errorParam) {
-      console.error('教育局回傳錯誤:', errorParam);
       this.$message.error('教育局授權失敗或取消');
       window.history.replaceState({}, document.title, '/login');
       this.fetchNews();
@@ -368,25 +357,17 @@ export default {
     }
 
     if (code) {
-      console.log(' [Step 2] 偵測到 Code，發送至後端進行兌換...');
       this.isOidcLoading = true;
-
       try {
-        console.log(' [Step 2] 向後端請求，換取【教育局門票】...');
-        //  換取教育局 Token
         const resOidc = await api.post('/students/oidc/token/', {
           code: code,
           redirect_uri: `${window.location.origin}/api/oidccallback/`
         }, { timeout: 60000 });
 
-        console.log(' [Step 3] 拿到教育局門票，準備解析...');
-
-        //  解析教育局的 id_token，取出裡面的學生身分資料
         const idToken = resOidc.data.id_token;
         if (!idToken) throw new Error("沒有收到 id_token");
         const decodedUser = jwtDecode(idToken);
 
-        //  整理資料，準備給自家系統註冊/登入
         const postData = {
           sub: decodedUser.sub,
           kh_profile: decodedUser.kh_profile || {},
@@ -394,32 +375,21 @@ export default {
           kh_classes: decodedUser.kh_classes || {}
         };
 
-        console.log(' [Step 4] 拿著學生資料，向自家系統換取【真正的系統 Token】...', postData);
-
-        // 使用原有的 API，換取系統專屬 Token
         const loginResponse = await api.post('students/oidc/oidclogin/', postData, { timeout: 60000 });
-
-        console.log(' [Step 5] 拿到自家系統 Token！系統登入成功！');
-
-        // 清理網址
         window.history.replaceState({}, document.title, '/login');
-
-        //  執行登入 (這裡是傳入 loginResponse.data，不是教育局的資料)
         const targetPath = (loginResponse.data.role === 'student') ? '/home' : '/dashboard';
         this.performLogin(loginResponse.data, targetPath);
-
       } catch (error) {
-        console.error(' OIDC 登入流程徹底失敗:', error.response?.data || error.message);
+        console.error('OIDC 失敗:', error);
         this.isOidcLoading = false;
-        this.$message.error('系統登入失敗，請重新操作');
+        this.$message.error('系統登入失敗');
         window.history.replaceState({}, document.title, '/login');
       }
-      return; // OIDC 流程結束
+      return;
     }
-
-    // 💡 一般登入頁面載入流程
     this.fetchNews();
   },
+
 
   beforeDestroy() {
     // 移除監聽器
