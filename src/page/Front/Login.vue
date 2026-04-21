@@ -4,6 +4,11 @@
     <p>請稍候，正在與教育局連線中...</p>
   </div>
   <div v-else class="login-page">
+    <el-row>
+      <div class="logo-section">
+        <img src="../../assets/image/login/logo.png" alt="Logo">
+      </div>
+    </el-row>
     <el-row class="login-container" :gutter="40" type="flex">
       <el-col :span="12">
         <div class="announcement-card mobile-scroll-box">
@@ -108,6 +113,17 @@
         </div>
       </el-col>
     </el-row>
+
+    <div class="login-footer">
+      <div class="footer-scroll">
+        <p>英閱奇航 玩轉ABC</p>
+        <p>©高雄市梓官區梓官國民小學</p>
+        <p>地址：826002高雄市梓官區進學路61號</p>
+        <p>電話：07-6193927</p>
+        <p>傳真：07-6107135</p>
+        <p>VoIP：07-2624457</p>
+      </div>
+    </div>
 
     <el-dialog custom-class="confirm-pw-modal" :visible.sync="showFirstLoginDialog" width="600px" center
       :close-on-click-modal="false" :show-close="false">
@@ -305,82 +321,82 @@ export default {
 
     };
   },
-async mounted() {
-  const urlParams = new URLSearchParams(window.location.search);
-  // 同時檢查 Vue Router 與原生 URL 參數
-  const code = this.$route.query.code || urlParams.get('code');
-  const errorParam = this.$route.query.error || urlParams.get('error');
+  async mounted() {
+    const urlParams = new URLSearchParams(window.location.search);
+    // 同時檢查 Vue Router 與原生 URL 參數
+    const code = this.$route.query.code || urlParams.get('code');
+    const errorParam = this.$route.query.error || urlParams.get('error');
 
-  // 如果這不是回調 (Callback) 狀態，代表是用戶「第一次」進來登入頁
-  if (!code && !errorParam) {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('userRole');
-    console.log('[系統] 偵測為全新登入，已清空舊有 Token 緩存');
-  }
-
-  //  如果偵測到教育局回傳錯誤 (例如使用者按取消)
-  if (errorParam) {
-    console.error('教育局回傳錯誤:', errorParam);
-    this.$message.error('教育局授權失敗或取消');
-    window.history.replaceState({}, document.title, '/login');
-    this.fetchNews();
-    return;
-  }
-
-  if (code) {
-    console.log(' [Step 2] 偵測到 Code，發送至後端進行兌換...');
-    this.isOidcLoading = true;
-    
-  try {
-      console.log(' [Step 2] 向後端請求，換取【教育局門票】...');
-      //  換取教育局 Token
-      const resOidc = await api.post('/students/oidc/token/', {
-        code: code,
-        redirect_uri: `${window.location.origin}/api/oidccallback/`
-      }, { timeout: 60000 });
-
-      console.log(' [Step 3] 拿到教育局門票，準備解析...');
-
-      //  解析教育局的 id_token，取出裡面的學生身分資料
-      const idToken = resOidc.data.id_token;
-      if (!idToken) throw new Error("沒有收到 id_token");
-      const decodedUser = jwtDecode(idToken);
-
-      //  整理資料，準備給自家系統註冊/登入
-      const postData = {
-        sub: decodedUser.sub,
-        kh_profile: decodedUser.kh_profile || {},
-        kh_titles: decodedUser.kh_titles || {},
-        kh_classes: decodedUser.kh_classes || {}
-      };
-
-      console.log(' [Step 4] 拿著學生資料，向自家系統換取【真正的系統 Token】...', postData);
-
-      // 使用原有的 API，換取系統專屬 Token
-      const loginResponse = await api.post('students/oidc/oidclogin/', postData, { timeout: 60000 });
-
-      console.log(' [Step 5] 拿到自家系統 Token！系統登入成功！');
-
-      // 清理網址
-      window.history.replaceState({}, document.title, '/login');
-
-      //  執行登入 (這裡是傳入 loginResponse.data，不是教育局的資料)
-      const targetPath = (loginResponse.data.role === 'student') ? '/home' : '/dashboard';
-      this.performLogin(loginResponse.data, targetPath);
-
-    } catch (error) {
-      console.error(' OIDC 登入流程徹底失敗:', error.response?.data || error.message);
-      this.isOidcLoading = false;
-      this.$message.error('系統登入失敗，請重新操作');
-      window.history.replaceState({}, document.title, '/login');
+    // 如果這不是回調 (Callback) 狀態，代表是用戶「第一次」進來登入頁
+    if (!code && !errorParam) {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('userRole');
+      console.log('[系統] 偵測為全新登入，已清空舊有 Token 緩存');
     }
-    return; // OIDC 流程結束
-  }
 
-  // 💡 一般登入頁面載入流程
-  this.fetchNews();
-},
+    //  如果偵測到教育局回傳錯誤 (例如使用者按取消)
+    if (errorParam) {
+      console.error('教育局回傳錯誤:', errorParam);
+      this.$message.error('教育局授權失敗或取消');
+      window.history.replaceState({}, document.title, '/login');
+      this.fetchNews();
+      return;
+    }
+
+    if (code) {
+      console.log(' [Step 2] 偵測到 Code，發送至後端進行兌換...');
+      this.isOidcLoading = true;
+
+      try {
+        console.log(' [Step 2] 向後端請求，換取【教育局門票】...');
+        //  換取教育局 Token
+        const resOidc = await api.post('/students/oidc/token/', {
+          code: code,
+          redirect_uri: `${window.location.origin}/api/oidccallback/`
+        }, { timeout: 60000 });
+
+        console.log(' [Step 3] 拿到教育局門票，準備解析...');
+
+        //  解析教育局的 id_token，取出裡面的學生身分資料
+        const idToken = resOidc.data.id_token;
+        if (!idToken) throw new Error("沒有收到 id_token");
+        const decodedUser = jwtDecode(idToken);
+
+        //  整理資料，準備給自家系統註冊/登入
+        const postData = {
+          sub: decodedUser.sub,
+          kh_profile: decodedUser.kh_profile || {},
+          kh_titles: decodedUser.kh_titles || {},
+          kh_classes: decodedUser.kh_classes || {}
+        };
+
+        console.log(' [Step 4] 拿著學生資料，向自家系統換取【真正的系統 Token】...', postData);
+
+        // 使用原有的 API，換取系統專屬 Token
+        const loginResponse = await api.post('students/oidc/oidclogin/', postData, { timeout: 60000 });
+
+        console.log(' [Step 5] 拿到自家系統 Token！系統登入成功！');
+
+        // 清理網址
+        window.history.replaceState({}, document.title, '/login');
+
+        //  執行登入 (這裡是傳入 loginResponse.data，不是教育局的資料)
+        const targetPath = (loginResponse.data.role === 'student') ? '/home' : '/dashboard';
+        this.performLogin(loginResponse.data, targetPath);
+
+      } catch (error) {
+        console.error(' OIDC 登入流程徹底失敗:', error.response?.data || error.message);
+        this.isOidcLoading = false;
+        this.$message.error('系統登入失敗，請重新操作');
+        window.history.replaceState({}, document.title, '/login');
+      }
+      return; // OIDC 流程結束
+    }
+
+    // 💡 一般登入頁面載入流程
+    this.fetchNews();
+  },
 
   beforeDestroy() {
     // 移除監聽器
@@ -403,15 +419,15 @@ async mounted() {
     ...mapActions('oidcStore', ['authenticateOidc', 'oidcSignInCallback']),
 
     // 觸發 OIDC 彈出/跳轉登入 (學生專用)
-async handleOidcLogin() {
+    async handleOidcLogin() {
       console.log('啟動教育局 OIDC 登入跳轉...');
       this.isOidcLoading = true;
-      
+
       const redirectUri = `${window.location.origin}/api/oidccallback/`;
       const clientId = 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42';
-      
+
       const state = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-      
+
       const authUrl = `https://oidc.kh.edu.tw/oauth2/auth?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=openid%20email%20kh_profile%20kh_classes%20kh_titles&state=${state}`;
 
       window.location.href = authUrl;
@@ -550,7 +566,7 @@ async handleOidcLogin() {
     }
     ,
 
- async performLogin(loginData, path) {
+    async performLogin(loginData, path) {
       const token = loginData.token || loginData.access || loginData.access_token;
       const refresh = loginData.refresh || loginData.refresh_token;
       const role = loginData.role || 'student';
@@ -567,9 +583,12 @@ async handleOidcLogin() {
       if (role === 'student') {
         try {
           await api.post('students/attendance/');
-          console.log('自動簽到成功');
+          console.log('%c[簽到] 今日首次登入，簽到成功！', 'color: #27ae60');
         } catch (err) {
-          console.warn('[系統] 簽到提示或已簽到');
+          if (err.response && err.response.status === 400) {
+            const msg = err.response.data.message || '已簽到';
+            console.log(`%c[資訊] ${msg}`, 'color: #3498db; font-weight: bold;');
+          }
         }
       }
 
@@ -666,7 +685,20 @@ $bg-path: "~@/assets/image/login-bg.jpg";
   background-position: center center;
   background-repeat: no-repeat;
   justify-content: center;
-  @include flex-center;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  .logo-section {
+    padding-top: 2%;
+    justify-content: center;
+    @include flex-center;
+
+    img {
+      text-align: center;
+      width: 40%;
+    }
+  }
 
   i {
     margin-right: 4px;
@@ -711,10 +743,20 @@ $bg-path: "~@/assets/image/login-bg.jpg";
   }
 }
 
+.login-footer {
+  @include second-green-bg;
+  width: 100%;
+
+  .footer-scroll {
+    justify-content: center;
+    display: flex;
+    gap: 0 32px;
+  }
+}
+
 .login-container {
   width: 100vw;
-  padding: 4% 18%;
-
+  padding: 2% 18% 4%;
 
   #student-pass-disabled,
   #student-account,
@@ -1120,9 +1162,17 @@ $bg-path: "~@/assets/image/login-bg.jpg";
   }
 }
 
-@media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
+@media (orientation: landscape) and (max-height: 500px) {
   .login-container {
-    padding: 0;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+    padding: 4% 6% !important;
+    gap: 0 32px;
+
+    .el-col {
+      padding-right: 0 !important;
+      padding-left: 0 !important;
+    }
   }
 
   .mobile-scroll-box {
@@ -1139,14 +1189,21 @@ $bg-path: "~@/assets/image/login-bg.jpg";
     }
   }
 
-  .login-page {
-    padding: 5% !important;
-    height: auto;
-    overflow-y: auto;
-    // .card-subtitle{
-    //   font-size: 18px;
-    // }
+  .footer-scroll {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 20px;
+    padding: 8px 16px;
+    -webkit-overflow-scrolling: touch;
   }
+
+  .footer-scroll p {
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin: 0;
+    font-size: 12px;
+  }
+
 
 }
 </style>

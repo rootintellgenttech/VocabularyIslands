@@ -23,7 +23,10 @@ api.interceptors.request.use(
 
     // 只有不在白名單且有 token 時才加上標頭
     if (accessToken && !isWhiteListed) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
+        config.headers.Authorization = `Bearer ${accessToken}`;
+        console.log(`[發送請求] ${config.url} 已掛載 Token`);
+    } else {
+        console.log(`[發送請求] ${config.url} 沒有掛載 Token！(白名單或無Token)`);
     }
     return config;
   },

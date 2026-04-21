@@ -144,7 +144,7 @@
             <div class="dialog-content">
                 <h3 class="title exam-warning-title"><i class="fas fa-exclamation-circle"></i> 確定要離開考試嗎？</h3>
                 <p class="description" style="color:#AA1F0F; font-weight: bold;">
-                     注意：中途離開將會自動將剩餘題目視為「未填寫」並直接提交試卷，這將導致得分大幅降低或為零分。
+                    注意：中途離開將會自動將剩餘題目視為「未填寫」並直接提交試卷，這將導致得分大幅降低或為零分。
                 </p>
             </div>
             <span slot="footer" class="dialog-footer">
@@ -159,22 +159,38 @@
 import api from '@/config/api';
 
 
-// 測驗配置：設定各關卡的屬性
+// 測驗配置：設定各關卡的屬性與跳轉順序
 const EXAM_MASTER_SETTINGS = {
-    // 國小 第二階段
+    // --- 自主練習卷 (第一階段) ---
+    'ps-1': {
+        'EngToChi': { time: 15, totalScore: 50, next: 'part2-chi-eng' },
+        'ChiToEng': { time: 15, totalScore: 40, next: 'part3-listening' },
+        'Listening': { time: 5, totalScore: 10, next: null }
+    },
+    'ms7-1': {
+        'EngToChi': { time: 10, totalScore: 40, next: 'part2-chi-eng' },
+        'ChiToEng': { time: 10, totalScore: 32, next: 'part3-listening' },
+        'Listening': { time: 5, totalScore: 8, next: null }
+    },
+    'ms8-1': {
+        'EngToChi': { time: 10, totalScore: 40, next: 'part2-chi-eng' },
+        'ChiToEng': { time: 10, totalScore: 32, next: 'part3-listening' },
+        'Listening': { time: 5, totalScore: 8, next: 'ms-part4-context' },
+        'ContextFill': { time: 15, totalScore: 20, next: null }
+    },
+
+    // --- 正式考試卷 (第二階段) ---
     'ps-2': {
         'EngToChi': { time: 15, totalScore: 50, next: 'part2-chi-eng' },
         'ChiToEng': { time: 15, totalScore: 40, next: 'part3-listening' },
         'Listening': { time: 5, totalScore: 10, next: null }
     },
-    // 國中 7年級 第二階段
     'ms7-2': {
         'EngToChi': { time: 10, totalScore: 40, next: 'part2-chi-eng' },
         'ChiToEng': { time: 10, totalScore: 32, next: 'part3-listening' },
         'Listening': { time: 5, totalScore: 8, next: 'ms-part4-context' },
         'ContextFill': { time: 15, totalScore: 20, next: null }
     },
-    // 國中 8 年級 第一階段
     'ms8-2': {
         'EngToChi': { time: 10, totalScore: 40, next: 'part2-chi-eng' },
         'ChiToEng': { time: 10, totalScore: 32, next: 'part3-listening' },

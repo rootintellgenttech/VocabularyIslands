@@ -31,7 +31,11 @@
                         <div class="tabs-control">
                             <button :class="['tab-btn', { 'is-active': activeTab === 'challenge' }]"
                                 @click="activeTab = 'challenge'">
-                                <i class="fas fa-book-open"></i> 試煉挑戰
+                                <i class="fas fa-book-open"></i> 正式挑戰
+                            </button>
+                            <button :class="['tab-btn', { 'is-active': activeTab === 'practice' }]"
+                                @click="activeTab = 'practice'">
+                                <i class="fas fa-dumbbell"></i> 自主練習
                             </button>
                             <button :class="['tab-btn', { 'is-active': activeTab === 'history' }]"
                                 @click="activeTab = 'history'">
@@ -40,59 +44,70 @@
                         </div>
                         <div class="card-body-content">
                             <div v-if="activeTab === 'challenge'" class="challenge-area">
-                                <div class="exam-info-box">
+                                <div v-if="!isAllExamsCompleted" class="exam-info-box">
                                     <div class="exam-info">
                                         <h3 class="exam-title">{{ formatExamName(nextAvailableExam.name) }}</h3>
                                         <div class="exam-details">
-                                            <p class="detail-item">
-                                                <i class="far fa-clock"></i>
-                                                檢測期程: 2026-05-01 ~ 2026-06-02
-                                            </p>
+                                            <p class="detail-item"><i class="far fa-clock"></i> 檢測期程: 2026-05-01 ~
+                                                2026-06-02</p>
+                                            <p class="detail-item"><i class="fas fa-hourglass-half"></i> 考試時長: {{
+                                                totalExamTime }} 分鐘</p>
+                                        </div>
+                                    </div>
+                                    <button class="start-exam-btn" @click="showStartExamDialog(nextAvailableExam)">
+                                        {{ hasLocalProgress(nextAvailableExam.id) ? '繼續作答' : '開始作答' }}
+                                    </button>
+                                </div>
 
+                                <div v-else class="exam-info-box is-completed-box"
+                                    style="text-align: center; justify-content: center;">
+                                    <div class="exam-info">
+                                        <h3 class="exam-title" style="color: #999;">正式測驗已全部完成</h3>
+                                        <p>請前往「歷史記錄」查看您的成績</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div v-else-if="activeTab === 'practice'" class="practice-area">
+                                <div v-for="practice in filteredPracticeExams" :key="practice.id"
+                                    class="exam-info-box practice-box" style="margin-bottom: 15px;">
+                                    <div class="exam-info">
+                                        <h3 class="exam-title">{{ practice.name }}</h3>
+                                        <div class="exam-details">
                                             <p class="detail-item">
                                                 <i class="fas fa-hourglass-half"></i>
-                                                考試時長: {{ totalExamTime }} 分鐘
-                                            </p>
-
-                                            <p class="detail-item">
-                                                <i class="fas fa-list-ol"></i>
-                                                測驗部分: {{ nextAvailableExam.parts.length }} 個單元
+                                                考試時長: {{ getExamTime(practice.id) }} 分鐘
                                             </p>
                                         </div>
                                     </div>
-                                    <button :class="['start-exam-btn', { 'is-completed-btn': isExamCompleted }]"
-                                        :disabled="isExamCompleted" @click="showStartExamDialog(nextAvailableExam)">
-                                        <template v-if="isExamCompleted">
-                                            考試完畢
-                                        </template>
-                                        <template v-else>
-                                            {{ hasLocalProgress ? '繼續作答' : '開始作答' }}
-                                        </template>
+                                    <button class="start-exam-btn practice-btn" @click="showStartExamDialog(practice)">
+                                        {{ hasLocalProgress(practice.id) ? '繼續練習' : '開始練習' }}
                                     </button>
                                 </div>
+
+                                <div v-if="filteredPracticeExams.length === 0" class="no-data-info"
+                                    style="margin-top: 50px;">
+                                    <i class="fas fa-check-circle" style="font-size: 48px; color: #2A9D8F;"></i>
+                                    <p>太棒了！所有練習卷皆已完成。</p>
+                                </div>
                             </div>
+
                             <vue-custom-scrollbar v-else class="history-area" :settings="scrollSettings"
                                 v-loading="isLoadingHistory">
                                 <div v-if="historyList.length === 0 && !isLoadingHistory" class="no-data-info">
                                     <i class="fas fa-folder-open"></i>
-                                    <p>目前尚無有任何考試紀錄</p>
+                                    <p>目前尚無任何考試紀錄</p>
                                 </div>
-
                                 <div v-for="(record, idx) in historyList" :key="idx" class="score-info-box"
-                                    style="cursor: pointer;" @click="goToHistoryDetail(record)">
+                                    @click="goToHistoryDetail(record)">
                                     <div class="exam-info">
                                         <h3 class="exam-title">{{ formatExamName(record.exam_name) }}</h3>
                                         <div class="exam-details">
-                                            <p class="detail-item">
-                                                <i class="far fa-calendar-check"></i>
-                                                作答時間：{{ formatHistoryTime(record.answer_time) }}
+                                            <p class="detail-item"><i class="far fa-calendar-check"></i> {{
+                                                formatHistoryTime(record.answer_time) }}
                                             </p>
-                                            <p class="detail-summary">
-                                                總題數: {{ record.summary.total }} | 答對: <span style="color: #27ae60;">{{
-                                                    record.summary.correct }}</span> | 答錯: <span
-                                                    style="color:#AA1F0F;">{{
-                                                        record.summary.wrong }}</span>
-                                            </p>
+                                            <p class="detail-summary">答對: {{ record.summary.correct }} / 總題數: {{
+                                                record.summary.total }}</p>
                                         </div>
                                     </div>
                                     <div class="display-final-score">
@@ -105,54 +120,86 @@
                     </el-col>
                 </el-row>
             </div>
-
-
         </div>
-        <el-dialog custom-class="challenge-confirm-modal" :visible.sync="examDialogVisible" width="550px" center
-            :close-on-click-modal="false" :show-close="false">
-            <div class="dialog-content">
-                <h3 class="title exam-warning-title"><i class="fas fa-exclamation-circle"></i> 注意</h3>
-                <p class="description">請確認您已準備好再開始作答。</p>
-                <p class="description exam-checklist-title">為避免影響您的測驗結果，請務必確認：</p>
-                <ul class="exam-checklist">
-                    <li>網路連線穩定</li>
-                    <li>裝置有足夠電量</li>
-                    <li>已預留足夠作答時間 ({{ totalExamTime }} 分鐘)</li>
-                </ul>
-                <p class="description final-question">是否確定要開始考試？</p>
+
+        <el-dialog custom-class="challenge-confirm-modal" :visible.sync="examDialogVisible" width="600px" center
+            :close-on-click-modal="false" append-to-body @close="dialogStep = 1">
+
+            <div v-if="dialogStep === 1" class="dialog-content-custom">
+                <div class="warning-header">
+                    <i class="fas fa-exclamation-circle icon-big"></i>
+                    <h2 class="main-title">
+                        注意：此{{ (selectedExamTarget && selectedExamTarget.isPractice) ? '練習' : '考試' }}只有一次作答機會！
+                    </h2>
+                </div>
+
+                <div class="rule-box">
+                    <p v-if="!(selectedExamTarget && selectedExamTarget.isPractice)" class="rule-warn">
+                        本測驗須於學校統一安排之施測時段，並在教師監督下進行。<br>
+                        學生不得於未經學校安排或非在校情況下自行施測。
+                    </p>
+                    <p v-else class="rule-warn">
+                        本練習旨在協助您熟悉正式考試流程，請依正式考試態度作答。
+                    </p>
+                    <p class="rule-text secondary">
+                        違反施測規定者，其測驗結果自行負責。<br>
+                        作答途中不會保留作答紀錄，若因網路不穩或退出作答頁面，則視為結束考試。
+                    </p>
+                </div>
+
+                <div class="checklist-section">
+                    <p class="checklist-title">為避免影響您的測驗結果，請務必確認：</p>
+                    <ul class="exam-checklist-v2">
+                        <li>網路連線穩定</li>
+                        <li>裝置有足夠電量</li>
+                        <li>已預留足夠作答時間</li>
+                    </ul>
+                </div>
             </div>
+
+            <div v-else class="dialog-content-warn-step">
+                <div class="warn-img-wrapper">
+                    <img :src="warnImage" alt="警告" class="step2-warn-img">
+                </div>
+                <div class="warn-text-content">
+                    <h3 class="warn-highlight">注意！</h3>
+                    <p class="warn-desc">
+                        答案一經送出，將無法修改或返回上一題，<br>
+                        請確認作答無誤後再送出。
+                    </p>
+                </div>
+            </div>
+
             <span slot="footer" class="dialog-footer">
-                <el-button class="start-exam-btn" @click="confirmStartExam">開始考試</el-button>
+                <el-button class="btn-cancel" @click="examDialogVisible = false">取消返回</el-button>
+
+                <el-button v-if="dialogStep === 1" class="btn-confirm-start" @click="dialogStep = 2">
+                    下一步
+                </el-button>
+
+                <el-button v-else
+                    :class="['btn-confirm-start', { 'practice-theme': selectedExamTarget && selectedExamTarget.isPractice }]"
+                    @click="confirmStartExam">
+                    開始{{ (selectedExamTarget && selectedExamTarget.isPractice) ? '練習' : '考試' }}
+                </el-button>
             </span>
         </el-dialog>
 
+
     </div>
 </template>
+
 
 <script>
 import api from '@/config/api';
 
 const EXAM_MASTER_SETTINGS = {
-    // 國小：總共 15+15+5 = 35 分鐘
-    'ps-2': {
-        'EngToChi': { time: 15 },
-        'ChiToEng': { time: 15 },
-        'Listening': { time: 5 }
-    },
-    // 7年級：總共 10+10+5+15 = 40 分鐘
-    'ms7-2': {
-        'EngToChi': { time: 10 },
-        'ChiToEng': { time: 10 },
-        'Listening': { time: 5 },
-        'ContextFill': { time: 15 }
-    },
-    // 8年級：總共 10+10+5+15 = 40 分鐘
-    'ms8-2': {
-        'EngToChi': { time: 10 },
-        'ChiToEng': { time: 10 },
-        'Listening': { time: 5 },
-        'ContextFill': { time: 15 }
-    }
+    'ps-1': { 'EngToChi': { time: 15 }, 'ChiToEng': { time: 15 }, 'Listening': { time: 5 } },
+    'ps-2': { 'EngToChi': { time: 15 }, 'ChiToEng': { time: 15 }, 'Listening': { time: 5 } },
+    'ms7-1': { 'EngToChi': { time: 10 }, 'ChiToEng': { time: 10 }, 'Listening': { time: 5 }, 'ContextFill': { time: 15 } },
+    'ms7-2': { 'EngToChi': { time: 10 }, 'ChiToEng': { time: 10 }, 'Listening': { time: 5 }, 'ContextFill': { time: 15 } },
+    'ms8-1': { 'EngToChi': { time: 10 }, 'ChiToEng': { time: 10 }, 'Listening': { time: 5 }, 'ContextFill': { time: 15 } },
+    'ms8-2': { 'EngToChi': { time: 10 }, 'ChiToEng': { time: 10 }, 'Listening': { time: 5 }, 'ContextFill': { time: 15 } }
 };
 
 export default {
@@ -166,37 +213,22 @@ export default {
     },
     data() {
         return {
-            activeTab: 'challenge', // 'challenge', 'history'
+            activeTab: 'challenge',
             hallAvatar: require('../../assets/image/home/exam-island.png'),
             examDialogVisible: false,
-            isDevelopment: true,
-            isGenerating: false,
-            genProgress: '',
+            dialogStep: 1, // 1: 規則說明, 2: 最後警告
+            warnImage: require('@/assets/image/trial-quiz/warn.png'),
+            // 正式考試
             examTargets: [
-                {
-                    stage: 2,
-                    id: 'ps-2',
-                    name: '國小英語單字檢測-2',
-                    level: 'primary',
-                    words: 300,
-                    parts: ['EngToChi', 'ChiToEng', 'Listening']
-                },
-                {
-                    stage: 2,
-                    id: 'ms7-2',
-                    name: '7年級英語單字檢測-2',
-                    level: 'secondary-7',
-                    words: 800,
-                    parts: ['EngToChi', 'ChiToEng', 'Listening', 'ContextFill']
-                },
-                {
-                    stage: 2,
-                    id: 'ms8-2',
-                    name: '8年級英語單字檢測-2',
-                    level: 'secondary-8',
-                    words: 1200,
-                    parts: ['EngToChi', 'ChiToEng', 'Listening', 'ContextFill']
-                }
+                { id: 'ps-2', name: '國小英語單字檢測-2', level: 'primary', parts: ['EngToChi', 'ChiToEng', 'Listening'] },
+                { id: 'ms7-2', name: '7年級英語單字檢測-2', level: 'secondary-7', parts: ['EngToChi', 'ChiToEng', 'Listening', 'ContextFill'] },
+                { id: 'ms8-2', name: '8年級英語單字檢測-2', level: 'secondary-8', parts: ['EngToChi', 'ChiToEng', 'Listening', 'ContextFill'] }
+            ],
+            // 練習卷 (隨時開放)
+            practiceExams: [
+                { id: 'ps-1', name: '國小英語單字檢測-1', level: 'primary', parts: ['EngToChi', 'ChiToEng', 'Listening'], isPractice: true },
+                { id: 'ms7-1', name: '7年級英語單字檢測-1', level: 'secondary-7', parts: ['EngToChi', 'ChiToEng', 'Listening', 'ContextFill'], isPractice: true },
+                { id: 'ms8-1', name: '8年級英語單字檢測-1', level: 'secondary-8', parts: ['EngToChi', 'ChiToEng', 'Listening', 'ContextFill'], isPractice: true }
             ],
             historyList: [],
             isLoadingHistory: false,
@@ -211,12 +243,6 @@ export default {
         }
     },
     computed: {
-        // 檢查「目前這份試卷」是否有進度
-        hasLocalProgress() {
-            if (!this.nextAvailableExam) return false;
-            const key = `exam_progress_${this.nextAvailableExam.id}`;
-            return localStorage.getItem(key) !== null;
-        },
         totalExamTime() {
             const examId = this.nextAvailableExam.id;
             const settings = EXAM_MASTER_SETTINGS[examId];
@@ -228,15 +254,27 @@ export default {
                 return acc + (part.time || 0);
             }, 0);
         },
-        nextAvailableExam() {
-            if (!this.historyList || this.historyList.length === 0) {
-                return this.examTargets[0];
-            }
+        // 過濾後的正式考試列表
+        filteredExamTargets() {
             const completedCodes = this.historyList.map(h => h.code);
-            const next = this.examTargets.find(target => !completedCodes.includes(target.id));
+            return this.examTargets.filter(target => !completedCodes.includes(target.id));
+        },
 
-            // 如果找不到未完成的，就回傳最後一個或第一個，
-            return next || this.examTargets[this.examTargets.length - 1];
+        // 過濾後的自主練習列表
+        filteredPracticeExams() {
+            const completedCodes = this.historyList.map(h => h.code);
+            return this.practiceExams.filter(practice => !completedCodes.includes(practice.id));
+        },
+        nextAvailableExam() {
+            const list = this.filteredExamTargets;
+            if (list.length === 0) {
+                // 如果都考完了，回傳最後一個項目（或你可以自定義處理方式，例如回傳 null）
+                return this.examTargets[this.examTargets.length - 1];
+            }
+            return list[0];
+        },
+        isAllExamsCompleted() {
+            return this.filteredExamTargets.length === 0;
         },
 
         // 判斷當前顯示的這份試卷是否已經考過
@@ -252,20 +290,36 @@ export default {
             this.historyList = [];
             const validRecords = [];
 
-            for (const target of this.examTargets) {
+            // 合併正式考試與自主練習的所有 ID
+            const allPossibleIds = [
+                ...this.examTargets.map(t => t.id),
+                ...this.practiceExams.map(t => t.id)
+            ];
+
+            console.log("開始抓取歷史紀錄，目標清單:", allPossibleIds);
+
+            // 遍歷所有 ID 請求 API
+            for (const code of allPossibleIds) {
                 try {
                     const res = await api.get('/students/exam-papers/history/', {
-                        params: { code: target.id }
+                        params: { code: code }
                     });
 
+                    // 確保回傳資料有效且包含題目資訊
                     if (res.data && res.data.questions) {
                         validRecords.push(res.data);
                     }
                 } catch (err) {
-                    console.log(`試卷 ${target.id} 尚未有紀錄。`);
+                    // 404 代表該學生尚未作答這份試卷，屬於正常情況，不報錯
+                    if (err.response && err.response.status === 404) {
+                        console.log(`試卷 ${code} 尚未有作答紀錄。`);
+                    } else {
+                        console.error(`獲取試卷 ${code} 歷史失敗:`, err);
+                    }
                 }
             }
 
+            // 將所有紀錄依照「答題時間」由新到舊排序
             this.historyList = validRecords.sort((a, b) =>
                 new Date(b.answer_time) - new Date(a.answer_time)
             );
@@ -291,28 +345,50 @@ export default {
         },
         showStartExamDialog(target) {
             this.selectedExamTarget = target;
+            this.dialogStep = 1;
             this.examDialogVisible = true;
         },
+        hasLocalProgress(id) {
+            return localStorage.getItem(`exam_progress_${id}`) !== null;
+        },
+        getExamTime(id) {
+            const settings = EXAM_MASTER_SETTINGS[id];
+            return settings ? Object.values(settings).reduce((acc, p) => acc + (p.time || 0), 0) : 0;
+        },
 
-        // 確保點擊「瞭解」後執行正式流程
         async confirmStartExam() {
+            const target = this.selectedExamTarget;
             const now = new Date();
-            const startTime = new Date('2026-05-01T00:00:00');
-            const endTime = new Date('2026-06-02T23:59:59');
+            const endTime = new Date('2026-06-02T23:59:59'); // 統一截止時間
 
-            if (now < startTime || now > endTime) {
-                this.$message.warning('目前非考試開放時段（開放時間：2026-05-01 至 2026-06-02）');
-                this.examDialogVisible = false;
-                return;
+            if (target.isPractice) {
+                // --- 自主練習卷 (PS-1, MS7-1, MS8-1) ---
+                // 邏輯：即日開放，但超過 6/2 就關閉
+                if (now > endTime) {
+                    this.$message.warning('自主練習時段已結束（開放至 2026-06-02）');
+                    this.examDialogVisible = false;
+                    return;
+                }
+            } else {
+                // --- 正式考試卷 (PS-2, MS7-2, MS8-2) ---
+                // 邏輯：限定 5/1 ~ 6/2
+                const startTime = new Date('2026-05-01T00:00:00');
+                if (now < startTime || now > endTime) {
+                    this.$message.warning('此正式考試尚未開放或已結束（開放時間：2026-05-01 至 2026-06-02）');
+                    this.examDialogVisible = false;
+                    return;
+                }
             }
 
+            // 通過檢查，關閉視窗並開始測驗流程
             this.examDialogVisible = false;
-            if (!this.selectedExamTarget) return;
-
+            this.startExamFlow(target);
+        },
+        async startExamFlow(target) {
             try {
-                const response = await api.get('/students/exam-papers/', { params: { code: this.selectedExamTarget.id } });
+                const response = await api.get('/students/exam-papers/', { params: { code: target.id } });
                 let examData = response.data;
-                const storageKey = `exam_progress_${this.selectedExamTarget.id}`;
+                const storageKey = `exam_progress_${target.id}`;
                 const savedData = localStorage.getItem(storageKey);
 
                 let targetPartId = '';
@@ -332,10 +408,10 @@ export default {
                 this.$router.push({
                     name: 'TrialQuizPage',
                     params: {
-                        level: this.selectedExamTarget.level,
+                        level: target.level,
                         examId: targetPartId,
                         examData: examData,
-                        examCode: this.selectedExamTarget.id,
+                        examCode: target.id,
                         accumulatedAnswers: accumulatedAnswers
                     }
                 });
@@ -343,6 +419,7 @@ export default {
                 this.$message.error('無法載入考試資料');
             }
         },
+
         // God Mode 專用選擇函式
         async selectExamFromGodMode(target) {
             this.isGenerating = true;
@@ -465,16 +542,22 @@ export default {
             downloadAnchorNode.remove();
         },
         formatExamName(nameOrId) {
-            // 建立一個對照表，同時支援 ID 和 API 可能回傳的名稱
+            // 合併兩個清單來尋找對應的中文名稱
+            const allExams = [...this.examTargets, ...this.practiceExams];
+            const found = allExams.find(ex => ex.id === nameOrId || ex.name === nameOrId);
+
+            if (found) return found.name;
+
             const nameMap = {
+                'ps-1': '國小英語單字檢測-1',
                 'ps-2': '國小英語單字檢測-2',
+                'ms7-1': '7年級英語單字檢測-1',
                 'ms7-2': '7年級英語單字檢測-2',
-                'ms8-2': '8年級英語單字檢測-2',
-                // 為了相容 API 舊數據，也可以加上可能的舊名稱
-                '國小英文測驗 2': '國小英語單字檢測-2'
+                'ms8-1': '8年級英語單字檢測-1',
+                'ms8-2': '8年級英語單字檢測-2'
             };
 
-            return nameMap[nameOrId] || nameMap[nameOrId.trim()] || nameOrId;
+            return nameMap[nameOrId] || nameOrId;
         },
         goToHistoryDetail(record) {
             console.log("原始 API 紀錄:", record);
@@ -529,25 +612,90 @@ export default {
 .trial-hall-page {
     padding-left: 100px;
 
-    .challenge-confirm-modal {
+}
 
-        .description,
-        .exam-checklist {
-            display: inline;
-            align-self: flex-start;
-            margin: 4px 0;
-            padding-left: 8%;
-            text-align: left;
+.challenge-confirm-modal {
+
+    .warning-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        gap: 0 10px;
+
+        .main-title,
+        i {
+            margin: 0 0 20px;
+            color: $main-black-text;
         }
 
-        .exam-checklist {
+        i {
+            font-size: 20px;
+        }
+    }
+
+
+    .rule-box,
+    .checklist-section {
+        padding: 0 16px;
+
+        .rule-text,
+        .checklist-title,
+        .exam-checklist-v2 {
+            font-size: 16px;
+            margin: 8px 0 0;
+        }
+
+        .rule-warn {
+            font-size: 16px;
+            margin: 0 0 12px;
+            color: $main-black-text;
             font-weight: 600;
-            padding-left: 12%;
+        }
+    }
+
+    .dialog-content-warn-step {
+        text-align: center;
+        padding: 20px 0;
+
+        .warn-img-wrapper {
+            .step2-warn-img {
+                width: 100%;
+                height: auto;
+            }
         }
 
-        .final-question {
-            margin-top: 16px;
+        .warn-highlight,
+        .warn-text-content {
+            text-align: left;
+            font-size: 16px;
+            color: $main-black-text;
+            padding: 0 16px;
         }
+
+        .warn-highlight,
+        .warn-desc {
+            font-size: 18px;
+            padding: 0 16px;
+            margin: 0;
+        }
+    }
+
+    .description,
+    .exam-checklist {
+        display: inline;
+        align-self: flex-start;
+        margin: 4px 0;
+        padding-left: 8%;
+        text-align: left;
+    }
+
+    .exam-checklist {
+        font-weight: 600;
+        padding-left: 12%;
+    }
+
+    .final-question {
+        margin-top: 16px;
     }
 }
 

@@ -267,29 +267,39 @@ export default {
         }
     },
     async mounted() {
-        // 同步載入所有基礎數據
-        await Promise.all([
-            this.fetchSummaryData(),
-            this.fetchLearningData(),
-            this.fetchExamData()
-        ]);
 
-        // 載入列表數據並渲染圖表
-        const res = await api.get('/students/list/');
-        this.rawListData = res.data.results || [];
+        try {
+            // 同步載入所有基礎數據
+            const results = await Promise.all([
+                this.fetchSummaryData(),
+                this.fetchLearningData(),
+                this.fetchExamData()
+            ]);
+            // console.log('1. [Promise.all 基礎數據] 已全部回傳');
 
-        if (res.data.level === 'league' && this.userRole === 'global_leader') {
-            this.allianceOptions = this.rawListData.map(l => l.league_name);
-            const defaultLeague = this.allianceOptions[0];
+            // 載入列表數據並渲染圖表
+            const res = await api.get('/students/list/');
+            // console.log('2. [API: /students/list/] 原始回傳:', res.data);
 
-            this.selectedAttendanceAlliance = defaultLeague;
-            this.handleAttendanceAllianceChange(defaultLeague);
+            this.rawListData = res.data.results || [];
 
-            this.selectedChallengeAlliance = defaultLeague;
-            this.handleChallengeAllianceChange(defaultLeague);
-        } else {
-            this.renderAttendanceChart(this.rawListData);
-            this.renderChallengeChart(this.rawListData);
+            if (res.data.level === 'league' && this.userRole === 'global_leader') {
+                // console.log('3. [身分判定] 總召集人模式 (聯盟層級)');
+                this.allianceOptions = this.rawListData.map(l => l.league_name);
+                const defaultLeague = this.allianceOptions[0];
+
+                this.selectedAttendanceAlliance = defaultLeague;
+                this.handleAttendanceAllianceChange(defaultLeague);
+
+                this.selectedChallengeAlliance = defaultLeague;
+                this.handleChallengeAllianceChange(defaultLeague);
+            } else {
+                // console.log('3. [身分判定] 召集人/管理員模式 (學校/班級層級)');
+                this.renderAttendanceChart(this.rawListData);
+                this.renderChallengeChart(this.rawListData);
+            }
+        } catch (err) {
+            console.error('===== [儀錶板載入異常] =====', err);
         }
     },
     methods: {
