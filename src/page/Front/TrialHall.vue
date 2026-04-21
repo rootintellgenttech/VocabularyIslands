@@ -33,10 +33,10 @@
                                 @click="activeTab = 'challenge'">
                                 <i class="fas fa-book-open"></i> 正式挑戰
                             </button>
-                            <button :class="['tab-btn', { 'is-active': activeTab === 'practice' }]"
+                            <!-- <button :class="['tab-btn', { 'is-active': activeTab === 'practice' }]"
                                 @click="activeTab = 'practice'">
                                 <i class="fas fa-dumbbell"></i> 自主練習
-                            </button>
+                            </button> -->
                             <button :class="['tab-btn', { 'is-active': activeTab === 'history' }]"
                                 @click="activeTab = 'history'">
                                 <i class="fas fa-history"></i> 歷史記錄
@@ -48,14 +48,16 @@
                                     <div class="exam-info">
                                         <h3 class="exam-title">{{ formatExamName(nextAvailableExam.name) }}</h3>
                                         <div class="exam-details">
-                                            <p class="detail-item"><i class="far fa-clock"></i> 檢測期程: 2026-05-01 ~
-                                                2026-06-02</p>
+                                            <p class="detail-item"><i class="far fa-clock"></i> 檢測期程: 2026-06-01 ~
+                                                2026-06-30</p>
                                             <p class="detail-item"><i class="fas fa-hourglass-half"></i> 考試時長: {{
                                                 totalExamTime }} 分鐘</p>
                                         </div>
                                     </div>
-                                    <button class="start-exam-btn" @click="showStartExamDialog(nextAvailableExam)">
-                                        {{ hasLocalProgress(nextAvailableExam.id) ? '繼續作答' : '開始作答' }}
+                                    <button :class="['start-exam-btn', { 'is-disabled': !isExamOpen }]"
+                                        :disabled="!isExamOpen" @click="showStartExamDialog(nextAvailableExam)">
+                                        {{ isExamOpen ? (hasLocalProgress(nextAvailableExam.id) ? '繼續作答' : '開始作答') :
+                                            '尚未開放' }}
                                     </button>
                                 </div>
 
@@ -65,30 +67,6 @@
                                         <h3 class="exam-title" style="color: #999;">正式測驗已全部完成</h3>
                                         <p>請前往「歷史記錄」查看您的成績</p>
                                     </div>
-                                </div>
-                            </div>
-
-                            <div v-else-if="activeTab === 'practice'" class="practice-area">
-                                <div v-for="practice in filteredPracticeExams" :key="practice.id"
-                                    class="exam-info-box practice-box" style="margin-bottom: 15px;">
-                                    <div class="exam-info">
-                                        <h3 class="exam-title">{{ practice.name }}</h3>
-                                        <div class="exam-details">
-                                            <p class="detail-item">
-                                                <i class="fas fa-hourglass-half"></i>
-                                                考試時長: {{ getExamTime(practice.id) }} 分鐘
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <button class="start-exam-btn practice-btn" @click="showStartExamDialog(practice)">
-                                        {{ hasLocalProgress(practice.id) ? '繼續練習' : '開始練習' }}
-                                    </button>
-                                </div>
-
-                                <div v-if="filteredPracticeExams.length === 0" class="no-data-info"
-                                    style="margin-top: 50px;">
-                                    <i class="fas fa-check-circle" style="font-size: 48px; color: #2A9D8F;"></i>
-                                    <p>太棒了！所有練習卷皆已完成。</p>
                                 </div>
                             </div>
 
@@ -104,8 +82,7 @@
                                         <h3 class="exam-title">{{ formatExamName(record.exam_name) }}</h3>
                                         <div class="exam-details">
                                             <p class="detail-item"><i class="far fa-calendar-check"></i> {{
-                                                formatHistoryTime(record.answer_time) }}
-                                            </p>
+                                                formatHistoryTime(record.answer_time) }}</p>
                                             <p class="detail-summary">答對: {{ record.summary.correct }} / 總題數: {{
                                                 record.summary.total }}</p>
                                         </div>
@@ -225,11 +202,11 @@ export default {
                 { id: 'ms8-2', name: '8年級英語單字檢測-2', level: 'secondary-8', parts: ['EngToChi', 'ChiToEng', 'Listening', 'ContextFill'] }
             ],
             // 練習卷 (隨時開放)
-            practiceExams: [
-                { id: 'ps-1', name: '國小英語單字檢測-1', level: 'primary', parts: ['EngToChi', 'ChiToEng', 'Listening'], isPractice: true },
-                { id: 'ms7-1', name: '7年級英語單字檢測-1', level: 'secondary-7', parts: ['EngToChi', 'ChiToEng', 'Listening', 'ContextFill'], isPractice: true },
-                { id: 'ms8-1', name: '8年級英語單字檢測-1', level: 'secondary-8', parts: ['EngToChi', 'ChiToEng', 'Listening', 'ContextFill'], isPractice: true }
-            ],
+            // practiceExams: [
+            //     { id: 'ps-1', name: '國小英語單字檢測-1', level: 'primary', parts: ['EngToChi', 'ChiToEng', 'Listening'], isPractice: true },
+            //     { id: 'ms7-1', name: '7年級英語單字檢測-1', level: 'secondary-7', parts: ['EngToChi', 'ChiToEng', 'Listening', 'ContextFill'], isPractice: true },
+            //     { id: 'ms8-1', name: '8年級英語單字檢測-1', level: 'secondary-8', parts: ['EngToChi', 'ChiToEng', 'Listening', 'ContextFill'], isPractice: true }
+            // ],
             historyList: [],
             isLoadingHistory: false,
             selectedExamTarget: null,
@@ -243,6 +220,12 @@ export default {
         }
     },
     computed: {
+        isExamOpen() {
+            const now = new Date();
+            const startTime = new Date('2026-06-01T00:00:00');
+            const endTime = new Date('2026-06-30T23:59:59');
+            return now >= startTime && now <= endTime;
+        },
         totalExamTime() {
             const examId = this.nextAvailableExam.id;
             const settings = EXAM_MASTER_SETTINGS[examId];
@@ -260,11 +243,11 @@ export default {
             return this.examTargets.filter(target => !completedCodes.includes(target.id));
         },
 
-        // 過濾後的自主練習列表
-        filteredPracticeExams() {
-            const completedCodes = this.historyList.map(h => h.code);
-            return this.practiceExams.filter(practice => !completedCodes.includes(practice.id));
-        },
+        // // 過濾後的自主練習列表
+        // filteredPracticeExams() {
+        //     const completedCodes = this.historyList.map(h => h.code);
+        //     return this.practiceExams.filter(practice => !completedCodes.includes(practice.id));
+        // },
         nextAvailableExam() {
             const list = this.filteredExamTargets;
             if (list.length === 0) {
@@ -293,7 +276,7 @@ export default {
             // 合併正式考試與自主練習的所有 ID
             const allPossibleIds = [
                 ...this.examTargets.map(t => t.id),
-                ...this.practiceExams.map(t => t.id)
+                // ...this.practiceExams.map(t => t.id)
             ];
 
             console.log("開始抓取歷史紀錄，目標清單:", allPossibleIds);
@@ -359,28 +342,26 @@ export default {
         async confirmStartExam() {
             const target = this.selectedExamTarget;
             const now = new Date();
-            const endTime = new Date('2026-06-02T23:59:59'); // 統一截止時間
 
-            if (target.isPractice) {
-                // --- 自主練習卷 (PS-1, MS7-1, MS8-1) ---
-                // 邏輯：即日開放，但超過 6/2 就關閉
-                if (now > endTime) {
-                    this.$message.warning('自主練習時段已結束（開放至 2026-06-02）');
+            // 定義 6 月的起訖時間
+            const startTime = new Date('2026-06-01T00:00:00');
+            const endTime = new Date('2026-06-30T23:59:59');
+
+            if (!target.isPractice) {
+                // --- 正式考試卷 ---
+                if (now < startTime) {
+                    this.$message.warning('此正式考試尚未開放（開放時間：2026-06-01 起）');
                     this.examDialogVisible = false;
                     return;
                 }
-            } else {
-                // --- 正式考試卷 (PS-2, MS7-2, MS8-2) ---
-                // 邏輯：限定 5/1 ~ 6/2
-                const startTime = new Date('2026-05-01T00:00:00');
-                if (now < startTime || now > endTime) {
-                    this.$message.warning('此正式考試尚未開放或已結束（開放時間：2026-05-01 至 2026-06-02）');
+                if (now > endTime) {
+                    this.$message.warning('此正式考試已結束（開放至 2026-06-30）');
                     this.examDialogVisible = false;
                     return;
                 }
             }
 
-            // 通過檢查，關閉視窗並開始測驗流程
+            // 通過檢查，執行開始考試
             this.examDialogVisible = false;
             this.startExamFlow(target);
         },
@@ -542,12 +523,7 @@ export default {
             downloadAnchorNode.remove();
         },
         formatExamName(nameOrId) {
-            // 合併兩個清單來尋找對應的中文名稱
-            const allExams = [...this.examTargets, ...this.practiceExams];
-            const found = allExams.find(ex => ex.id === nameOrId || ex.name === nameOrId);
-
-            if (found) return found.name;
-
+            // 優先定義完整的名稱對照表 (包含所有正式與練習卷)
             const nameMap = {
                 'ps-1': '國小英語單字檢測-1',
                 'ps-2': '國小英語單字檢測-2',
@@ -557,7 +533,12 @@ export default {
                 'ms8-2': '8年級英語單字檢測-2'
             };
 
-            return nameMap[nameOrId] || nameOrId;
+            if (nameMap[nameOrId]) return nameMap[nameOrId];
+
+            const allExams = [...(this.examTargets || []), ...(this.practiceExams || [])];
+            const found = allExams.find(ex => ex.id === nameOrId || ex.name === nameOrId);
+
+            return found ? found.name : nameOrId;
         },
         goToHistoryDetail(record) {
             console.log("原始 API 紀錄:", record);
@@ -882,6 +863,13 @@ export default {
             border-radius: 0 16px 16px 0;
             font-size: 20px;
             transition: background-color 0.2s;
+
+            &.is-disabled {
+                background-color: #ccc !important;
+                cursor: not-allowed !important;
+                box-shadow: none !important;
+                transform: none !important;
+            }
         }
 
         .is-completed-btn {

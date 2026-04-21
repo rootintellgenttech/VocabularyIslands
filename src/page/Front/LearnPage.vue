@@ -19,10 +19,8 @@
 
                             <h1 v-if="!scope.data.isImageMode" class="card-word-title">{{ scope.data.mainText }}</h1>
 
-                            <img v-if="scope.data.isImageMode" 
-     :src="getImageUrl(scope.data.mainText)"
-     class="card-image" 
-     :alt="`${scope.data.mainText} 的學習圖片`" />
+                            <img v-if="scope.data.isImageMode" :src="getImageUrl(scope.data.mainText)"
+                                class="card-image" :alt="`${scope.data.mainText} 的學習圖片`" />
                         </div>
 
                         <div v-if="scope.data.subText" class="word-translation">
@@ -33,8 +31,8 @@
             </Tinder>
 
             <div class="btns">
-                <i class="fa-solid fa-circle-xmark" @click="decide('pass')" style="color: #c42121"></i>
-                <i class="fa-solid fa-circle-check" style="color: #4270f9" @click="decide('remember')"></i>
+                <p class="remember-btn" @click="decide('pass')">我不熟<span>✖</span></p>
+                <p class="forget-btn" @click="decide('remember')">我會了<span>✔</span></p>
             </div>
         </div>
 
@@ -97,7 +95,7 @@ export default {
             this.isFinished = false;
             this.queue = [];
             try {
-                console.log('--- [LearnPage ABC Debug] ---');
+                // console.log('--- [LearnPage ABC Debug] ---');
                 let payload = {};
 
                 const isAbcRequest =
@@ -115,7 +113,7 @@ export default {
                 }
 
                 if (isAbcRequest) {
-                    console.log('執行 ABC 學習模式請求');
+                    // console.log('執行 ABC 學習模式請求');
                     if (this.unitId === 'final' || this.stageLabel === 'A-Z') {
                         // ABC 總複習
                         payload = {
@@ -154,7 +152,7 @@ export default {
                     };
                 }
 
-                console.log(' LearnPage Payload:', JSON.stringify(payload));
+                // console.log(' LearnPage Payload:', JSON.stringify(payload));
                 const response = await api.post('/questionbank/generate/', payload);
                 const apiData = response.data;
 
@@ -163,7 +161,7 @@ export default {
                 let cards = [];
 
                 if (isAbcRequest) {
-                    console.log('處理 ABC 學習卡片數據');
+                    // console.log('處理 ABC 學習卡片數據');
                     cards = apiData.map((item, index) => ({
                         id: item.id || (Date.now() + index),
                         mainText: item.question_text || item.answer,
@@ -172,7 +170,7 @@ export default {
                         isImageMode: true
                     }));
                 } else {
-                    console.log('處理一般單字卡片數據');
+                    // console.log('處理一般單字卡片數據');
                     cards = apiData
                         .filter(item => item.type !== 'cloze')
                         .map((item, index) => {
@@ -205,7 +203,7 @@ export default {
         },
 
         onSubmit({ item, type }) {
-            console.log(`卡片: ${item.mainText}, 選擇: ${type}`);
+            // console.log(`卡片: ${item.mainText}, 選擇: ${type}`);
 
             if (type === 'pass') {
                 const retryItem = { ...item, id: Date.now() + Math.random() };
@@ -281,6 +279,28 @@ export default {
         padding: 5% 0;
     }
 
+    .remember-btn,
+    .forget-btn {
+        cursor: pointer;
+        @include flex-center;
+        gap: 0 10px;
+        color: white;
+        font-weight: 600;
+        width: 150px;
+        border-radius: 40px;
+        justify-content: space-between;
+        padding: 0 16px;
+        font-size: 18px;
+    }
+
+    .remember-btn {
+        background-color: #c42121;
+    }
+
+    .forget-btn {
+        background-color: #4270f9;
+    }
+
     .back-link {
         color: $main-black-text;
         font-size: 18px;
@@ -300,6 +320,10 @@ export default {
 
     .btns {
         text-align: center;
+        display: flex;
+        gap: 0 20px;
+        justify-content: center;
+        height: 80px;
     }
 }
 
