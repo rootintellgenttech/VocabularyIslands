@@ -290,14 +290,59 @@ export default {
         filteredRanking() {
             return this.rankingType === 'all' ? this.allRanking : this.schoolRanking;
         },
-        filteredGames() {
-            const allGames = this.gamesData[this.gameLevel] || [];
-            // 如果是國中 (secondary)，確保不會出現 id 為 'abc' 的遊戲
-            if (this.gameLevel === 'secondary') {
-                return allGames.filter(game => game.id !== 'abc');
+       filteredGames() {
+        const typeName = this.currentWeekType === 'listening' ? '聽力' : '閱讀';
+        const isPrimary = this.gameLevel === 'primary';
+        const levelName = isPrimary ? '國小' : '國中';
+        
+        // 根據目前的週次動態生成列表
+        const baseGames = isPrimary ? [
+            { 
+                id: 'abc', 
+                title: '字母轉盤樂', 
+                description: '答對所有字母題目', 
+                point: '每題10分，共5題', 
+                island: 'ABC啟航島', 
+                iconClass: 'ABC_ICON' 
+            },
+            { 
+                id: 'perfect', 
+                title: `完美連擊 (${typeName})`, 
+                description: `連續答對${typeName}題目直到錯誤`, 
+                point: '每題10分', 
+                island: `${levelName}${typeName}海灣`, 
+                iconClass: 'TARGET_ICON' 
+            },
+            { 
+                id: 'speed', 
+                title: `速度對決 (${typeName})`, 
+                description: `1分鐘內，盡可能的答對${typeName}題`, 
+                point: '每題10分', 
+                island: `${levelName}${typeName}海灣`, 
+                iconClass: 'THUNDER_ICON' 
             }
-            return allGames;
-        },
+        ] : [
+            // 國中版 (移除 ABC)
+            { 
+                id: 'perfect', 
+                title: `完美連擊 (${typeName})`, 
+                description: `連續答對${typeName}題目直到錯誤`, 
+                point: '每題10分', 
+                island: `${levelName}${typeName}海灣`, 
+                iconClass: 'TARGET_ICON' 
+            },
+            { 
+                id: 'speed', 
+                title: `速度對決 (${typeName})`, 
+                description: `1分鐘內，盡可能的答對${typeName}題`, 
+                point: '每題10分', 
+                island: `${levelName}${typeName}海灣`, 
+                iconClass: 'THUNDER_ICON' 
+            }
+        ];
+
+        return baseGames;
+    },
         // 遊戲/挑戰 Tab 的計算圖示
         challengeTabIcon() {
             return '<i class="fa-solid fa-gamepad"></i>';

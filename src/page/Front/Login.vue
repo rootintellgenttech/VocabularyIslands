@@ -101,17 +101,6 @@
               <p class="forgot-password-link" @click="openForgetPassModal">忘記密碼</p>
             </div>
           </div>
-          <!-- 快速身份登錄 -->
-          <!-- <div class="dev-test-zone">
-            <p class="dev-title">🛠️ 開發測試快速通道 (點擊直接登入)</p>
-            <div class="dev-btn-grid">
-              <button v-for="(role, index) in testRoles" :key="index" class="dev-role-btn" :class="role.class"
-                @click="handleTestLogin(role)">
-                {{ role.name }}
-              </button>
-            </div>
-          </div> -->
-
         </div>
       </el-col>
     </el-row>
@@ -251,47 +240,8 @@ export default {
         password: '',
       },
       alertMessage: '',
-      alertType: 'error', // success, info, warning, error
+      alertType: 'error', 
       showAlert: false,
-      testRoles: [
-        {
-          key: 'student',
-          name: '1. 學生 (God Mode)',
-          path: '/home',
-          class: 'btn-student',
-          account: 's0099999',
-          password: '0kiec354'
-        },
-        {
-          key: 'school_admin',
-          name: '2. 學校管理員',
-          path: '/dashboard',
-          class: 'btn-admin',
-          account: 'school_admin@example.com',
-          password: 'ENpassword123'
-        },
-        {
-          key: 'union_leader',
-          name: '3. 聯盟召集人',
-          path: '/dashboard',
-          class: 'btn-admin',
-          account: 'union_leader@example.com',
-          password: 'ENpassword123'
-        },
-        {
-          key: 'global_leader',
-          name: '4. 總召集人/教育部',
-          path: '/dashboard',
-          class: 'btn-top',
-          account: 'global_leader@example.com',
-          password: 'ENpassword123'
-        }
-      ],
-      // defaultBackendTokens: {
-      //   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY1ODY3NDc0LCJpYXQiOjE3NjU4NjU2NzQsImp0aSI6ImU2YTc4OTVhZDRlNzQ1NzBhMmEyMmE4OTA4YjM1ZDBjIiwidXNlcl9pZCI6MzV9.lewJXA_rBur_1gPtrZqcmeai4K5etxhSN27X7P4FU0",
-      //   "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2NjQ3MDQ3NCwiaWF0IjoxNzY1ODY1Njc0LCJqdGkiOiIxNTc3MDU0YWQ0NzI0NmEyOGY0OGVhNDhiMDM1ODNkMyIsInVzZXJfaWQiOjM1fQ.E_wvI9MgdA0rNC9XCRRYGFpggsl1N6djXj9zfMM2BeI",
-      //   "email": "test@example.com"
-      // },
       showFirstLoginDialog: false,
       showChangePassDialog: false,
       tempLoginData: null,
@@ -316,33 +266,21 @@ export default {
         ]
       },
       showResetPassDialog: false,
-      resetPassToken: '', // 存儲網址帶來的 token
+      resetPassToken: '', 
       resetPassForm: {
         new_password: ''
       }
 
     };
   },
-async mounted() {
+  async mounted() {
     const urlParams = new URLSearchParams(window.location.search);
     
-    const isDebugMode = urlParams.get('debug_mode') === 'min_special';
-    
-    if (isDebugMode) {
-      console.log('[Freego 應援] 偵測到檢測暗號，準備自動登入...');
-      // 預設用第一個角色 (學生) 登入
-      const autoRole = this.testRoles[0];
-      if (autoRole) {
-        this.handleTestLogin(autoRole);
-        return; // 執行自動登入後跳出，不走後面的 OIDC 邏輯
-      }
-    }
-
     const code = this.$route.query.code || urlParams.get('code');
     const errorParam = this.$route.query.error || urlParams.get('error');
 
-    // 如果不是 OIDC 回調，也不是偵錯模式，才清空緩存
-    if (!code && !errorParam && !isDebugMode) {
+    // 如果這不是回調 (Callback) 狀態，代表是用戶「第一次」進來登入頁
+    if (!code && !errorParam) {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('userRole');
@@ -389,10 +327,7 @@ async mounted() {
     }
     this.fetchNews();
   },
-
-
   beforeDestroy() {
-    // 移除監聽器
     window.removeEventListener('message', this.handleOidcMessage);
   },
   computed: {
@@ -404,23 +339,18 @@ async mounted() {
     submitButtonText() {
       return this.currentRole === 'teacher' ? '教職員登入' : '學生登入';
     },
-    // 引入插件解析好的使用者資料
     ...mapGetters('oidcStore', ['oidcUser', 'oidcIsAuthenticated'])
   },
   methods: {
-    // 引入插件的 登入 與 回調 函數
     ...mapActions('oidcStore', ['authenticateOidc', 'oidcSignInCallback']),
 
-    // 觸發 OIDC 彈出/跳轉登入 (學生專用)
     async handleOidcLogin() {
       console.log('啟動教育局 OIDC 登入跳轉...');
       this.isOidcLoading = true;
 
       const redirectUri = `${window.location.origin}/api/oidccallback/`;
       const clientId = 'kh_vendor_englishability_a95da8c087d6f9c3f62acc5e22c26f42';
-
       const state = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-
       const authUrl = `https://oidc.kh.edu.tw/oauth2/auth?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=openid%20email%20kh_profile%20kh_classes%20kh_titles&state=${state}`;
 
       window.location.href = authUrl;
@@ -431,30 +361,24 @@ async mounted() {
       const message = event.data;
       if (message.type === 'OIDC_LOGIN_SUCCESS') {
         const loginData = message.payload;
-
-        // 加上預設值 'student'，避免後端沒給 role 時導致誤判
         const realRole = loginData.role || 'student';
-
         let targetPath = '';
         if (realRole === 'student') {
           targetPath = '/home';
         } else {
           targetPath = '/dashboard';
         }
-
         this.performLogin(loginData, targetPath);
       } else if (message.type === 'OIDC_LOGIN_ERROR') {
         alert('登入失敗: ' + message.error);
       }
     },
-    //  觸發忘記密碼彈窗
     openForgetPassModal() {
       this.showForgetPassDialog = true;
       if (this.$refs.forgetForm) {
         this.$refs.forgetForm.resetFields();
       }
     },
-    //  忘記密碼提交
     async handleForgetPassword() {
       this.$refs.forgetForm.validate(async (valid) => {
         if (!valid) return;
@@ -470,7 +394,6 @@ async mounted() {
         }
       });
     },
-    // 教職員點擊按鈕觸發這個
     async handleLogin() {
       if (!this.teacherForm.account || !this.teacherForm.password) {
         alert('請輸入帳號和密碼');
@@ -498,9 +421,8 @@ async mounted() {
         this.loadingNews = false;
       }
     },
-    // 沿用舊密碼：回傳 skip_change: true
     async handleKeepOldPassword() {
-      this.performLogin(this.tempLoginData, null); // 需先存 Token
+      this.performLogin(this.tempLoginData, null); 
       try {
         await api.post('students/first-change-password/', {
           skip_change: true
@@ -508,28 +430,20 @@ async mounted() {
         this.showFirstLoginDialog = false;
         this.$router.push(this.tempPath);
       } catch (err) {
-        this.$router.push(this.tempPath); // 失敗仍進入，避免死循環
+        this.$router.push(this.tempPath);
       }
     },
-
-    // 前往修改密碼對話框
     openChangePassDialog() {
       this.showFirstLoginDialog = false;
       this.showChangePassDialog = true;
     },
-
     closeChangePassDialog() {
       this.showChangePassDialog = false;
-
-      // 做法 1：手動清空數據
       this.passForm.new_password = '';
-
-      // 做法 2：重置 Element UI 表單校驗狀態與數值（推薦）
       if (this.$refs.passForm) {
         this.$refs.passForm.resetFields();
       }
     },
-
     async submitNewPassword() {
       this.$refs.passForm.validate(async (valid) => {
         if (!valid) return;
@@ -539,8 +453,6 @@ async mounted() {
             new_password: this.passForm.new_password
           });
           alert('密碼修改成功，請使用新密碼重新登入');
-
-          // 成功後清理
           this.closeChangePassDialog();
           this.logoutAndReset();
         } catch (err) {
@@ -548,17 +460,13 @@ async mounted() {
         }
       });
     },
-
     logoutAndReset() {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('userRole');
       if (window.tokenTimer) clearInterval(window.tokenTimer);
-
       this.loginForm.password = '';
-    }
-    ,
-
+    },
     async performLogin(loginData, path) {
       const token = loginData.token || loginData.access || loginData.access_token;
       const refresh = loginData.refresh || loginData.refresh_token;
@@ -572,7 +480,6 @@ async mounted() {
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       }
 
-      // 只有真正的學生才執行簽到
       if (role === 'student') {
         try {
           await api.post('students/attendance/');
@@ -585,42 +492,12 @@ async mounted() {
         }
       }
 
-      // 啟動刷新計時器
       this.startTokenRefreshTimer();
 
       if (path) {
         this.$router.push(path);
       }
     },
-
-    // 測試帳號快捷登入：自動填入並執行 API 登入
-    async handleTestLogin(role) {
-      this.currentRole = (role.key === 'student') ? 'student' : 'teacher';
-
-      const loginPayload = {
-        username: role.account,
-        password: role.password || 'ENpassword123' // 如果 role 沒寫密碼則用預設
-      };
-
-      try {
-        console.log(`[GodMode] 正在以 ${role.name} 身分登入...`);
-
-        const response = await api.post('students/login/', loginPayload);
-
-        // 執行登入成功後的 token 存儲與跳轉
-        // 如果是學生 role.path 通常是 /home，管理員則是 /dashboard
-        this.performLogin(response.data, role.path);
-
-        this.$message({
-          message: `${role.name} 快速登入成功`,
-          type: 'success'
-        });
-      } catch (error) {
-        console.error('[GodMode] 登入失敗:', error);
-        alert(role.name + ' 自動登入失敗：' + (error.response?.data?.detail || '網路錯誤'));
-      }
-    },
-    //Token 刷新計時器
     async startTokenRefreshTimer() {
       if (this.refreshTimer) return;
 
@@ -640,7 +517,6 @@ async mounted() {
         }
       }, 25 * 60 * 1000);
     },
-    // 提交重設密碼 
     async handleResetPasswordSubmit() {
       this.$refs.resetPassForm.validate(async (valid) => {
         if (!valid) return;
@@ -649,12 +525,9 @@ async mounted() {
             token: this.resetPassToken,
             new_password: this.resetPassForm.new_password
           });
-
           alert('密碼重設成功！');
           this.showResetPassDialog = false;
           this.resetPassForm.new_password = '';
-
-          // 清理網址，回到乾淨的 /login
           this.$router.replace('/login');
         } catch (error) {
           alert(error.response?.data?.detail || '重設失敗，連結可能過期');

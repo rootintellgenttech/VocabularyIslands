@@ -15,12 +15,20 @@
 
                 <div class="question-content">
                     <div class="question-wrap">
-                        <div class="audio-trigger big-icon" @click="playAudio(currentQuestionText)">
-                            <i class="fas fa-volume-up"></i>
-                        </div>
+                        <template v-if="gameType === 'listening'">
+                            <div class="audio-trigger big-icon" @click="playAudio(currentQuestionText)">
+                                <i class="fas fa-volume-up"></i>
+                            </div>
+                        </template>
+
+                        <template v-else>
+                            <h1 class="question-title reading-mode-title">{{ currentQuestionText }}</h1>
+                        </template>
                     </div>
 
-                    <p class="instruction-text">請選擇聽到的中文意思</p>
+                    <p class="instruction-text">
+                        {{ gameType === 'listening' ? '請聽音檔並選擇正確的中文意思' : '請選擇正確的中文意思' }}
+                    </p>
 
                     <div class="options-grid">
                         <button v-for="(option, index) in currentOptions" :key="index"
@@ -29,8 +37,6 @@
                             {{ option.text }}
                         </button>
                     </div>
-
-
                     <el-button class="submit-btn" :disabled="!tempSelectedAnswer" @click="handleQuestionSubmit">
                         提交
                     </el-button>
@@ -53,7 +59,9 @@
             <div class="dialog-content">
                 <img :src="heroAvatarPath" alt="吉祥物" class="dialog-avatar">
                 <h3 class="title">準備好開始挑戰了嗎？</h3>
-                <p class="description">快速回答完 50 題「英翻中」聽力挑戰！</p>
+                <p class="description">
+                    快速回答完 50 題「英翻中」{{ gameType === 'listening' ? '聽力' : '閱讀' }}挑戰！
+                </p>
             </div>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="handleGameStartClose">取 消</el-button>
@@ -66,7 +74,7 @@
             <div class="dialog-content">
                 <h3 class="title exam-warning-title"><i class="fas fa-exclamation-circle"></i> 確定要離開嗎？</h3>
                 <p class="description" style="color: #AA1F0F; font-weight: bold;">
-                     注意：中途離開將會自動將剩餘題目視為「未填寫」並直接結算，這將導致您失去今天的挑戰機會。
+                    注意：中途離開將會自動將剩餘題目視為「未填寫」並直接結算，這將導致您失去今天的挑戰機會。
                 </p>
             </div>
             <span slot="footer" class="dialog-footer">
@@ -131,7 +139,8 @@ export default {
                 this.dialogVisible = false;
                 this.isGameActive = true;
                 this.$nextTick(() => {
-                    if (this.currentQuestionText) {
+                    // 只有聽力模式才自動播放
+                    if (this.currentQuestionText && this.gameType === 'listening') {
                         this.playAudio(this.currentQuestionText);
                     }
                 });
@@ -261,11 +270,14 @@ export default {
         questionCount(newVal) {
             if (this.isGameActive && !this.isFinished) {
                 this.$nextTick(() => {
-                    this.playAudio(this.currentQuestionText);
+                    // 只有聽力模式切換題目時才自動播放聲音
+                    if (this.gameType === 'listening' && this.currentQuestionText) {
+                        this.playAudio(this.currentQuestionText);
+                    }
                 });
             }
         }
-    },
+    }
 };
 </script>
 
