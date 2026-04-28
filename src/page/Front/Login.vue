@@ -119,7 +119,7 @@
     <div class="login-footer">
       <div class="footer-scroll">
         <p>英閱奇航 玩轉ABC</p>
-        <p>©高雄市梓官區梓官國民小學</p>
+        <p>©高雄市政府教育局</p>
         <p>地址：826002高雄市梓官區進學路61號</p>
         <p>電話：07-6193927</p>
         <p>傳真：07-6107135</p>
@@ -377,7 +377,7 @@ async mounted() {
 
         const loginResponse = await api.post('students/oidc/oidclogin/', postData, { timeout: 60000 });
         window.history.replaceState({}, document.title, '/login');
-        const targetPath = (loginResponse.data.role === 'student') ? '/home' : '/dashboard';
+        const targetPath = (loginResponse.data.role === 'student') ? '/' : '/dashboard';
         this.performLogin(loginResponse.data, targetPath);
       } catch (error) {
         console.error('OIDC 失敗:', error);

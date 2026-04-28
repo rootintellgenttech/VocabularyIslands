@@ -15,10 +15,18 @@ const routes = [
     name: 'OidcCallbackSlash',
     component: Login
   },
-  
   {
-    path: '/',
-    redirect: '/login'
+    path: '/', 
+    name: 'F_Home',
+    component: () => import('../page/Front/Home.vue')
+  },
+  {
+    path: '/login/:token?',
+    name: 'Login',
+    component: Login,
+    meta: {
+      hideSidebar: true
+    }
   },
   {
     path: '/login/:token?',
@@ -207,15 +215,11 @@ const router = new VueRouter({
   routes
 });
 
-// 路由守衛：確保遇到 OIDC 網址時「絕對放行」
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('accessToken');
   
-  // 如果網址帶有 code，強制把它護送到 /login，並且【保留所有參數】
+  // 1. OIDC 強制攔截 
   if (to.query.code) {
-    // console.log('[RouterGuard] 攔截到 code！強制帶往 /login 並保留參數:', to.query.code);
-    
-    // 如果目前不在 /login，我們強制把它導向 /login，並把 query (包含 code) 傳過去
     if (to.path !== '/login') {
       next({ path: '/login', query: to.query });
       return;
@@ -224,14 +228,21 @@ router.beforeEach((to, from, next) => {
       return;
     }
   }
-  
-  if (to.name === 'Login' || to.path.includes('/api/oidccallback')) {
+
+  // 2. 判斷是否為白名單 (登入頁或 OIDC 回調)
+  const isPublicPage = to.name === 'Login' || to.path.includes('/api/oidccallback');
+
+  if (isPublicPage) {
+    // 如果要去登入頁，直接放行
     next();
   } else if (!token) {
+    // 如果不是去登入頁，且「沒有 Token」，一律送回登入
     next('/login');
   } else {
+    // 有 Token，正常跳轉 (包含去 '/')
     next();
   }
 });
+
 
 export default router;
