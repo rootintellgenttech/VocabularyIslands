@@ -563,8 +563,8 @@ export default {
     .reply-info {
         display: flex;
         justify-content: space-between;
-        margin-top: 16px;
-        font-size: 16px;
+        margin-top: 1rem;
+        font-size: 1rem;
     }
 
     .copy-icon {
@@ -587,15 +587,15 @@ export default {
 }
 
 .password-modal .el-input {
-    margin-top: 10px;
+    margin-top: .625rem;
 }
 
 .sidebar {
     justify-content: space-between;
     background-color: transparent;
-    width: 90px;
+    width: 5.625rem;
     color: $main-black-text;
-    padding-top: 16px;
+    padding-top: 1rem;
     transition: width 0.3s ease-in-out, background-color 0.3s ease;
     display: flex;
     flex-direction: column;
@@ -623,11 +623,11 @@ export default {
     }
 
     .achievement-section {
-        padding: 24px 16px 16px;
+        padding: 1.5rem 1rem 1rem;
 
         .section-title {
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: .625rem;
             color: $main-black-text;
             white-space: nowrap;
         }
@@ -636,20 +636,20 @@ export default {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(1, 1fr);
-            grid-column-gap: 12px;
-            margin-top: 10px;
+            grid-column-gap: .75rem;
+            margin-top: .625rem;
 
             .badge-item {
                 width: 100%;
-                height: 80px;
+                height: 5rem;
                 background: linear-gradient(135deg, rgba(245, 108, 66, 0.2) 0%, rgba(22, 162, 73, 0.2) 100%);
-                border: 1px solid #F56C424D;
-                border-radius: 24px;
+                border: .0625rem solid #F56C424D;
+                border-radius: 1.5rem;
                 @include flex-center;
                 justify-content: center;
 
                 i {
-                    font-size: 16px;
+                    font-size: 1rem;
                     margin-bottom: 0;
                 }
             }
@@ -658,15 +658,15 @@ export default {
 
 
     .toggle-btn {
-        width: 30px;
-        height: 30px;
+        width: 1.875rem;
+        height: 1.875rem;
         @include flex-center;
         justify-content: center;
         color: #666;
-        font-size: 16px;
+        font-size: 1rem;
         border-radius: 50%;
         transition: transform 0.3s ease, background-color 0.2s;
-        margin-right: 5px;
+        margin-right: .3125rem;
         cursor: pointer;
 
         i {
@@ -681,12 +681,12 @@ export default {
         .second-row {
             @include flex-center;
             justify-content: space-between;
-            margin-top: 8px;
+            margin-top: .5rem;
         }
 
         .user-name {
             font-weight: bold;
-            font-size: 18px;
+            font-size: 1.125rem;
             color: $main-black-text;
         }
     }
@@ -694,28 +694,28 @@ export default {
     .menu-section {
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: 1rem;
     }
 
     .stat-item {
         @include flex-center;
         color: white;
-        padding: 8px 10px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: .5rem .625rem;
+        border-radius: .5rem;
+        box-shadow: 0 .125rem .25rem rgba(0, 0, 0, 0.1);
         transition: padding 0.3s ease, width 0.3s ease;
         overflow: hidden;
-        height: 60px;
+        height: 3.75rem;
         position: relative;
 
         i {
-            font-size: 20px !important
+            font-size: 1.25rem !important
         }
 
         .stat-icon {
             margin-right: 0;
-            font-size: 14px;
-            margin-bottom: 2px;
+            font-size: .875rem;
+            margin-bottom: .125rem;
             color: white;
         }
 
@@ -730,35 +730,35 @@ export default {
 
         .stat-label {
             flex-grow: 1;
-            font-size: 16px;
+            font-size: 1rem;
             white-space: nowrap;
             overflow: hidden;
         }
 
         .stat-value {
             font-weight: bold;
-            font-size: 16px;
+            font-size: 1rem;
             white-space: nowrap;
             overflow: hidden;
         }
     }
 
     .bottom-menu {
-        padding-bottom: 38px;
+        padding-bottom: 2.375rem;
 
         .menu-item {
             @include flex-center;
-            padding: 0 16px;
+            padding: 0 1rem;
             cursor: pointer;
             transition: background-color 0.2s, color 0.2s;
             color: $main-black-text;
             font-weight: 500;
-            height: 40px;
+            height: 2.5rem;
 
 
             i {
-                width: 30px;
-                font-size: 18px;
+                width: 1.875rem;
+                font-size: 1.125rem;
                 text-align: center;
             }
 
@@ -772,16 +772,16 @@ export default {
 
 
     &.is-expanded {
-        width: 300px;
+        width: 18.75rem;
         background-color: #F0FAFFBF;
-        box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1);
+        box-shadow: .125rem 0 .375rem rgba(0, 0, 0, 0.1);
 
         .user-info {
-            padding: 0 16px;
+            padding: 0 1rem;
         }
 
         .toggle-btn i {
-            font-size: 18px;
+            font-size: 1.125rem;
         }
 
         .sidebar-header {
@@ -793,26 +793,26 @@ export default {
         }
 
         .menu-section {
-            padding: 0 16px;
-            margin-top: 8px;
-            padding-top: 12px;
-            border-top: 1px solid rgba(128, 128, 128, 0.274);
+            padding: 0 1rem;
+            margin-top: .5rem;
+            padding-top: .75rem;
+            border-top: .0625rem solid rgba(128, 128, 128, 0.274);
         }
 
 
         .stat-item {
             .stat-icon {
-                height: 40px;
-                width: 40px;
+                height: 2.5rem;
+                width: 2.5rem;
                 color: white;
                 @include flex-center;
                 justify-content: center;
-                border-radius: 8px;
+                border-radius: .5rem;
                 background-color: rgba(255, 255, 255, 0.2);
-                margin-right: 12px;
+                margin-right: .75rem;
 
                 i {
-                    font-size: 18px;
+                    font-size: 1.125rem;
                 }
             }
         }
@@ -829,17 +829,17 @@ export default {
 
         .sidebar-header {
             justify-content: center;
-            margin-bottom: 16px;
+            margin-bottom: 1rem;
         }
 
         .toggle-btn {
             margin: 0;
             background-color: #F0FAFFBF;
-            border: #DAE2E7 2px solid;
-            width: 42px;
-            height: 42px;
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: #DAE2E7 .125rem solid;
+            width: 2.625rem;
+            height: 2.625rem;
+            border-radius: .75rem;
+            box-shadow: 0 .125rem .25rem rgba(0, 0, 0, 0.1);
             color: $main-black-text;
 
             &:hover {
@@ -848,8 +848,8 @@ export default {
         }
 
         .stat-item {
-            width: 60px;
-            height: 60px;
+            width: 3.75rem;
+            height: 3.75rem;
             padding: 0;
             flex-direction: column;
             justify-content: center;
@@ -858,12 +858,12 @@ export default {
 
             .stat-icon {
                 margin-right: 0;
-                font-size: 14px;
-                margin: 4px 0;
+                font-size: .875rem;
+                margin: .25rem 0;
                 color: white;
 
                 i {
-                    font-size: 16px;
+                    font-size: 1rem;
                 }
             }
 
@@ -874,7 +874,7 @@ export default {
             .stat-value {
                 position: static;
                 transform: none;
-                font-size: 16px;
+                font-size: 1rem;
                 line-height: 1;
                 display: block;
                 width: 100%;
@@ -886,17 +886,17 @@ export default {
             border-top: none;
             @include flex-center;
             flex-direction: column;
-            gap: 16px;
+            gap: 1rem;
 
             .menu-item {
                 background-color: #F0FAFFBF;
-                border: #DAE2E7 2px solid;
-                width: 40px;
-                height: 40px;
-                border-radius: 12px;
+                border: #DAE2E7 .125rem solid;
+                width: 2.5rem;
+                height: 2.5rem;
+                border-radius: .75rem;
                 justify-content: center;
                 padding: 0;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 .125rem .25rem rgba(0, 0, 0, 0.1);
 
                 &:hover {
                     background-color: #a3defcbf;
@@ -904,7 +904,7 @@ export default {
 
                 i {
                     width: auto;
-                    font-size: 18px;
+                    font-size: 1.125rem;
                     color: $main-black-text;
                 }
             }
@@ -913,7 +913,7 @@ export default {
 
     .teacher-menu-item {
         @include flex-center;
-        padding: 12px 16px;
+        padding: .75rem 1rem;
         cursor: pointer;
         transition: all 0.2s ease;
         color: #555;
@@ -929,27 +929,27 @@ export default {
         &.active {
             background-color: #e6f7f5;
             color: #2aaea0;
-            border-right: 3px solid #2aaea0;
+            border-right: .1875rem solid #2aaea0;
         }
 
         .menu-icon {
-            width: 30px;
+            width: 1.875rem;
             text-align: center;
-            font-size: 18px;
-            margin-right: 10px;
+            font-size: 1.125rem;
+            margin-right: .625rem;
             flex-shrink: 0;
         }
 
         .menu-label {
-            font-size: 16px;
+            font-size: 1rem;
             font-weight: 500;
             flex-grow: 1;
         }
 
         .menu-sub {
-            font-size: 12px;
+            font-size: .75rem;
             color: #999;
-            margin-left: 5px;
+            margin-left: .3125rem;
             display: block;
             transform: scale(0.9);
         }
@@ -957,12 +957,12 @@ export default {
 
     &:not(.is-expanded) {
         .teacher-menu-item {
-            padding: 15px 0;
+            padding: .9375rem 0;
             justify-content: center;
 
             .menu-icon {
                 margin-right: 0;
-                font-size: 20px;
+                font-size: 1.25rem;
             }
 
             .menu-label,
@@ -982,9 +982,9 @@ export default {
 }
 
 
-@media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
+@media (orientation: landscape) and (max-height: 47.9988rem) and (pointer: coarse) {
     .sidebar {
-        width: 90px;
+        width: 5.625rem;
         padding: 0;
         background-color: unset;
         box-shadow: none;
@@ -994,13 +994,13 @@ export default {
             .toggle-btn {
                 visibility: visible !important;
                 position: fixed;
-                left: 10px;
-                top: 10px;
+                left: .625rem;
+                top: .625rem;
                 z-index: 100;
-                width: 42px;
-                height: 42px;
+                width: 2.625rem;
+                height: 2.625rem;
                 background-color: #F0FAFFBF;
-                border: #DAE2E7 2px solid;
+                border: #DAE2E7 .125rem solid;
             }
         }
 
@@ -1017,7 +1017,7 @@ export default {
         }
 
         .achievement-section .achievement-badges .badge-item {
-            width: 100px;
+            width: 6.25rem;
         }
     }
 
@@ -1026,9 +1026,9 @@ export default {
         height: 100vh;
         top: 0;
         left: 0;
-        padding: 10px 0;
+        padding: .625rem 0;
         background-color: #F0FAFF;
-        box-shadow: 2px 0 6px rgba(0, 0, 0, 0.3);
+        box-shadow: .125rem 0 .375rem rgba(0, 0, 0, 0.3);
         position: fixed;
         z-index: 9999;
 
@@ -1042,8 +1042,8 @@ export default {
                 background-color: transparent;
                 border: none;
                 box-shadow: none;
-                width: 30px;
-                height: 30px;
+                width: 1.875rem;
+                height: 1.875rem;
             }
         }
     }

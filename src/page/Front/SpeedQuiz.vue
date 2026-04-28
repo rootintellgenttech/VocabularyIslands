@@ -21,17 +21,26 @@
 
                 <div class="question-content">
                     <div class="question-wrap">
-                        <h1 class="question-title">{{ currentQuestion ? currentQuestion.question_text : '' }}</h1>
+                        <template v-if="gameType === 'listening'">
+                            <div class="audio-trigger big-icon" @click="playAudio(currentQuestion.question_text)">
+                                <i class="fas fa-volume-up"></i>
+                            </div>
+                        </template>
+
+                        <template v-else>
+                            <h1 class="question-title reading-mode-title">{{ currentQuestion.question_text }}</h1>
+                        </template>
                     </div>
 
-                    <p class="instruction-text">請聽音檔並選擇正確的英文單字</p>
+                    <p class="instruction-text">
+                        {{ gameType === 'listening' ? '請聽音檔並選擇正確的英文單字' : '請選出正確的英文單字' }}
+                    </p>
 
                     <div class="options-grid">
                         <button v-for="(option, index) in currentOptions" :key="index"
                             :class="['option-btn', { 'is-selected': tempSelectedAnswer === option.id }]"
-                            @click="handleOptionClick(option)" type="button" :aria-label="`播放選項 ${index + 1} 的音檔並選擇`"
-                            :aria-pressed="tempSelectedAnswer === option.id">
-                            <i class="fas fa-volume-up" aria-hidden="true"></i>
+                            @click="handleOptionClick(option)">
+                            {{ option.text }}
                         </button>
                     </div>
                     <el-button class="submit-btn" :disabled="!tempSelectedAnswer" @click="handleQuestionSubmit">
@@ -56,7 +65,9 @@
             <div class="dialog-content">
                 <img :src="heroAvatarPath" alt="英雄吉祥物" class="dialog-avatar">
                 <h3 class="title">準備好開始挑戰了嗎？</h3>
-                <p class="description">目標是在 1 分鐘內回答完 50 題抽選！</p>
+                <p class="description">
+                    目標是在 1 分鐘內回答盡可能多的{{ gameType === 'listening' ? '聽力' : '閱讀' }}題！
+                </p>
             </div>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="handleClose">取 消</el-button>
@@ -69,7 +80,7 @@
             <div class="dialog-content">
                 <h3 class="title exam-warning-title"><i class="fas fa-exclamation-circle"></i> 確定要離開嗎？</h3>
                 <p class="description" style="color:#AA1F0F; font-weight: bold;">
-                     注意：中途離開將會自動將剩餘題目視為「未填寫」並立即結算。
+                    注意：中途離開將會自動將剩餘題目視為「未填寫」並立即結算。
                 </p>
             </div>
             <span slot="footer" class="dialog-footer">
@@ -147,7 +158,10 @@ export default {
         },
         handleOptionClick(option) {
             this.tempSelectedAnswer = option.id;
-            this.playAudio(option.text);
+            // 如果是聽力模式，點擊選項時播放英文；閱讀模式不播，
+            if (this.gameType === 'listening') {
+                this.playAudio(option.text);
+            }
         },
         // 存檔並判斷下一題
         handleQuestionSubmit() {
