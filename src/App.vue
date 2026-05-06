@@ -17,8 +17,6 @@
         <a href="/trial-hall">試煉大廳</a>
       </nav>
     </main>
-
-    ...
   </div>
 </template>
 
@@ -30,7 +28,7 @@ export default {
   components: {
     Sidebar
   },
- data() {
+  data() {
     return {
       refreshTimer: null,
       // 新增：判斷是否為本地開發環境
@@ -127,7 +125,7 @@ body {
 
 
 html {
-  font-size: 100%; 
+  font-size: 100%;
 }
 
 .el-form--label-top .el-form-item__label {

@@ -43,6 +43,12 @@
             <div id="export-island-analysis">
                 <el-table height="400" :data="islandTableData" style="width: 100%" class="custom-table">
 
+                    <el-table-column v-if="userRole === 'school_admin'" prop="grade" label="年級" align="center"
+                        width="80">
+                        <template slot-scope="scope">
+                            {{ scope.row.grade }} 年
+                        </template>
+                    </el-table-column>
                     <el-table-column v-if="userRole === 'global_leader'" type="expand">
                         <template slot-scope="props">
                             <div class="expand-table-wrapper">
@@ -69,14 +75,24 @@
 
                     <el-table-column v-if="userRole === 'global_leader'" prop="alliance" label="聯盟名稱"
                         min-width="150"></el-table-column>
-
                     <el-table-column
                         :label="userRole === 'global_leader' ? '學校數量' : (userRole === 'school_admin' ? '班級' : '學校名稱')"
                         align="center">
                         <template slot-scope="scope">
+                            <!-- 總召身份：顯示 XX 間 -->
                             <span v-if="userRole === 'global_leader'">{{ scope.row.schoolCount }} 間</span>
-                            <span v-else>{{ userRole === 'school_admin' ? scope.row.classroom : scope.row.schoolName
-                            }}</span>
+
+                            <!-- 非總召身份 -->
+                            <span v-else>
+                                <template v-if="userRole === 'school_admin'">
+                                    <!-- 校管身份：顯示 數字 + 班 -->
+                                    {{ scope.row.classroom }} 班
+                                </template>
+                                <template v-else>
+                                    <!-- 其他身份（如聯盟召集人）：僅顯示 學校名稱 -->
+                                    {{ scope.row.schoolName }}
+                                </template>
+                            </span>
                         </template>
                     </el-table-column>
 
@@ -307,7 +323,7 @@ export default {
 
         // 處理身分標籤
         renderParticipantChart(dataArray) {
-            const categories = dataArray.map(item => item.school_name || `${item.grade}年${item.classroom}班`);
+            const categories = dataArray.map(item => item.school_name || (item.grade ? `${item.grade}年${item.classroom}班` : '未命名'));
             const values = dataArray.map(item => item.today_competition_participants || 0);
             this.participantCount = categories.length;
             this.stackedBarOptions = this.getCommonBarOptions(categories, '人');
@@ -328,23 +344,36 @@ export default {
         // 處理中間的參與人數表格
         processTableData(resData) {
             const rawResults = resData.results || [];
-            if (resData.level === 'league') {
-                this.islandTableData = rawResults.map(league => {
-                    const schools = league.schools || [];
-                    const sTotal = schools.reduce((sum, s) => sum + (Number(s.student_total) || 0), 0);
-                    const pTotal = schools.reduce((sum, s) => sum + (Number(s.today_competition_participants) || 0), 0);
-                    const scoreTotal = schools.reduce((sum, s) => sum + (Number(s.competition_total_score) || 0), 0);
+
+            if (resData.level === 'class') {
+                this.islandTableData = rawResults.map(item => ({
+                    grade: item.grade,
+                    classroom: item.classroom,
+                    schoolName: item.school_name || resData.school_name,
+                    totalStudents: Number(item.student_total) || 0,
+                    participants: Number(item.today_competition_participants) || 0,
+                    participationRate: Number(item.student_total) > 0
+                        ? ((Number(item.today_competition_participants) / Number(item.student_total)) * 100).toFixed(0) + '%'
+                        : '0%',
+                    totalScore: Number(item.competition_total_score) || 0
+                }));
+            } else if (resData.level === 'league') {
+                this.islandTableData = rawResults.map(item => {
+                    const sTotal = Number(item.student_total) || 0;
+                    const pTotal = Number(item.today_competition_participants) || 0;
+                    const scoreTotal = Number(item.competition_total_score) || 0;
+
                     return {
-                        alliance: league.league_name,
-                        schoolCount: league.school_total || schools.length,
+                        schoolName: item.school_name,
+                        classroom: item.classroom || '',
                         totalStudents: sTotal,
                         participants: pTotal,
                         participationRate: sTotal > 0 ? ((pTotal / sTotal) * 100).toFixed(0) + '%' : '0%',
-                        totalScore: scoreTotal,
-                        schools: schools
+                        totalScore: scoreTotal
                     };
                 });
             } else {
+                // 其他身分 (校管等) 的處理
                 this.islandTableData = rawResults.map(item => ({
                     classroom: item.classroom,
                     schoolName: item.school_name,
