@@ -123,9 +123,9 @@ export default {
 
       // 試卷列表
       rawExamList: [
-        { id: 1, name: '國小英語單字檢測-2', date: '05.01 - 06.02', type: 'primary', participants: 0, avgScore: null },
-        { id: 2, name: '7年級英語單字檢測-2', date: '05.01 - 06.02', type: 'junior', participants: 0, avgScore: null },
-        { id: 3, name: '8年級英語單字檢測-2', date: '05.01 - 06.02', type: 'junior', participants: 0, avgScore: null }
+        { id: 1, name: '國小英語單字檢測-2', date: '06.01 - 06.30', type: 'primary', participants: 0, avgScore: null },
+        { id: 2, name: '7年級英語單字檢測-2', date: '06.01 - 06.30', type: 'junior', participants: 0, avgScore: null },
+        { id: 3, name: '8年級英語單字檢測-2', date: '06.01 - 06.30', type: 'junior', participants: 0, avgScore: null }
       ],
       examOverviewData: [],
       allExamsStatsCache: {},
