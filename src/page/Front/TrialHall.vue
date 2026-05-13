@@ -1,6 +1,7 @@
 <template>
     <div class="trial-hall-page">
-        <div class="return-last-page" @click="goBack">
+        <div class="return-last-page" tabindex="0" role="button" aria-label="返回上一頁" @click="goBack"
+            @keydown.enter.prevent="goBack" @keydown.space.prevent="goBack">
             <i class="fas fa-angle-left"></i> 返回
         </div>
         <!-- <div v-if="isDevelopment" class="god-mode-selection">
@@ -28,22 +29,27 @@
                             </div>
                         </div>
 
-                        <div class="tabs-control">
-                            <button :class="['tab-btn', { 'is-active': activeTab === 'challenge' }]"
-                                @click="activeTab = 'challenge'">
-                                <i class="fas fa-book-open"></i> 正式挑戰
+                        <div class="tabs-control" role="tablist" aria-label="試煉單元切換">
+                            <button role="tab" id="tab-challenge" :aria-selected="activeTab === 'challenge'"
+                                aria-controls="panel-challenge"
+                                :class="['tab-btn', { 'is-active': activeTab === 'challenge' }]"
+                                @click="activeTab = 'challenge'" @keydown.enter="activeTab = 'challenge'">
+                                <i class="fas fa-book-open" aria-hidden="true"></i> 正式挑戰
                             </button>
                             <!-- <button :class="['tab-btn', { 'is-active': activeTab === 'practice' }]"
                                 @click="activeTab = 'practice'">
                                 <i class="fas fa-dumbbell"></i> 自主練習
                             </button> -->
-                            <button :class="['tab-btn', { 'is-active': activeTab === 'history' }]"
-                                @click="activeTab = 'history'">
-                                <i class="fas fa-history"></i> 歷史記錄
+                            <button role="tab" id="tab-history" :aria-selected="activeTab === 'history'"
+                                aria-controls="panel-history"
+                                :class="['tab-btn', { 'is-active': activeTab === 'history' }]"
+                                @click="activeTab = 'history'" @keydown.enter="activeTab = 'history'">
+                                <i class="fas fa-history" aria-hidden="true"></i> 歷史記錄
                             </button>
                         </div>
                         <div class="card-body-content">
-                            <div v-if="activeTab === 'challenge'" class="challenge-area">
+                            <div v-show="activeTab === 'challenge'" id="panel-challenge" role="tabpanel"
+                                aria-labelledby="tab-challenge" tabindex="0" class="challenge-area">
                                 <div v-if="!isAllExamsCompleted" class="exam-info-box">
                                     <div class="exam-info">
                                         <h3 class="exam-title">{{ formatExamName(nextAvailableExam.name) }}</h3>
@@ -55,7 +61,9 @@
                                         </div>
                                     </div>
                                     <button :class="['start-exam-btn', { 'is-disabled': !isExamOpen }]"
-                                        :disabled="!isExamOpen" @click="showStartExamDialog(nextAvailableExam)">
+                                        :disabled="!isExamOpen" @click="showStartExamDialog(nextAvailableExam)"
+                                        :title="`${isExamOpen ? (hasLocalProgress(nextAvailableExam.id) ? '繼續' : '開始') : '尚未開放'} ${formatExamName(nextAvailableExam.name)} 測驗`"
+                                        :aria-label="`${isExamOpen ? (hasLocalProgress(nextAvailableExam.id) ? '繼續' : '開始') : '尚未開放'} ${formatExamName(nextAvailableExam.name)} 測驗`">
                                         {{ isExamOpen ? (hasLocalProgress(nextAvailableExam.id) ? '繼續作答' : '開始作答') :
                                             '尚未開放' }}
                                     </button>
@@ -69,30 +77,33 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <vue-custom-scrollbar v-else class="history-area" :settings="scrollSettings"
-                                v-loading="isLoadingHistory">
-                                <div v-if="historyList.length === 0 && !isLoadingHistory" class="no-data-info">
-                                    <i class="fas fa-folder-open"></i>
-                                    <p>目前尚無任何考試紀錄</p>
-                                </div>
-                                <div v-for="(record, idx) in historyList" :key="idx" class="score-info-box"
-                                    @click="goToHistoryDetail(record)">
-                                    <div class="exam-info">
-                                        <h3 class="exam-title">{{ formatExamName(record.exam_name) }}</h3>
-                                        <div class="exam-details">
-                                            <p class="detail-item"><i class="far fa-calendar-check"></i> {{
-                                                formatHistoryTime(record.answer_time) }}</p>
-                                            <p class="detail-summary">答對: {{ record.summary.correct }} / 總題數: {{
-                                                record.summary.total }}</p>
+                            <div v-show="activeTab === 'history'" id="panel-history" role="tabpanel"
+                                aria-labelledby="tab-history" tabindex="0" class="history-area-wrap">
+                                <vue-custom-scrollbar class="history-area" :settings="scrollSettings"
+                                    v-loading="isLoadingHistory">
+                                    <div v-if="historyList.length === 0 && !isLoadingHistory" class="no-data-info">
+                                        <i class="fas fa-folder-open"></i>
+                                        <p>目前尚無任何考試紀錄</p>/
+                                    </div>
+                                    <div v-for="(record, idx) in historyList" :key="idx" class="score-info-box"
+                                        role="button" tabindex="0" @click="goToHistoryDetail(record)"
+                                        @keydown.enter="goToHistoryDetail(record)">
+                                        <div class="exam-info">
+                                            <h3 class="exam-title">{{ formatExamName(record.exam_name) }}</h3>
+                                            <div class="exam-details">
+                                                <p class="detail-item"><i class="far fa-calendar-check"></i> {{
+                                                    formatHistoryTime(record.answer_time) }}</p>
+                                                <p class="detail-summary">答對: {{ record.summary.correct }} / 總題數: {{
+                                                    record.summary.total }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="display-final-score">
+                                            <p class="final-score">{{ record.score }}</p>
+                                            <p>分數</p>
                                         </div>
                                     </div>
-                                    <div class="display-final-score">
-                                        <p class="final-score">{{ record.score }}</p>
-                                        <p>分數</p>
-                                    </div>
-                                </div>
-                            </vue-custom-scrollbar>
+                                </vue-custom-scrollbar>
+                            </div>
                         </div>
                     </el-col>
                 </el-row>
@@ -100,7 +111,8 @@
         </div>
 
         <el-dialog custom-class="challenge-confirm-modal" :visible.sync="examDialogVisible" width="37.5rem" center
-            :close-on-click-modal="false" append-to-body @close="dialogStep = 1">
+            :close-on-click-modal="false" append-to-body @close="dialogStep = 1"
+            @opened="() => $refs.cancelExamBtn.$el.focus()">
 
             <div v-if="dialogStep === 1" class="dialog-content-custom">
                 <div class="warning-header">
@@ -148,7 +160,7 @@
             </div>
 
             <span slot="footer" class="dialog-footer">
-                <el-button class="btn-cancel" @click="examDialogVisible = false">取消返回</el-button>
+                <el-button ref="cancelExamBtn" class="btn-cancel" @click="examDialogVisible = false">取消返回</el-button>
 
                 <el-button v-if="dialogStep === 1" class="btn-confirm-start" @click="dialogStep = 2">
                     下一步
@@ -708,7 +720,7 @@ export default {
     .card-header-content {
         @include flex-center;
 
-        .right-section { 
+        .right-section {
             min-width: 37.5rem;
         }
 
@@ -947,7 +959,7 @@ export default {
 
 @media (orientation: landscape) and (max-height: 31.25rem) {
     .trial-hall-page {
-        padding: 1.5rem 8%;
+        padding: 0 8% 1.5rem;
 
         .page-title {
             margin-top: 1rem;

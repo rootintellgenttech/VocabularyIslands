@@ -2,7 +2,9 @@
     <div class="home-page">
         <div class="main-content">
             <h1 class="page-title">大廳</h1>
-            <vue-custom-scrollbar class="islands-scroll-container" :settings="scrollSettings">
+
+            <vue-custom-scrollbar class="islands-scroll-container" :settings="dynamicScrollSettings" role="region"
+                aria-label="島嶼選擇滑動區" tabindex="0">
                 <div class="island-map-container">
                     <div v-for="island in islands" :key="island.name" class="island-container">
                         <div class="island-card">
@@ -10,7 +12,7 @@
                             <div class="action-section">
                                 <h2 class="island-name">{{ island.name }}</h2>
                                 <button class="enter-btn" @click="goToIsland(island.route)"
-                                    :aria-label="`進入${island.name}學習`">
+                                    :aria-label="`進入${island.name}`" :title="`進入${island.name}`">
                                     進入學習
                                 </button>
                             </div>
@@ -18,25 +20,21 @@
                     </div>
                 </div>
             </vue-custom-scrollbar>
+
         </div>
     </div>
 </template>
 
 <script>
+import "vue-custom-scrollbar/dist/vueScrollbar.css"
+
+
 export default {
     name: 'Home',
-    props: {
-        scrollSettings: {
-            suppressScrollY: true,
-            suppressScrollX: false,
-            wheelPropagation: false
-        }
-    },
     data() {
         return {
-            // 側邊欄是否展開，初始為 false (收合)
             isMenuExpanded: false,
-            // 島嶼資料
+            windowWidth: window.innerWidth,
             islands: [
                 {
                     name: '國小島',
@@ -50,7 +48,8 @@ export default {
                 },
                 {
                     name: '試煉殿堂',
-                    imagePath: require('../../assets/image/home/exam-island.png'), route: '/trial-hall',
+                    imagePath: require('../../assets/image/home/exam-island.png'),
+                    route: '/trial-hall',
                 },
                 {
                     name: '競技島',
@@ -65,11 +64,36 @@ export default {
             ],
         };
     },
+    computed: {
+        dynamicScrollSettings() {
+            if (this.windowWidth <= 768) {
+                return {
+                    suppressScrollX: true,  // 禁用橫向
+                    suppressScrollY: false, // 允許縱向
+                    wheelPropagation: true
+                };
+            }
+            // 電腦版一般情況
+            return {
+                suppressScrollX: false, // 啟用橫向
+                suppressScrollY: true,  // 禁用縱向（由頁面主滾動條處理）
+                wheelPropagation: false
+            };
+        }
+    },
+    mounted() {
+        window.addEventListener('resize', this.handleResize);
+    },
+    beforeDestroy() {
+        window.removeEventListener('resize', this.handleResize);
+    },
     methods: {
+        handleResize() {
+            this.windowWidth = window.innerWidth;
+        },
         goToIsland(path) {
             if (path) {
                 this.$router.push(path).catch(err => {
-                    // 避免導航到相同路由時控制台出現警告
                     if (err.name !== 'NavigationDuplicated') {
                         throw err;
                     }
@@ -78,7 +102,6 @@ export default {
                 console.warn('此島嶼尚未設定路由！');
             }
         },
-        // 切換側邊欄的展開/收合狀態
         toggleMenu() {
             this.isMenuExpanded = !this.isMenuExpanded;
         },
@@ -94,16 +117,20 @@ export default {
 }
 
 .islands-scroll-container {
-    margin: 5% 5% 0 8%;
+    width: 100%;
+    height: 650px;
+    overflow: hidden;
+    position: relative;
 }
+
 
 .island-map-container {
     display: flex;
-    flex-wrap: nowrap;
-    align-items: end;
-    gap: 0 8%;
-    margin-top: calc(8% - 5%);
-    padding: 0 2rem 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: max-content;
+    padding: 2rem;
+    gap: 2rem;
 
     .action-section {
         display: flex;
@@ -113,59 +140,79 @@ export default {
     }
 
     .island-container {
-        width: 18.75rem;
+        width: 300px;
         text-align: center;
-        position: relative;
+        flex: 0 0 auto;
         transition: transform 0.3s ease;
-        transform: translateY(0);
+        display: flex;
         flex-direction: column;
-        @include flex-center;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 2rem;
 
         &:hover {
-            transform: translateY(-0.625rem) scale(1.05);
+            transform: translateY(-10px) scale(1.05);
         }
 
+        .island-card {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .island-image {
+            width: 100%;
+            height: auto;
+            max-height: 300px;
+            object-fit: contain;
+            margin-bottom: 1rem;
+        }
 
         .island-name {
-            @include unit-title
+            @include unit-title;
+            word-wrap: break-word;
+            white-space: normal;
         }
 
         .enter-btn {
-            @include common-btn
+            @include common-btn;
         }
     }
 }
 
-
-@media (orientation: landscape) and (max-height: 74.9988rem) and (pointer: coarse) {
+@media (max-width: 768px) {
+    .islands-scroll-container {
+        height: auto;
+        overflow: visible !important;
+    }
 
     .island-map-container {
-        gap: 0 12%;
-        padding: 0 8% 1.5rem;
-    }
+        flex-wrap: wrap;
+        width: 100%;
+        justify-content: center;
+        padding: 2rem 0;
+        gap: 2rem;
 
-    .island-container {
-        width: 12.5rem;
+        .island-container {
+            flex: 0 0 100%;
+            max-width: 300px;
+        }
     }
-
 }
 
-
 @media (orientation: landscape) and (max-height: 47.9988rem) and (pointer: coarse) {
-
     .islands-scroll-container {
         margin: 0 1.25rem 1.25rem;
     }
 
     .island-map-container {
-        gap: 0 5%;
+        gap: 1rem 5%;
         padding: 0 0 2.5rem;
 
         .island-card img {
             width: 9.375rem;
         }
-
     }
-
 }
 </style>

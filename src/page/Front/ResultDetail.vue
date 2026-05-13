@@ -48,7 +48,7 @@
                             <el-table-column label="我的答案" min-width="120">
                                 <template slot-scope="scope">
                                     <span :class="{ 'text-danger': !scope.row.isCorrect }">{{ scope.row.myAnswer
-                                    }}</span>
+                                        }}</span>
                                 </template>
                             </el-table-column>
 
@@ -83,7 +83,7 @@
                         <el-table-column prop="myAnswer" label="我的答案" min-width="120">
                             <template slot-scope="scope">
                                 <span :class="{ 'text-danger': !scope.row.isCorrect }">{{ scope.row.myAnswer || '未作答'
-                                }}</span>
+                                    }}</span>
                             </template>
                         </el-table-column>
 
@@ -130,6 +130,9 @@ export default {
             apiSummary: null,
             cachedExamTitle: ''
         };
+    },
+    mounted() {
+        this.fixTableAccessibility();
     },
     computed: {
         displayTitle() {
@@ -268,6 +271,17 @@ export default {
         });
     },
     methods: {
+        fixTableAccessibility() {
+            this.$nextTick(() => {
+                const wrappers = this.$el.querySelectorAll('.el-table__body-wrapper');
+                wrappers.forEach((el, index) => {
+                    el.setAttribute('tabindex', '0');
+                    el.setAttribute('role', 'region');
+                    el.setAttribute('aria-label', `測驗結果詳情內容捲動區 ${index + 1}`);
+                    el.style.outline = 'none';
+                });
+            });
+        },
         formatApiResults(results) {
             const uniqueMap = new Map(); // 使用 Map 以 ID 為 Key，確保唯一性
 

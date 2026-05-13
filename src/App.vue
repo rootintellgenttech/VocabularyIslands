@@ -1,8 +1,26 @@
 <template>
   <div id="app" :class="{ 'has-global-bg': $route.path !== '/login' }">
-    <aside v-if="!$route.meta.hideSidebar" role="complementary" aria-label="側邊選單">
-      <Sidebar />
-    </aside>
+    <nav class="global-access-nav" aria-label="無障礙工具欄">
+      <a href="#main-content" class="sr-only-focusable">跳到主要內容</a>
+      
+      <div class="top-utility-links">
+        <router-link to="/sitemap" class="access-link" title="網站導覽">網站導覽</router-link>
+        </div>
+    </nav>
+
+    <div v-if="isFrontPage && isWrongOrientation" class="orientation-lock-overlay">
+      <div class="lock-content">
+        <div class="icon-group">
+          <i class="fa-solid fa-mobile-screen rotate-animation"></i>
+        </div>
+        <h2>請旋轉您的設備</h2>
+        <p>本系統之學習活動與遊戲<br>需在<span>橫向模式</span>下獲得最佳體驗</p>
+        <p class="sub-text">請將您的設備橫放以繼續使用</p>
+      </div>
+    </div>
+<aside v-if="shouldShowSidebar" role="complementary" aria-label="側邊選單">
+  <Sidebar />
+</aside>
 
     <main id="main-content" role="main" class="router-view-content">
       <router-view />
@@ -31,25 +49,62 @@ export default {
   data() {
     return {
       refreshTimer: null,
-      // 新增：判斷是否為本地開發環境
+      isWrongOrientation: false,
+      isFrontPage: false,
       isDevelopment: window.location.hostname === 'localhost'
     };
   },
-  mounted() {
-    // 當頁面載入或刷新時，如果已經是登入狀態，立刻啟動自動更新
-    if (localStorage.getItem('refreshToken')) {
-      this.startTokenRefreshTimer();
-    }
-  },
   watch: {
-    // 監控路由變化，如果是從登入頁進來，確保定時器有啟動
-    '$route'() {
-      if (localStorage.getItem('refreshToken') && !this.refreshTimer) {
-        this.startTokenRefreshTimer();
+    // 合併後的路由監控
+    '$route': {
+      immediate: true,
+      handler(to) {
+        // 1. 判斷是否為前台頁面
+        const backOfficePaths = ['/dashboard', '/island-analysis', '/exam-analysis', '/exam-detail', '/news'];
+        this.isFrontPage = !backOfficePaths.some(path => to.path.startsWith(path));
+
+        // 2. 檢查方向
+        this.checkOrientation();
+
+        // 3. 檢查 Token 定時器
+        if (localStorage.getItem('refreshToken') && !this.refreshTimer) {
+          this.startTokenRefreshTimer();
+        }
       }
     }
   },
+computed: {
+  shouldShowSidebar() {
+    const token = localStorage.getItem('accessToken');
+    const routeMetaHide = this.$route.meta.hideSidebar;
+    const isSitemap = this.$route.name === 'Sitemap';
+    
+    // 1. 如果 meta 寫死要隱藏 (如 Login 頁)，絕對隱藏
+    if (routeMetaHide) return false;
+
+    // 2. 如果是 Sitemap 頁面：沒登入不給看側欄
+    if (isSitemap && !token) return false;
+
+    // 3. 只要有 Token，且不是在 Login/404，就應該顯示
+    return !!token;
+  }
+},
   methods: {
+    checkOrientation() {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+
+      // 直向判斷：高度 > 寬度，且寬度小於 1024 (通常是行動裝置)
+
+      this.isWrongOrientation = height > width && width < 1024;
+
+      // 同步鎖定 body 捲動
+      if (this.isFrontPage && this.isWrongOrientation) {
+        document.body.classList.add('locked');
+      } else {
+        document.body.classList.remove('locked');
+      }
+    },
     async startTokenRefreshTimer() {
       // 避免重複設定定時器
       if (this.refreshTimer) return;
@@ -97,7 +152,15 @@ export default {
       }
     }
   },
+  mounted() {
+    if (localStorage.getItem('refreshToken')) {
+      this.startTokenRefreshTimer();
+    }
+    this.checkOrientation();
+    window.addEventListener('resize', this.checkOrientation);
+  },
   beforeDestroy() {
+    window.removeEventListener('resize', this.checkOrientation);
     // 當組件銷毀時清理定時器，避免記憶體洩漏
     this.stopTokenRefreshTimer();
   }
@@ -108,6 +171,73 @@ export default {
 <style lang="scss">
 // @import '~vue-multiselect/dist/vue-multiselect.min.css';
 $bg-path: "~@/assets/image/bg.png";
+
+.orientation-lock-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(28, 28, 30, 0.95);
+  backdrop-filter: blur(10px);
+  z-index: 999999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-align: center;
+
+  .lock-content {
+    h2 {
+      font-size: 1.5rem;
+      color: #4ABCB1;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+
+      span {
+        font-weight: bold;
+        color: #4ABCB1;
+      }
+    }
+
+    .sub-text {
+      font-size: 0.9rem;
+      color: #999;
+      margin-top: 1rem;
+    }
+  }
+
+  .rotate-animation {
+    font-size: 4rem;
+    margin-bottom: 2rem;
+    display: inline-block;
+    animation: rotateDevice 2s infinite ease-in-out;
+  }
+}
+
+@keyframes rotateDevice {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  50% {
+    transform: rotate(-90deg);
+  }
+
+  100% {
+    transform: rotate(-90deg);
+  }
+}
+
+body.locked {
+  overflow: hidden;
+}
+
 
 body {
   margin: 0;
@@ -211,7 +341,7 @@ html {
 }
 
 .islands-scroll-container {
-  margin: 4% 4% 4% 6%;
+  margin: 2% 4% 4% 6%;
 }
 
 .island-map-container {
@@ -430,6 +560,9 @@ button {
 
 .router-view-content {
   min-height: 100vh;
+    &.full-width {
+    padding-left: 0;
+  }
 }
 
 .orientation-lock {
@@ -467,9 +600,59 @@ button {
     }
   }
 
-  // --- 當螢幕是直向 (Portrait) 時顯示 ---
   @media screen and (orientation: portrait) {
     display: block !important;
+  }
+}
+
+.global-access-nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  display: flex;
+  justify-content: flex-end; 
+  padding: 0 20px;
+  pointer-events: none; 
+
+  .top-utility-links {
+    pointer-events: auto;
+  }
+
+  .access-link {
+    display: inline-block;
+    padding: 5px 12px;
+    text-decoration: none;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #0369a1; 
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 0 0 5px 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+
+    &:focus {
+      outline: 3px solid #ffed4a; 
+      background-color: #fff;
+    }
+  }
+}
+
+.sr-only-focusable {
+  position: absolute;
+  top: -100px;
+  left: 20px;
+  background: #ffed4a;
+  color: #000;
+  padding: 10px 20px;
+  z-index: 10001;
+  font-weight: bold;
+  pointer-events: auto;
+  text-decoration: none;
+  border: 2px solid #000;
+
+  &:focus {
+    top: 10px;
   }
 }
 

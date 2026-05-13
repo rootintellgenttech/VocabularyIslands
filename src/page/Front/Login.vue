@@ -1,110 +1,121 @@
 <template>
   <div v-if="isOidcLoading" class="callback-loading" style="text-align: center; padding: 100px;">
-    <h2><i class="fa-solid fa-spinner fa-spin"></i> 正在獲取學生資料並登入...</h2>
+    <h2 role="status"><i class="fa-solid fa-spinner fa-spin"></i> 正在獲取學生資料並登入...</h2>
     <p>請稍候，正在與教育局連線中...</p>
   </div>
   <div v-else class="login-page">
-    <el-row>
-      <div class="logo-section">
-        <img src="../../assets/image/login/logo.png" alt="Logo">
-      </div>
-    </el-row>
-    <el-row class="login-container" :gutter="40" type="flex">
-      <el-col :span="12">
-        <div class="announcement-card mobile-scroll-box">
-          <h2 class="card-title">
-            <i class="fa-solid fa-bullhorn" aria-hidden="true"></i>最新公告
-          </h2>
-          <vue-custom-scrollbar :settings="scrollSettings" class="announcement-list" aria-label="最新公告列表">
-            <div v-if="loadingNews" style="text-align: center; padding: 20px; color: #999;">
-              <i class="fa-solid fa-spinner fa-spin"></i> 公告載入中...
-            </div>
 
-            <div v-else-if="announcements.length === 0" style="text-align: center; padding: 20px; color: #999;">
-              目前尚無公告
-            </div>
-            <div v-for="(item, index) in announcements" :key="item.id" class="announcement-item">
-              <div class="item-header">
-                <div class="news-title">
-                  <i class="fa-solid fa-bullhorn" style="color: #FFD43B;"></i>
-                  {{ item.title }}
-                </div>
-                <div v-if="item.category" class="news-tag">
-                  <span class="tag new">{{ item.category }}</span>
-                </div>
+    <header class="logo-section">
+      <h1 class="main-title">
+        <img src="../../assets/image/login/logo.png" alt="英閱奇航：玩轉ABC (登入頁面)">
+      </h1>
+    </header>
+    <main id="main-content" class="login-container-wrapper">
+      <el-row class="login-container" :gutter="40" type="flex">
+        <el-col :span="12">
+          <div class="announcement-card mobile-scroll-box">
+            <h2 class="card-title">
+              <i class="fa-solid fa-bullhorn" aria-hidden="true"></i>最新公告
+            </h2>
+            <vue-custom-scrollbar :settings="scrollSettings" class="announcement-list" aria-label="最新公告列表">
+              <div v-if="loadingNews" role="status" style="text-align: center; padding: 20px; color: #595959;">
+                <i class="fa-solid fa-spinner fa-spin"></i> 公告載入中...
               </div>
-              <p class="item-content">{{ item.content }}</p>
-              <span class="item-date">{{ item.date }}</span>
-            </div>
-          </vue-custom-scrollbar>
-        </div>
-      </el-col>
-      <el-col :span="12">
-        <div class="login-card mobile-scroll-box">
-          <h2 class="card-title">登入系統</h2>
-          <p class="card-subtitle">選擇身分並登入您的帳號</p>
-
-          <div class="role-switch">
-            <button :class="['role-btn', { active: currentRole === 'student' }]" @click="currentRole = 'student'">
-              學生
-            </button>
-            <button :class="['role-btn', { active: currentRole === 'teacher' }]" @click="currentRole = 'teacher'">
-              教職員
-            </button>
+              <div v-else-if="announcements.length === 0" class="no-news-text">
+                目前尚無公告
+              </div>
+              <div v-for="(item, index) in announcements" :key="item.id" class="announcement-item">
+                <div class="item-header">
+                  <div class="news-title">
+                    <i class="fa-solid fa-bullhorn" style="color: #FFD43B;"></i>
+                    {{ item.title }}
+                  </div>
+                  <div v-if="item.category" class="news-tag">
+                    <span class="tag new">{{ item.category }}</span>
+                  </div>
+                </div>
+                <p class="item-content">{{ item.content }}</p>
+                <span class="item-date">{{ item.date }}</span>
+              </div>
+            </vue-custom-scrollbar>
           </div>
+        </el-col>
+        <el-col :span="12">
+          <div class="login-card mobile-scroll-box">
+            <h2 class="card-title">登入系統</h2>
+            <p class="card-subtitle">選擇身分並登入您的帳號</p>
 
-          <p v-if="currentRole === 'teacher'" class="role-notice-text">
-            * 帳號密碼請跟主管機關索取
-          </p>
-          <p v-else class="role-notice-text">* 學生登入將自動前往另一頁面</p>
-
-          <div class="login-form-container">
-            <div v-if="currentRole === 'student'" class="student-input-zone">
-              <div class="input-group">
-                <label class="input-label">登入說明</label>
-                <div class="oidc-notice-box">
-                  <p>本系統已接高雄市教育局單一簽入 (OIDC)</p>
-                  <p>點擊下方按鈕後，將前往教育局驗證頁面輸入您的帳號與密碼。</p>
-                </div>
-              </div>
-
-              <div class="input-group" style="opacity: 0.6;">
-                <label class="input-label" for="student-account-placeholder">帳號 / 密碼</label>
-
-                <el-input id="student-account-placeholder" placeholder="請於跳轉後的教育局頁面輸入" disabled class="custom-input"
-                  title="帳號密碼輸入說明：請於跳轉後的教育局頁面輸入" aria-label="帳號密碼輸入說明：請於跳轉後的教育局頁面輸入">
-                </el-input>
-              </div>
-
-              <button class="login-submit-btn" @click="handleOidcLogin">
-                <i class="fa-solid fa-graduation-cap"></i> 前往教育局認證登入
+            <div class="role-switch" role="tablist">
+              <button role="tab" :aria-selected="currentRole === 'student'"
+                :class="['role-btn', { active: currentRole === 'student' }]" @click="currentRole = 'student'">
+                學生
+              </button>
+              <button role="tab" :aria-selected="currentRole === 'teacher'"
+                :class="['role-btn', { active: currentRole === 'teacher' }]" @click="currentRole = 'teacher'">
+                教職員
               </button>
             </div>
 
-            <div v-if="currentRole === 'teacher'" class="teacher-input-zone">
-              <div class="input-group">
-                <label class="input-label" for="teacher-account">帳號</label>
-                <el-input id="teacher-account" v-model="teacherForm.account" placeholder="請輸入教職員帳號"
-                  class="custom-input">
-                </el-input>
-              </div>
-              <div class="input-group">
-                <label class="input-label" for="teacher-password">密碼</label>
-                <el-input id="teacher-password" type="password" v-model="teacherForm.password" show-password
-                  placeholder="請輸入密碼" class="custom-input">
-                </el-input>
-              </div>
-              <button @click="handleLogin">
-                <i class="fa-solid fa-chalkboard-user"></i> 教職員登入
-              </button>
+            <p v-if="currentRole === 'teacher'" class="role-notice-text">
+              * 帳號密碼請跟主管機關索取
+            </p>
+            <p v-else class="role-notice-text">* 學生登入將自動前往另一頁面</p>
 
-              <p class="forgot-password-link" @click="openForgetPassModal">忘記密碼</p>
+            <div class="login-form-container">
+              <div v-if="currentRole === 'student'" class="student-input-zone">
+                <div class="input-group">
+                  <label class="input-label">登入說明</label>
+                  <div class="oidc-notice-box">
+                    <p>本系統已接高雄市教育局單一簽入 (OIDC)</p>
+                    <p>點擊下方按鈕後，將前往教育局驗證頁面輸入您的帳號與密碼。</p>
+                  </div>
+                </div>
+
+                <div class="input-group" style="opacity: 0.6;">
+                  <label class="input-label" for="student-account-placeholder">帳號 / 密碼</label>
+
+                  <el-input id="student-account-placeholder" placeholder="請於跳轉後的教育局頁面輸入" disabled class="custom-input"
+                    title="帳號密碼輸入說明：請於跳轉後的教育局頁面輸入" aria-label="帳號密碼輸入說明：請於跳轉後的教育局頁面輸入">
+                  </el-input>
+                </div>
+
+                <button class="login-submit-btn" @click="handleOidcLogin">
+                  <i class="fa-solid fa-graduation-cap"></i> 前往教育局認證登入
+                </button>
+              </div>
+
+              <div v-if="currentRole === 'teacher'" class="teacher-input-zone">
+                <div class="input-group">
+                  <label class="input-label" for="teacher-account">帳號</label>
+                  <el-input id="teacher-account" v-model="teacherForm.account" placeholder="請輸入教職員帳號"
+                    class="custom-input">
+                  </el-input>
+                </div>
+                <div class="input-group">
+                  <label class="input-label" for="teacher-password">密碼</label>
+                  <el-input id="teacher-password" v-model="teacherForm.password"
+                    :type="isPasswordVisible ? 'text' : 'password'" placeholder="請輸入密碼" class="custom-input"
+                    @keyup.enter.native="handleLogin">
+                    <button slot="suffix" type="button" class="password-toggle-btn"
+                      :aria-label="isPasswordVisible ? '隱藏密碼' : '顯示密碼'"
+                      :aria-pressed="isPasswordVisible ? 'true' : 'false'"
+                      @click="isPasswordVisible = !isPasswordVisible">
+                      <i :class="isPasswordVisible ? 'el-icon-view' : 'el-icon-lock'" aria-hidden="true"></i>
+                    </button>
+                  </el-input>
+                </div>
+                <button @click="handleLogin">
+                  <i class="fa-solid fa-chalkboard-user"></i> 教職員登入
+                </button>
+                <button ref="forgetPasswordBtn" type="button" class="forgot-password-link" @click="openForgetPassModal">
+                  忘記密碼？
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </el-col>
-    </el-row>
-
+        </el-col>
+      </el-row>
+    </main>
     <div class="login-footer">
       <div class="footer-scroll">
         <p>英閱奇航 玩轉ABC</p>
@@ -117,7 +128,7 @@
     </div>
 
     <el-dialog custom-class="confirm-pw-modal" :visible.sync="showFirstLoginDialog" width="600px" center
-      :close-on-click-modal="false" :show-close="false">
+      :close-on-click-modal="false" :show-close="false" @opened="$refs.changePassBtn.$el.focus()">
       <div class="dialog-content">
         <h3 class="title">
           <i class="fas fa-key"></i> 安全提示：首次登錄建議修改密碼
@@ -134,11 +145,12 @@
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleKeepOldPassword">沿用舊密碼</el-button>
-        <el-button type="primary" @click="openChangePassDialog">前往修改</el-button>
+        <el-button ref="changePassBtn" type="primary" @click="openChangePassDialog">前往修改</el-button>
       </span>
     </el-dialog>
 
-    <el-dialog custom-class="confirm-change-pw-modal" :visible.sync="showChangePassDialog" width="450px" center
+    <el-dialog custom-class="confirm-change-pw-modal" :visible.sync="showChangePassDialog"
+      @opened="$refs.changeInput.focus()" @closed="$refs.forgetPasswordBtn.focus()" width="450px" center
       :close-on-click-modal="false" :show-close="false">
       <div class="dialog-content">
         <h3 class="title">
@@ -147,7 +159,7 @@
 
         <el-form class="input-pw-area" :model="passForm" :rules="passRules" ref="passForm" label-position="top">
           <el-form-item label="請輸入新密碼 (至少 6 位)" prop="new_password">
-            <el-input v-model="passForm.new_password" type="password" show-password placeholder="請輸入新密碼"></el-input>
+            <el-input ref="changeInput" v-model="passForm.new_password" type="password" show-password></el-input>
           </el-form-item>
         </el-form>
 
@@ -159,26 +171,18 @@
       </span>
     </el-dialog>
 
-    <el-dialog custom-class="challenge-confirm-modal" :visible.sync="showForgetPassDialog" width="550px" center
-      :close-on-click-modal="false" :show-close="false">
+    <el-dialog title="找回密碼" :visible.sync="showForgetPassDialog" width="550px" custom-class="challenge-confirm-modal"
+      center @opened="$refs.usernameInput.focus()" @closed="$refs.forgetPasswordBtn.focus()">
       <div class="dialog-content">
-        <h3 class="title">
-          <i class="fas fa-question-circle"></i> 找回密碼
-        </h3>
-
         <p class="description">請輸入帳號與綁定的 Email，系統將驗證身分。</p>
-
-        <div style="margin: 20px 0; width: 80%;">
-          <el-form :model="forgetForm" :rules="forgetRules" ref="forgetForm" label-position="top">
-            <el-form-item label="用戶帳號" prop="username">
-              <el-input v-model="forgetForm.username" placeholder="請輸入帳號"></el-input>
-            </el-form-item>
-            <el-form-item label="電子郵件" prop="email">
-              <el-input v-model="forgetForm.email" placeholder="請輸入 Email"></el-input>
-            </el-form-item>
-          </el-form>
-        </div>
-
+        <el-form class="input-pw-area" :model="forgetForm" :rules="forgetRules" ref="forgetForm" label-position="top">
+          <el-form-item label="用戶帳號" prop="username">
+            <el-input ref="usernameInput" v-model="forgetForm.username" placeholder="請輸入帳號"></el-input>
+          </el-form-item>
+          <el-form-item label="電子郵件" prop="email">
+            <el-input v-model="forgetForm.email" placeholder="請輸入 Email"></el-input>
+          </el-form-item>
+        </el-form>
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="showForgetPassDialog = false">取 消</el-button>
@@ -186,7 +190,8 @@
       </span>
     </el-dialog>
 
-    <el-dialog custom-class="confirm-change-pw-modal" :visible.sync="showResetPassDialog" width="450px" center
+    <el-dialog custom-class="confirm-change-pw-modal" :visible.sync="showResetPassDialog"
+      @opened="$refs.resetInput.focus()" @closed="$refs.forgetPasswordBtn.focus()" width="450px" center
       :close-on-click-modal="false" :show-close="false">
       <div class="dialog-content">
         <h3 class="title">
@@ -197,9 +202,10 @@
         <el-form class="input-pw-area" :model="resetPassForm" :rules="passRules" ref="resetPassForm"
           label-position="top">
           <el-form-item label="新密碼 (至少 6 位)" prop="new_password">
-            <el-input v-model="resetPassForm.new_password" type="password" show-password
+            <el-input ref="resetInput" v-model="resetPassForm.new_password" type="password" show-password
               placeholder="請輸入新密碼"></el-input>
           </el-form-item>
+
         </el-form>
       </div>
       <span slot="footer" class="dialog-footer">
@@ -240,7 +246,7 @@ export default {
         password: '',
       },
       alertMessage: '',
-      alertType: 'error', 
+      alertType: 'error',
       showAlert: false,
       showFirstLoginDialog: false,
       showChangePassDialog: false,
@@ -266,16 +272,18 @@ export default {
         ]
       },
       showResetPassDialog: false,
-      resetPassToken: '', 
+      resetPassToken: '',
       resetPassForm: {
         new_password: ''
-      }
-
+      },
+      isPasswordVisible: false,
+      isNewPasswordVisible: false,
+      isResetPasswordVisible: false,
     };
   },
   async mounted() {
     const urlParams = new URLSearchParams(window.location.search);
-    
+
     const code = this.$route.query.code || urlParams.get('code');
     const errorParam = this.$route.query.error || urlParams.get('error');
 
@@ -375,9 +383,11 @@ export default {
     },
     openForgetPassModal() {
       this.showForgetPassDialog = true;
-      if (this.$refs.forgetForm) {
-        this.$refs.forgetForm.resetFields();
-      }
+      this.$nextTick(() => {
+        if (this.$refs.usernameInput) {
+          this.$refs.usernameInput.focus();
+        }
+      });
     },
     async handleForgetPassword() {
       this.$refs.forgetForm.validate(async (valid) => {
@@ -422,7 +432,7 @@ export default {
       }
     },
     async handleKeepOldPassword() {
-      this.performLogin(this.tempLoginData, null); 
+      this.performLogin(this.tempLoginData, null);
       try {
         await api.post('students/first-change-password/', {
           skip_change: true
@@ -544,6 +554,70 @@ $card-bg: #fff;
 $bg-path: "~@/assets/image/login-bg.jpg";
 
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.sr-only-focusable:focus {
+  top: 0;
+}
+
+.no-news-text {
+  text-align: center;
+  padding: 20px;
+  color: #595959;
+  font-weight: 500;
+}
+
+.password-toggle-btn {
+  border: none;
+  color: #909399;
+  cursor: pointer;
+  height: 100%;
+  padding: 0 5px;
+  font-size: 16px;
+  background: transparent !important;
+
+  &:hover {
+    color: $primary-color;
+  }
+
+  &:focus {
+    outline: 2px solid $primary-color;
+    outline-offset: 2px;
+  }
+}
+
+.item-content {
+  font-size: 1rem;
+  color: #444444;
+  margin: .5rem 0;
+}
+
+.sr-only-focusable {
+  position: absolute;
+  top: -100px;
+  left: 10px;
+  background: #ffed4a;
+  color: #000;
+  padding: 10px 20px;
+  z-index: 10000;
+  font-weight: bold;
+  border: 2px solid #000;
+  text-decoration: none;
+
+  &:focus {
+    top: 10px;
+  }
+}
+
 .login-page {
   min-height: 100vh;
   background-image: url($bg-path);
@@ -555,10 +629,16 @@ $bg-path: "~@/assets/image/login-bg.jpg";
   flex-direction: column;
   overflow: hidden;
 
+
   .logo-section {
     padding-top: 2%;
     justify-content: center;
     @include flex-center;
+    text-align: center;
+
+    .main-title {
+      margin-bottom: 0;
+    }
 
     img {
       text-align: center;
@@ -599,12 +679,14 @@ $bg-path: "~@/assets/image/login-bg.jpg";
   }
 }
 
-.confirm-change-pw-modal {
+.confirm-change-pw-modal,
+.challenge-confirm-modal {
   .description {
     text-align: center;
   }
 
   .input-pw-area {
+    width: 80%;
     margin-top: 1.5rem;
   }
 }
@@ -689,7 +771,7 @@ $bg-path: "~@/assets/image/login-bg.jpg";
 
   .role-notice-text {
     font-size: 0.875rem;
-    color: #ad5910;
+    color: #854d0e;
     margin-top: -1.25rem;
     margin-bottom: 1.25rem;
     text-align: center;
@@ -777,7 +859,7 @@ $bg-path: "~@/assets/image/login-bg.jpg";
 
       .item-date {
         display: block;
-      font-size: 0.75rem;
+        font-size: 0.75rem;
         color: $main-grey-text;
       }
     }
@@ -785,7 +867,7 @@ $bg-path: "~@/assets/image/login-bg.jpg";
 
   .card-title {
     color: $main-blue-text;
-font-size: 1.5rem;
+    font-size: 1.5rem;
     font-weight: bold;
     margin: 0;
     @include flex-center;
@@ -819,6 +901,7 @@ font-size: 1.5rem;
       .forgot-password-link {
         color: $main-dark-blue;
         display: flex;
+        background-color: transparent !important;
         justify-content: center;
         cursor: pointer;
         margin-top: 1rem;
@@ -858,7 +941,7 @@ font-size: 1.5rem;
 
       .input-label {
         display: block;
-       font-size: 1rem;
+        font-size: 1rem;
         font-weight: bold;
         color: $main-black-text;
         margin-bottom: .5rem;
@@ -931,7 +1014,7 @@ font-size: 1.5rem;
       border: none;
       padding: .75rem;
       border-radius: 1rem;
-     font-size: 1rem;
+      font-size: 1rem;
       font-weight: 600;
 
       &:hover {
@@ -945,7 +1028,7 @@ font-size: 1.5rem;
     }
 
     .card-subtitle {
-    font-size: 1rem;
+      font-size: 1rem;
       text-align: center;
       color: #666;
       margin-bottom: 1.5625rem;
@@ -1023,9 +1106,9 @@ font-size: 1.5rem;
     padding: 0;
   }
 
-  .login-page {
-    padding: 0 8%;
-  }
+  // .login-page {
+  //   padding: 0 8%;
+  // }
 }
 
 @media (orientation: landscape) and (max-height: 31.25rem) {
@@ -1067,7 +1150,7 @@ font-size: 1.5rem;
     white-space: nowrap;
     flex-shrink: 0;
     margin: 0;
-   font-size: 0.75rem;
+    font-size: 0.75rem;
   }
 
 

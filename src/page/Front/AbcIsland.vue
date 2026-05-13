@@ -1,7 +1,7 @@
 <template>
     <div class="abc-page">
         <h1 class="page-title">ABC啟航島</h1>
-        <vue-custom-scrollbar class="islands-scroll-container" :settings="scrollSettings">
+        <vue-custom-scrollbar class="islands-scroll-container" :settings="dynamicScrollSettings">
             <div class="island-map-container">
 
                 <div class="unit-card-container back-to-island is-up" @click="goBack">
@@ -10,11 +10,8 @@
                     </div>
                     <button class="return-btn">返回國小島</button>
                 </div>
-               <div
-  v-for="(item, index) in units"
-  :key="item.id"
-  :class="['unit-card-container', { 'is-up': index % 2 !== 0 }]"
->
+                <div v-for="(item, index) in units" :key="item.id"
+                    :class="['unit-card-container', { 'is-up': index % 2 !== 0 }]">
 
                     <div class="island-card">
                         <img :src="item.imgColor" :alt="item.name" :class="{ 'is-bw': item.stars === 0 }" />
@@ -43,15 +40,9 @@ import api from '@/config/api';
 
 export default {
     name: 'AbcIsland',
-    props: {
-        scrollSettings: {
-            suppressScrollY: true,
-            suppressScrollX: false,
-            wheelPropagation: false
-        }
-    },
     data() {
         return {
+            windowWidth: window.innerWidth,
             islandTitle: 'ABC啟航島',
             units: [
                 { id: 'af', name: 'A-F', route: 'lesson/af', progress: 0, stars: 0, totalStars: 0, imgColor: require('@/assets/image/elementary/a-c.png') },
@@ -62,10 +53,27 @@ export default {
             ],
         };
     },
+    computed: {
+        dynamicScrollSettings() {
+            if (this.windowWidth <= 768) {
+                // 手機版/縮放時：允許直向，關閉橫向
+                return { suppressScrollY: false, suppressScrollX: true, wheelPropagation: false };
+            }
+            // 電腦版：允許橫向，關閉直向
+            return { suppressScrollY: true, suppressScrollX: false, wheelPropagation: false };
+        }
+    },
     mounted() {
+        window.addEventListener('resize', this.handleResize);
         this.updateStarsFromApi();
     },
+    beforeDestroy() {
+        window.removeEventListener('resize', this.handleResize);
+    },
     methods: {
+        handleResize() {
+            this.windowWidth = window.innerWidth;
+        },
         async updateStarsFromApi() {
             try {
                 const ABC_TOTAL_MAP = {
@@ -133,6 +141,23 @@ export default {
     }
 }
 
+.islands-scroll-container {
+    width: 100%;
+    height: 600px;
+    overflow: hidden;
+    position: relative;
+}
+
+.island-map-container {
+    display: flex;
+    flex-wrap: nowrap;
+    width: max-content;
+    padding: 2rem 4rem;
+    gap: 4rem;
+    align-items: center;
+    margin-top: 0;
+}
+
 .unit-card-container.back-to-island {
     .return-btn {
         @include common-btn
@@ -186,22 +211,36 @@ export default {
     margin-top: 5%;
 }
 
-@media (orientation: landscape) and (max-height: 47.9988rem) and (pointer: coarse) {
-    .abc-page {
-        .island-map-container {
-            .island-card img {
-                width: 9.375rem;
-            }
+@media (max-width: 768px) {
+    .islands-scroll-container {
+        height: auto !important;
+        overflow: visible !important;
+        touch-action: auto;
+        margin: 0;
+    }
 
-            .unit-card-container {
-                padding-top: 3rem;
+    .island-map-container {
+        flex-direction: column;
+        flex-wrap: nowrap;
+        width: 100%;
+        padding: 2rem 0;
+        gap: 3rem;
+    }
 
-                .back-to-island .return-btn {
-                    padding: .5rem 1rem;
-                }
+    .unit-card-container {
+        width: 100%;
+        max-width: 300px;
+        transform: none !important;
+        margin: 0 !important;
+
+        &:not(.is-up):has(.enter-btn:hover),
+        &.is-up:has(.enter-btn:hover) {
+            transform: none !important;
+
+            .enter-btn {
+                transform: none !important;
             }
         }
     }
-
 }
 </style>

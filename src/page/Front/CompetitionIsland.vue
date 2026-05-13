@@ -1,7 +1,7 @@
 <template>
     <div class="competition-page">
         <el-dialog custom-class="challenge-confirm-modal" :visible.sync="challengeDialogVisible" width="31.25rem" center
-            :close-on-click-modal="false" :show-close="false">
+            :close-on-click-modal="false" :show-close="false" @opened="() => $refs.cancelDialogBtn.$el.focus()">
 
             <div class="dialog-content">
                 <h3 class="title">使用今日挑戰機會？</h3>
@@ -14,11 +14,12 @@
             </div>
 
             <span slot="footer" class="dialog-footer">
-                <el-button @click="challengeDialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="confirmStartChallenge">開始挑戰</el-button>
+                <el-button ref="cancelDialogBtn" @click="challengeDialogVisible = false">取 消</el-button>
+                <el-button type="primary" class="start-btn" @click="confirmStartChallenge">開始挑戰</el-button>
             </span>
         </el-dialog>
-        <div class="return-last-page" @click="goToHome">
+        <div class="return-last-page" tabindex="0" role="button" aria-label="返回上一頁" @click="goToHome"
+            @keydown.enter.prevent="goToHome" @keydown.space.prevent="goToHome">
             <i class="fas fa-angle-left"></i> 返回
         </div>
         <h1 class="page-title">競技島</h1>
@@ -52,34 +53,35 @@
                                 {{ rankingType === 'all' ? '所屬聯盟排行' : '所屬學校排行' }}
                             </span>
                             <span class="stat-value">{{ currentRanking ? currentRanking.display_name : '無排行'
-                                }}</span>
+                            }}</span>
                             <span class="stat-status">排名第 {{ currentRanking ? currentRanking.my_rank : '-' }} 名</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="ranking-challenge-section">
-                    <div class="tabs">
-                        <button :class="['tab-btn', { 'is-active': activeTab === 'ranking' }]"
+                    <div class="tabs" role="tablist" aria-label="競技單元">
+                        <button role="tab" id="tab-ranking" :aria-selected="activeTab === 'ranking'"
+                            aria-controls="panel-ranking" :class="['tab-btn', { 'is-active': activeTab === 'ranking' }]"
                             @click="activeTab = 'ranking'">
-                            <span v-html="rankingTabIcon"></span> 排行榜
+                            <span v-html="rankingTabIcon" aria-hidden="true"></span> 排行榜
                         </button>
-                        <button :class="['tab-btn', { 'is-active': activeTab === 'challenge' }]"
+                        <button id="tab-challenge" role="tab" :aria-selected="activeTab === 'challenge'"
+                            aria-controls="panel-games" :class="['tab-btn', { 'is-active': activeTab === 'challenge' }]"
                             @click="activeTab = 'challenge'">
-                            <span v-html="challengeTabIcon"></span> 挑戰遊戲
+                            <span v-html="challengeTabIcon" aria-hidden="true"></span> 挑戰遊戲
                         </button>
                     </div>
 
-                    <div v-if="activeTab === 'ranking'" class="ranking-container">
-                        <div class="ranking-toggle">
-                            <button :class="['toggle-btn', { 'is-active': rankingType === 'all' }]"
-                                @click="rankingType = 'all'">
-                                <span v-html="allRankingIcon"></span> 全聯盟
-                            </button>
-                            <button :class="['toggle-btn', { 'is-active': rankingType === 'school' }]"
-                                @click="rankingType = 'school'">
-                                <span v-html="schoolRankingIcon"></span> 校排行榜
-                            </button>
+                    <div v-show="activeTab === 'ranking'" id="panel-ranking" role="tabpanel" tabindex="0"
+                        aria-labelledby="tab-ranking" class="ranking-container">
+                        <div class="ranking-toggle" role="tablist" aria-label="排行榜範圍">
+                            <button role="tab" :aria-selected="rankingType === 'all'"
+                                :class="['toggle-btn', { 'is-active': rankingType === 'all' }]"
+                                @click="rankingType = 'all'">全聯盟</button>
+                            <button role="tab" :aria-selected="rankingType === 'school'"
+                                :class="['toggle-btn', { 'is-active': rankingType === 'school' }]"
+                                @click="rankingType = 'school'">校排行榜</button>
                         </div>
                         <vue-custom-scrollbar :settings="rankingScrollSettings">
                             <div class="ranking-list" v-loading="isLoadingRanking">
@@ -93,7 +95,7 @@
                                         <div class="player-info">
                                             <span class="player-name">{{ player.displayName }}</span>
                                             <span v-if="player.school_name" class="player-school">{{ player.school_name
-                                                }}</span>
+                                            }}</span>
                                         </div>
                                     </div>
                                     <div class="score-info">
@@ -105,7 +107,8 @@
                         </vue-custom-scrollbar>
                     </div>
 
-                    <div v-if="activeTab === 'challenge'" class="challenge-container">
+                    <div v-show="activeTab === 'challenge'" id="panel-games" role="tabpanel" tabindex="0"
+                        aria-labelledby="tab-challenge" class="challenge-container">
                         <div v-for="game in filteredGames" :key="game.id" class="game-item">
                             <div class="game-info">
                                 <img :src="getGameIcon(game.iconClass)" :alt="game.title" class="game-icon">
@@ -123,7 +126,8 @@
                             </div>
 
                             <button :class="['start-btn', getChallengeButtonProps().className]"
-                                :disabled="getChallengeButtonProps().disabled" @click="showChallengeDialog(game)">
+                                :disabled="getChallengeButtonProps().disabled" @click="showChallengeDialog(game)"
+                                :title="`開始挑戰 ${game.title}`" :aria-label="`開始挑戰 ${game.title}`">
                                 {{ getChallengeButtonProps().text }}
                             </button>
                         </div>
@@ -189,7 +193,7 @@
                 <div class="player-right-info">
                     <div class="player-actual-score">
                         <span class="player-score">{{ currentRanking ? formatScore(currentRanking.my_score) : 0
-                            }}</span>
+                        }}</span>
                         <span class="score-title">積分</span>
                     </div>
 
@@ -286,63 +290,59 @@ export default {
         };
     },
     computed: {
+        filteredGames() {
+            const typeName = this.currentWeekType === 'listening' ? '聽力' : '閱讀';
+            const isPrimary = this.gameLevel === 'primary';
+            const levelName = isPrimary ? '國小' : '國中';
 
-        filteredRanking() {
-            return this.rankingType === 'all' ? this.allRanking : this.schoolRanking;
+            // 根據目前的週次動態生成列表
+            const baseGames = isPrimary ? [
+                {
+                    id: 'abc',
+                    title: '字母轉盤樂',
+                    description: '答對所有字母題目',
+                    point: '每題10分，共5題',
+                    island: 'ABC啟航島',
+                    iconClass: 'ABC_ICON'
+                },
+                {
+                    id: 'perfect',
+                    title: `完美連擊 (${typeName})`,
+                    description: `連續答對${typeName}題目直到錯誤`,
+                    point: '每題10分',
+                    island: `${levelName}${typeName}海灣`,
+                    iconClass: 'TARGET_ICON'
+                },
+                {
+                    id: 'speed',
+                    title: `速度對決 (${typeName})`,
+                    description: `1分鐘內，盡可能的答對${typeName}題`,
+                    point: '每題10分',
+                    island: `${levelName}${typeName}海灣`,
+                    iconClass: 'THUNDER_ICON'
+                }
+            ] : [
+                // 國中版 (移除 ABC)
+                {
+                    id: 'perfect',
+                    title: `完美連擊 (${typeName})`,
+                    description: `連續答對${typeName}題目直到錯誤`,
+                    point: '每題10分',
+                    island: `${levelName}${typeName}海灣`,
+                    iconClass: 'TARGET_ICON'
+                },
+                {
+                    id: 'speed',
+                    title: `速度對決 (${typeName})`,
+                    description: `1分鐘內，盡可能的答對${typeName}題`,
+                    point: '每題10分',
+                    island: `${levelName}${typeName}海灣`,
+                    iconClass: 'THUNDER_ICON'
+                }
+            ];
+
+            return baseGames;
         },
-       filteredGames() {
-        const typeName = this.currentWeekType === 'listening' ? '聽力' : '閱讀';
-        const isPrimary = this.gameLevel === 'primary';
-        const levelName = isPrimary ? '國小' : '國中';
-        
-        // 根據目前的週次動態生成列表
-        const baseGames = isPrimary ? [
-            { 
-                id: 'abc', 
-                title: '字母轉盤樂', 
-                description: '答對所有字母題目', 
-                point: '每題10分，共5題', 
-                island: 'ABC啟航島', 
-                iconClass: 'ABC_ICON' 
-            },
-            { 
-                id: 'perfect', 
-                title: `完美連擊 (${typeName})`, 
-                description: `連續答對${typeName}題目直到錯誤`, 
-                point: '每題10分', 
-                island: `${levelName}${typeName}海灣`, 
-                iconClass: 'TARGET_ICON' 
-            },
-            { 
-                id: 'speed', 
-                title: `速度對決 (${typeName})`, 
-                description: `1分鐘內，盡可能的答對${typeName}題`, 
-                point: '每題10分', 
-                island: `${levelName}${typeName}海灣`, 
-                iconClass: 'THUNDER_ICON' 
-            }
-        ] : [
-            // 國中版 (移除 ABC)
-            { 
-                id: 'perfect', 
-                title: `完美連擊 (${typeName})`, 
-                description: `連續答對${typeName}題目直到錯誤`, 
-                point: '每題10分', 
-                island: `${levelName}${typeName}海灣`, 
-                iconClass: 'TARGET_ICON' 
-            },
-            { 
-                id: 'speed', 
-                title: `速度對決 (${typeName})`, 
-                description: `1分鐘內，盡可能的答對${typeName}題`, 
-                point: '每題10分', 
-                island: `${levelName}${typeName}海灣`, 
-                iconClass: 'THUNDER_ICON' 
-            }
-        ];
-
-        return baseGames;
-    },
         // 遊戲/挑戰 Tab 的計算圖示
         challengeTabIcon() {
             return '<i class="fa-solid fa-gamepad"></i>';
@@ -411,6 +411,17 @@ export default {
         currentRanking() {
             return this.rankingType === 'all' ? this.rankingData.all : this.rankingData.school;
         },
+
+        filteredRanking() {
+            // 保護機制：若資料還沒回來或沒有 top_30，回傳空陣列
+            if (!this.currentRanking || !this.currentRanking.top_30) {
+                return [];
+            }
+            return this.currentRanking.top_30.map(item => ({
+                ...item,
+                displayName: this.maskName(item.student_name)
+            }));
+        },
         // 計算與前一名的差距
         myDiffFromPrevious() {
             if (!this.currentRanking || !this.currentRanking.top_30) return 0;
@@ -428,14 +439,6 @@ export default {
                 return prevPlayer.score - this.currentRanking.my_score;
             }
             return 0;
-        },
-        // 獲取 top_30 並進行資料脫敏
-        filteredRanking() {
-            if (!this.currentRanking || !this.currentRanking.top_30) return [];
-            return this.currentRanking.top_30.map(item => ({
-                ...item,
-                displayName: this.maskName(item.student_name) // 資料脫敏
-            }));
         },
     },
     methods: {
@@ -475,9 +478,9 @@ export default {
                 this.isDailyChallengeCompleted = response.data.has_done_today;
 
                 if (scope === 'all') {
-                    this.rankingData.all = response.data;
+                    this.rankingData = { ...this.rankingData, all: response.data };
                 } else {
-                    this.rankingData.school = response.data;
+                    this.rankingData = { ...this.rankingData, school: response.data };
                 }
             } catch (err) {
                 console.error('獲取排行榜失敗:', err);
@@ -655,6 +658,7 @@ export default {
     width: 100%;
 }
 
+.player-school,
 .ranking-diff,
 .rank-number,
 .info-footer,
@@ -667,10 +671,6 @@ export default {
 .diff-score,
 .player-rank,
 .score-title {
-    color: $main-grey-text;
-}
-
-.player-school {
     color: $main-black-text;
 }
 

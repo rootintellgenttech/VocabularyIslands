@@ -2,33 +2,29 @@
     <div class="primary-page">
 
         <div class="islands-grid">
-           <main role="main" class="islands-grid">
-      <div class="top-bar">
-        <h1 class="page-title">國小</h1>
-        <button class="back-btn" @click="goBack" title="返回大廳">
-          返回大廳
-        </button>
-      </div>
-      
-      </main>
+            <main role="main" class="islands-grid">
+                <div class="top-bar">
+                    <h1 class="page-title">國小</h1>
+                    <button class="back-btn" @click="goBack" title="返回大廳">
+                        返回大廳
+                    </button>
+                </div>
 
-            <vue-custom-scrollbar class="islands-scroll-container" :settings="scrollSettings">
+            </main>
+
+            <vue-custom-scrollbar class="islands-scroll-container" :settings="dynamicScrollSettings">
                 <div class="island-map">
                     <div v-for="island in islands" :key="island.id" class="island-container">
-                    <div class="island-card">
-  <img 
-    :src="island.imgColor" 
-    :class="{ 'is-bw': island.stars === 0 }" 
-    :alt="`${island.name}關卡地圖`"
-    class="island-image" 
-  />
-</div>
+                        <div class="island-card">
+                            <img :src="island.imgColor" :class="{ 'is-bw': island.stars === 0 }"
+                                :alt="`${island.name}關卡地圖`" class="island-image" />
+                        </div>
 
                         <div class="stats-row">
-                           <div class="stat-group">
-  <img src="../../assets/image/elementary/star.png" alt="" aria-hidden="true">
-  <span>{{ island.stars }}/{{ island.totalStars || 0 }}</span>
-</div>
+                            <div class="stat-group">
+                                <img src="../../assets/image/elementary/star.png" alt="" aria-hidden="true">
+                                <span>{{ island.stars }}/{{ island.totalStars || 0 }}</span>
+                            </div>
                             <!-- <div class="stat-group">
                                 <img src="../../assets/image/elementary/book.png" alt="⭐">
                                 <span>學習 {{ island.progress }}%</span>
@@ -36,13 +32,9 @@
                         </div>
 
                         <div class="island-title">{{ island.name }}</div>
-<button 
-  class="enter-btn" 
-  @click="enterIsland(island.id)"
-  :aria-label="`進入${island.name}學習`"
->
-  進入學習
-</button>
+                        <button class="enter-btn" @click="enterIsland(island.id)" :aria-label="`進入${island.name}學習`">
+                            進入學習
+                        </button>
                     </div>
                 </div>
             </vue-custom-scrollbar>
@@ -55,13 +47,7 @@ import api from '@/config/api';
 
 export default {
     name: 'PrimaryIsland',
-    props: {
-        scrollSettings: {
-            suppressScrollY: true,  // 關閉直向滾動
-            suppressScrollX: false, // 開啟橫向滾動
-            wheelPropagation: false
-        }
-    },
+
     data() {
         const levelOptions = [
             { name: '國小', value: 'primary' },
@@ -69,6 +55,7 @@ export default {
         ];
 
         return {
+            windowWidth: window.innerWidth,
             selectedLevel: levelOptions[0], // 預設選擇國小
             levelOptions: levelOptions,
             islands: [
@@ -107,7 +94,21 @@ export default {
             ]
         };
     },
+    computed: {
+        dynamicScrollSettings() {
+            // 小於 768 時 (包含 400% 放大)：關閉橫向、開啟直向
+            if (this.windowWidth <= 768) {
+                return { suppressScrollY: false, suppressScrollX: true, wheelPropagation: false };
+            }
+            // 電腦版正常時：開啟橫向、關閉直向
+            return { suppressScrollY: true, suppressScrollX: false, wheelPropagation: false };
+        }
+    },
+    beforeDestroy() {
+        window.removeEventListener('resize', this.handleResize);
+    },
     mounted() {
+        window.addEventListener('resize', this.handleResize);
         this.fetchIslandStars();
     },
     methods: {
@@ -164,7 +165,6 @@ export default {
     @include island-main-grid
 }
 
-
 .stats-row {
     @include island-stats-row
 }
@@ -178,15 +178,54 @@ export default {
 }
 
 
-@media (orientation: landscape) and (max-height: 74.9988rem) and (pointer: coarse) {
+
+.islands-scroll-container {
+    height: 550px;
+    overflow: hidden;
+    position: relative;
+}
+
+.island-map {
+    display: flex;
+    flex-wrap: nowrap;
+    width: max-content;
+    gap: 4rem;
+    padding-left: 8%;
+    padding-top: 2%;
+    justify-content: start !important;
+
+    .island-container {
+        flex: 0 0 auto;
+        width: 300px;
+    }
+}
+
+@media (orientation: landscape) and (max-height: 1199.98px) and (pointer: coarse) {
     .primary-page .islands-grid {
         @include md-island-layout
     }
 }
 
-@media (orientation: landscape) and (max-height: 47.9988rem) and (pointer: coarse) {
-    .primary-page {
-        @include sm-island-layout
+@media (max-width: 768px) {
+    .islands-scroll-container {
+        height: auto !important;
+        overflow: visible !important;
+        touch-action: auto;
+        margin: 0;
+    }
+
+    .island-map {
+        flex-direction: column;
+        flex-wrap: nowrap;
+        width: 100%;
+        align-items: center !important;
+        padding: 2rem 0;
+        gap: 3rem;
+
+        .island-container {
+            width: 100%;
+            max-width: 300px;
+        }
     }
 }
 </style>

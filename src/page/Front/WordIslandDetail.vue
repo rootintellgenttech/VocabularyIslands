@@ -1,7 +1,7 @@
 <template>
     <div class="abc-page">
         <h1 class="page-title">{{ islandTitle }}</h1>
-        <vue-custom-scrollbar class="islands-scroll-container" :settings="scrollSettings">
+        <vue-custom-scrollbar class="islands-scroll-container" :settings="dynamicScrollSettings">
             <div class="island-map-container">
 
                 <div class="unit-card-container back-to-island is-up" @click="goBack">
@@ -39,31 +39,56 @@ import api from '@/config/api';
 export default {
     name: 'WordIslandDetail',
     props: {
-        level: { type: String, required: true },
-        wordCount: { type: String, required: true },
-        scrollSettings: {
-            suppressScrollY: true,
-            suppressScrollX: false,
-            wheelPropagation: false
+        level: {
+            type: String,
+            required: true
+        },
+        wordCount: {
+            type: String,
+            required: true
         }
     },
     data() {
         return {
             islandTitle: '',
             returnButtonText: '返回國小島',
+            windowWidth: window.innerWidth,
             units: [],
             imgBackPrimary: require('@/assets/image/home/elementary-island.png'),
             imgBackSecondary: require('@/assets/image/home/primary-island.png'),
         };
     },
+    computed: {
+        dynamicScrollSettings() {
+            if (this.windowWidth <= 768) {
+                // 手機版 / 400% 縮放：關閉橫向，允許直向
+                return { suppressScrollY: false, suppressScrollX: true, wheelPropagation: false };
+            }
+            // 電腦版：允許橫向，關閉直向
+            return { suppressScrollY: true, suppressScrollX: false, wheelPropagation: false };
+        }
+    },
     watch: {
-        level: 'loadIslandData',
-        wordCount: 'loadIslandData',
+        level: {
+            handler: 'loadIslandData',
+            immediate: true
+        },
+        wordCount: {
+            handler: 'loadIslandData',
+            immediate: true
+        },
     },
     mounted() {
+        window.addEventListener('resize', this.handleResize);
         this.loadIslandData();
     },
+    beforeDestroy() {
+        window.removeEventListener('resize', this.handleResize);
+    },
     methods: {
+        handleResize() {
+            this.windowWidth = window.innerWidth;
+        },
         getBackIslandImage() {
             return this.level === 'primary' ? this.imgBackPrimary : this.imgBackSecondary;
         },
@@ -201,17 +226,18 @@ export default {
 
 .unit-card-container {
     @include island-design;
-    .island-card{
+
+    .island-card {
         flex-shrink: 0;
-                width: 300px;
-                height: auto; 
-                
-                img {
-                    width: 100%; 
-                    height: auto;
-                    display: block;
-                }
-            
+        width: 300px;
+        height: auto;
+
+        img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
     }
 
     &:not(.is-up) {
@@ -254,28 +280,61 @@ export default {
     transition: transform 0.3s ease;
 }
 
-@media (orientation: landscape) and (max-height: 1199.98px) and (pointer: coarse) {
-       .island-card{
-                width: 150px;
-            }
+.islands-scroll-container {
+    width: 100%;
+    height: 650px;
+    overflow: hidden;
+    position: relative;
 }
 
-@media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
-    .abc-page {
-        .island-map-container {
-            margin-top: 18%;
+.island-map-container {
+    display: flex;
+    flex-wrap: nowrap;
+    width: max-content;
+    align-items: center;
+    padding: 2rem 4rem;
+    gap: 4rem;
+}
 
-            .island-card{
-                width: 150px;
+@media (orientation: landscape) and (max-height: 1199.98px) and (pointer: coarse) {
+    .island-card {
+        width: 150px;
+    }
+}
+
+
+@media (max-width: 768px) {
+    .islands-scroll-container {
+        height: auto !important;
+        overflow: visible !important;
+        touch-action: auto;
+        margin: 0;
+    }
+
+    .island-map-container {
+        flex-direction: column;
+        flex-wrap: nowrap;
+        width: 100%;
+        padding: 2rem 0;
+        gap: 3rem;
+    }
+
+    .unit-card-container {
+        width: 100%;
+        max-width: 300px;
+        transform: none !important;
+        margin: 0 !important;
+
+        &:not(.is-up):has(.enter-btn:hover),
+        &.is-up:has(.enter-btn:hover) {
+            transform: none !important;
+
+            .back-to-island .return-btn {
+                padding: 8px 16px;
             }
 
-            .unit-card-container {
-                flex-shrink: 0;
-                width: 150px;
-
-                .back-to-island .return-btn {
-                    padding: 8px 16px;
-                }
+            .enter-btn {
+                transform: none !important;
             }
         }
     }

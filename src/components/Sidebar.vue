@@ -11,9 +11,10 @@
                             <div class="user-name">{{ currentRoleName }}</div>
                         </template>
 
-                        <div class="toggle-btn" @click="toggleMenu">
-                            <i :class="['fas', isMenuExpanded ? 'fa-angle-double-left' : 'fa-angle-double-right']"
-                                @click.stop="toggleMenu"></i>
+                        <div class="toggle-btn" tabindex="0" role="button" aria-label="切換選單展開或收合" @click="toggleMenu"
+                            aria-expanded="true" @keydown.enter.prevent="toggleMenu"
+                            @keydown.space.prevent="toggleMenu">
+                            <i :class="['fas', isMenuExpanded ? 'fa-angle-double-left' : 'fa-angle-double-right']"></i>
                         </div>
                     </div>
 
@@ -25,7 +26,8 @@
                     </template>
                 </div>
 
-                <div v-else class="toggle-btn" @click="toggleMenu">
+                <div v-else class="toggle-btn" tabindex="0" role="button" aria-label="展開選單" aria-expanded="false"
+                    @click="toggleMenu" @keydown.enter.prevent="toggleMenu" @keydown.space.prevent="toggleMenu">
                     <i class="fas fa-angle-double-right"></i>
                 </div>
             </div>
@@ -78,19 +80,19 @@
 
 
         <div class="bottom-menu">
-
-            <div v-if="!isStudent" class="menu-item" @click="passwordDialogVisible = true">
-                <i class="fas fa-key"></i>
+            <div v-if="!isStudent" ref="passwordTrigger" class="menu-item" tabindex="0" role="button" aria-label="修改密碼"
+                @click="passwordDialogVisible = true" @keydown.enter.prevent="passwordDialogVisible = true">
+                <i class="fas fa-key" aria-hidden="true"></i>
                 <span v-if="isMenuExpanded">修改密碼</span>
             </div>
-
-            <div class="menu-item" @click="contactDialogVisible = true">
-                <i class="fa-solid fa-envelope"></i>
+            <div ref="contactTrigger" class="menu-item" tabindex="0" role="button" aria-label="聯絡我們"
+                @click="contactDialogVisible = true" @keydown.enter.prevent="contactDialogVisible = true">
+                <i class="fa-solid fa-envelope" aria-hidden="true"></i>
                 <span v-if="isMenuExpanded">聯絡我們</span>
             </div>
-
-            <el-dialog :visible.sync="contactDialogVisible" width="600px" center custom-class="mails-modal"
-                append-to-body>
+            <el-dialog width="600px" center custom-class="mails-modal" :visible.sync="contactDialogVisible"
+                @opened="() => $refs.closeContactBtn.$el.focus()" append-to-body role="dialog" aria-modal="true"
+                aria-labelledby="contact-title">
                 <h3 class="title">聯絡我們</h3>
 
                 <div class="mail-info">
@@ -99,8 +101,10 @@
                         聯絡信箱
                     </div>
                     <div class="mail-content">
-                        <i class="fa-solid fa-copy copy-icon" @click="copyEmail" title="複製信箱"></i>
-                        <a href="mailto:rootintellgenttech@gmail.com?subject=【系統聯絡】使用者來信" class="contact-email">
+                        <i class="fa-solid fa-copy copy-icon" tabindex="0" role="button" aria-label="複製信箱"
+                            @click="copyEmail" @keydown.enter.prevent="copyEmail" @keydown.space.prevent="copyEmail"
+                            title="複製信箱"></i>
+                        <a ref="emailLink" href="mailto:rootintellgenttech@gmail.com" class="contact-email">
                             rootintellgenttech@gmail.com
                         </a>
                     </div>
@@ -118,31 +122,32 @@
                     </div>
                 </div>
 
-                <span slot="footer" class="dialog-footer">
-                    <el-button @click="contactDialogVisible = false">
-                        關閉
-                    </el-button>
+                <span slot="footer">
+                    <el-button ref="closeContactBtn" @click="contactDialogVisible = false">關閉</el-button>
                 </span>
             </el-dialog>
 
 
             <template v-if="isStudent">
-                <div class="menu-item" @click="settingsDialogVisible = true">
-                    <i class="fas fa-cog"></i>
+                <div ref="settingsTrigger" class="menu-item" tabindex="0" role="button" aria-label="系統設定"
+                    @click="settingsDialogVisible = true" @keydown.enter.prevent="settingsDialogVisible = true">
+                    <i class="fas fa-cog" aria-hidden="true"></i>
                     <span v-if="isMenuExpanded">設定</span>
                 </div>
-
                 <audio ref="mainAudio" :src="require('@/assets/mp3/main-bg.mp3')" loop title="系統背景音樂"></audio>
                 <audio ref="fightAudio" :src="require('@/assets/mp3/fight-island.mp3')" loop></audio>
 
                 <el-dialog :visible.sync="settingsDialogVisible" width="400px" center custom-class="settings-modal"
-                    append-to-body>
+                    append-to-body :close-on-click-modal="false" @opened="$refs.musicSwitch.focus()"
+                    @closed="$refs.settingsTrigger.focus()">
                     <h3 class="title">設定</h3>
                     <div class="setting-item">
-                        <div class="setting-label">
-                            <i class="fas fa-music"></i> 背景音樂
+                        <div class="setting-label" id="music-switch-label">
+                            <i class="fas fa-music" aria-hidden="true"></i> 背景音樂
                         </div>
-                        <el-switch v-model="isMusicEnabled" active-color="#18AC9D" @change="handleMusicToggle">
+                        <el-switch ref="musicSwitch" v-model="isMusicEnabled" active-color="#18AC9D"
+                            aria-labelledby="music-switch-label" :aria-checked="isMusicEnabled ? 'true' : 'false'"
+                            @change="handleMusicToggle">
                         </el-switch>
                     </div>
                     <span slot="footer" class="dialog-footer">
@@ -154,19 +159,21 @@
             <audio ref="mainAudio" :src="require('@/assets/mp3/main-bg.mp3')" loop></audio>
             <audio ref="fightAudio" :src="require('@/assets/mp3/fight-island.mp3')" loop></audio>
 
-            <div class="menu-item" @click="handleLogout">
-                <i class="fas fa-sign-out-alt"></i>
+            <div class="menu-item" tabindex="0" role="button" aria-label="登出系統" @click="handleLogout"
+                @keydown.enter.prevent="handleLogout" @keydown.space.prevent="handleLogout">
+                <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
                 <span v-if="isMenuExpanded">登出</span>
             </div>
         </div>
 
         <el-dialog :visible.sync="passwordDialogVisible" width="400px" center custom-class="password-modal"
-            append-to-body>
+            append-to-body @opened="$refs.newPassInput.focus()" @closed="$refs.passwordTrigger.focus()">
             <h3 class="title">修改密碼</h3>
             <div class="setting-item-box">
                 <div class="input-group">
                     <label>新密碼</label>
-                    <el-input v-model="newPassword" type="password" show-password placeholder="請輸入新密碼"></el-input>
+                    <el-input ref="newPassInput" v-model="newPassword" type="password" show-password
+                        placeholder="請輸入新密碼"></el-input>
                 </div>
                 <div class="input-group" style="margin-top: 15px;">
                     <label>確認新密碼</label>
@@ -314,11 +321,19 @@ export default {
         }
     },
     mounted() {
+        // 無論有無登入都需要的交互邏輯
         document.addEventListener('click', this.handleOutsideClick);
 
-        // 頁面加載後，如果音樂開關是開的，嘗試播放
-        if (this.isMusicEnabled) {
-            this.playAppropriateMusic(this.$route.path);
+        // 增加 Token 檢查，防止未登入時發送 API 請求
+        const token = localStorage.getItem('accessToken');
+
+        if (token) {
+            // 有登入才執行的邏輯
+            if (this.isMusicEnabled) {
+                this.playAppropriateMusic(this.$route.path);
+            }
+        } else {
+            console.log('[Sidebar] 訪客模式：跳過權限資料請求');
         }
     },
     beforeDestroy() {
@@ -542,14 +557,11 @@ export default {
     },
     async created() {
         const savedRole = localStorage.getItem('userRole');
+        const token = localStorage.getItem('accessToken');
 
-        if (savedRole) {
+        if (savedRole && token) {
             this.userRole = savedRole;
-            // 確保身份更新後才根據身份執行對應
             await this.checkAndFetchData();
-        } else {
-            // 若無身份，導回登入
-            this.$router.push('/login');
         }
     },
 };
@@ -599,7 +611,7 @@ export default {
     transition: width 0.3s ease-in-out, background-color 0.3s ease;
     display: flex;
     flex-direction: column;
-    z-index: 99;
+    z-index: 999;
     box-shadow: none;
     position: fixed;
     top: 0;
@@ -1016,9 +1028,9 @@ export default {
             }
         }
 
-        .achievement-section .achievement-badges .badge-item {
-            width: 6.25rem;
-        }
+        // .achievement-section .achievement-badges .badge-item {
+        //     width: 6.25rem;
+        // }
     }
 
     .sidebar.is-expanded {

@@ -8,15 +8,18 @@
         <div v-else-if="!isFinished" class="learning-container">
             <Tinder ref="tinder" key-name="id" :queue.sync="queue" :offset-y="10" @submit="onSubmit">
                 <template slot-scope="scope">
-                    <div class="card-return-text" @click="goBack">
+                    <div class="card-return-text" tabindex="0" role="button" aria-label="返回上一頁" @click="goBack"
+                        @keydown.enter.prevent="goBack" @keydown.space.prevent="goBack">
                         <i class="fas fa-angle-left"></i> 返回
                     </div>
                     <div class="content-display">
                         <div class="question-wrap">
-                            <div v-if="scope.data.audioSrc" class="audio-trigger" @click.stop="playAudio(scope.data)">
+                            <div v-if="scope.data.audioSrc" class="audio-trigger" tabindex="0" role="button"
+                                aria-label="播放發音" @click.stop="playAudio(scope.data)"
+                                @keydown.enter.stop.prevent="playAudio(scope.data)"
+                                @keydown.space.stop.prevent="playAudio(scope.data)">
                                 <i class="fas fa-volume-up"></i>
                             </div>
-
                             <h1 v-if="!scope.data.isImageMode" class="card-word-title">{{ scope.data.mainText }}</h1>
 
                             <img v-if="scope.data.isImageMode" :src="getImageUrl(scope.data.mainText)"
@@ -31,16 +34,22 @@
             </Tinder>
 
             <div class="btns">
-                <p class="remember-btn" @click="decide('pass')">我不熟<span>✖</span></p>
-                <p class="forget-btn" @click="decide('remember')">我會了<span>✔</span></p>
+                <p class="remember-btn" tabindex="0" role="button" @click="decide('pass')"
+                    @keydown.enter.prevent="decide('pass')" @keydown.space.prevent="decide('pass')">
+                    我不熟<span>✖</span>
+                </p>
+                <p class="forget-btn" tabindex="0" role="button" @click="decide('remember')"
+                    @keydown.enter.prevent="decide('remember')" @keydown.space.prevent="decide('remember')">
+                    我會了<span>✔</span>
+                </p>
             </div>
         </div>
 
         <div v-else class="result-container">
-            <div class="back-link" @click="goBack">
+            <div class="back-link" tabindex="0" role="button" aria-label="返回上一頁" @click="goBack"
+                @keydown.enter.prevent="goBack" @keydown.space.prevent="goBack">
                 <i class="fas fa-arrow-left"></i> 返回
             </div>
-
             <div class="game-result-card">
                 <img :src="correctAvatarPath" alt="吉祥物" class="avatar-result-icon">
                 <div class="result-description">你已完成本單元學習</div>
@@ -385,6 +394,21 @@ export default {
 
         .learning-container {
             padding: 5%;
+        }
+    }
+}
+
+
+@media (max-width: 768px) {
+
+    .learn-page {
+        display: unset;
+        padding: 5% 12%;
+
+        .main-card {
+            margin: 5% auto;
+            width: max-content;
+            padding: 1rem;
         }
     }
 }

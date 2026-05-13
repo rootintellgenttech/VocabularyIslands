@@ -13,7 +13,7 @@
                 </div>
             </div>
 
-            <vue-custom-scrollbar class="level-scroll-container" :settings="scrollSettings">
+            <vue-custom-scrollbar class="level-scroll-container" :settings="dynamicScrollSettings">
                 <div class="lesson-options">
                     <div v-for="(option, index) in lessonData.options" :key="index" class="option-item" :class="{
                         'is-learn-mode': option.type === 'learn',
@@ -29,7 +29,8 @@
                                 </div>
                                 <div class="single-right">
                                     <span v-if="option.type === 'learn'" class="action-text">總學習</span>
-                                    <div v-else class="star-rating">
+                                    <div v-else class="star-rating" role="img" :title="`獲得 ${option.stars} 顆星`"
+                                        :aria-label="`難度得分：${option.stars} 顆星`">
                                         <i v-for="n in 5" :key="n"
                                             :class="['fas', option.stars >= n ? 'fa-star filled' : 'fa-star outline']">
                                         </i>
@@ -51,7 +52,8 @@
 
                             <div class="item-bottom" @click.stop="startActivity('quiz', option)">
                                 <div class="bottom-right">
-                                    <div class="star-rating">
+                                    <div class="star-rating" role="img" :title="`獲得 ${option.stars} 顆星`"
+                                        :aria-label="`難度得分：${option.stars} 顆星`">
                                         <img :src="firePath" alt="" aria-hidden="true" class="fire-icon"
                                             :class="{ 'is-bw': option.stars <= 0 }" />
                                         <i v-for="n in 5" :key="n"
@@ -81,27 +83,13 @@ import api from '@/config/api';
 export default {
     name: 'LessonDetail',
     props: {
-        unitId: {
-            type: String,
-            required: true
-        },
-        level: {
-            type: String,
-            default: 'primary' // 預設為 primary 以防萬一
-        },
-        wordCount: {
-            type: String,
-            default: '300'
-        },
-        scrollSettings: {
-            suppressScrollY: true,
-            suppressScrollX: false,
-            wheelPropagation: false
-        }
+        level: { type: String, required: true },
+        wordCount: { type: String, default: '300' },
+        unitId: { type: String, required: true }
     },
     data() {
         return {
-            // 圖片路徑
+            windowWidth: window.innerWidth,
             avatarPath: require('@/assets/image/elementary/avatar.png'),
             bookPath: require('@/assets/image/book.png'),
             firePath: require('@/assets/image/fire.png'),
@@ -113,16 +101,35 @@ export default {
                 options: []
             },
             userStats: null,
+            currentKey: '',
         };
     },
     watch: {
         unitId: {
             immediate: true,
-            handler(newUnitId) {
-                this.loadLessonData(newUnitId);
-                this.fetchUserStars();
+            handler(newId) {
+                if (newId) {
+                    this.loadLessonData(newId);
+                    this.fetchUserStars();
+                }
             }
         }
+    },
+    computed: {
+        dynamicScrollSettings() {
+            // 小於 768 時 (包含 400% 放大)：關閉橫向、開啟直向
+            if (this.windowWidth <= 768) {
+                return { suppressScrollY: false, suppressScrollX: true, wheelPropagation: false };
+            }
+            // 電腦版正常時：開啟橫向、關閉直向
+            return { suppressScrollY: true, suppressScrollX: false, wheelPropagation: false };
+        }
+    },
+    mounted() {
+        window.addEventListener('resize', this.handleResize);
+    },
+    beforeDestroy() {
+        window.removeEventListener('resize', this.handleResize);
     },
     methods: {
         loadLessonData(id) {
@@ -412,5 +419,72 @@ export default {
         }
     }
 
+}
+
+
+.star-rating {
+    cursor: help;
+}
+
+.level-scroll-container {
+    width: 100%;
+    height: 500px;
+    overflow: hidden;
+    position: relative;
+    margin-top: 1rem;
+}
+
+.lesson-options {
+    display: flex;
+    flex-wrap: nowrap;
+    width: max-content;
+    padding: 1rem 2rem 2rem;
+    gap: 2rem;
+
+    .option-item {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .lesson-detail-page {
+        display: unset;
+        padding: 5% 12%;
+
+        .main-card {
+            margin: 5% auto;
+            width: max-content;
+            padding: 1rem;
+        }
+    }
+
+    .level-scroll-container {
+        height: auto !important;
+        overflow: visible !important;
+        touch-action: auto;
+    }
+
+    .lesson-options {
+        flex-direction: column;
+        width: 100%;
+        align-items: center;
+        padding: 1rem 0;
+        gap: 1.5rem;
+
+        .option-item {
+            width: 100%;
+        }
+    }
+
+
+    .item-single-row,
+    .item-top,
+    .item-bottom {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 1rem;
+    }
 }
 </style>

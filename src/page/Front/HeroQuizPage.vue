@@ -20,10 +20,10 @@
 
                 <el-col :xs="24" :md="14">
                     <div class="main-card question-mode">
-                        <div class="back-link" @click="handleQuizBack">
+                        <div class="back-link" tabindex="0" role="button" aria-label="返回上一頁" @click="handleQuizBack"
+                            @keydown.enter.prevent="handleQuizBack" @keydown.space.prevent="handleQuizBack">
                             <i class="fas fa-angle-left"></i> 返回
                         </div>
-
                         <template v-if="currentQuestion">
                             <div class="exam-header-bar">
                                 <div class="timer-area">
@@ -71,7 +71,8 @@
 
         <div v-else-if="currentPhase === 'intro'" class="main-card">
             <div class="intro-content">
-                <div class="back-link" @click="goBack">
+                <div class="back-link" tabindex="0" role="button" aria-label="返回上一頁" @click="goBack"
+                    @keydown.enter.prevent="goBack" @keydown.space.prevent="goBack">
                     <i class="fas fa-angle-left"></i> 返回
                 </div>
                 <div class="intro-main-area">
@@ -94,10 +95,10 @@
 
         <div v-else-if="currentPhase === 'complete'" class="main-card result-mode">
             <div class="result-inner-card">
-                <div class="back-link" @click="goBack()">
+                <div class="back-link" tabindex="0" role="button" aria-label="返回上一頁" @click="goBack()"
+                    @keydown.enter.prevent="goBack" @keydown.space.prevent="goBack">
                     <i class="fas fa-angle-left"></i> 返回
                 </div>
-
                 <h2 class="result-title">{{ earnedStars > 0 ? '太棒了!' : '再接再厲' }}</h2>
 
                 <img :src="wonderfulAvatarPath" alt="Result" class="result-avatar">

@@ -82,7 +82,7 @@
 
             <div v-if="!item.isCompleted" class="unfinished-mask">
               <span v-if="item.canClaim" class="claim-text">點擊兌換</span>
-              <span v-else>未達成</span>
+              <span v-else class="no-yet-claim">未達成</span>
             </div>
           </div>
         </div>
@@ -343,7 +343,7 @@ export default {
 }
 
 .achievement-card {
-  background: white;
+  background: #4b4949;
   height: 13.75rem;
   display: flex;
   flex-direction: column;
@@ -365,7 +365,7 @@ export default {
   }
 
   .card-desc {
-    color: $main-grey-text;
+    color: $main-black-text;
     white-space: pre-line;
     margin: 0;
   }
@@ -441,6 +441,10 @@ export default {
   color: white;
   font-weight: bold;
   pointer-events: none;
+
+  .no-yet-claim {
+    font-size: 1.5rem;
+  }
 }
 
 .status-icon {
@@ -491,7 +495,7 @@ export default {
 
 .progress-info {
   font-size: 1rem;
-  color: #706868;
+  color: $main-black-text;
   margin-top: .25rem;
   z-index: 1;
 }

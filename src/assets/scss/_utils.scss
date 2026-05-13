@@ -81,7 +81,7 @@ $main-back-blue-text: #00332D;
         transition: background-color 0.1s, transform 0.1s, box-shadow 0.1s;
 
         &:hover {
-            background-color: #49a5e3;
+            background-color: #2872a3;
         }
 
         &:active {
@@ -441,7 +441,7 @@ $main-back-blue-text: #00332D;
     transition: background-color 0.1s, transform 0.1s, box-shadow 0.1s;
 
     &:hover {
-        background-color: #49a5e3;
+        background-color: #2872a3;
     }
 }
 
@@ -517,7 +517,7 @@ $main-back-blue-text: #00332D;
     @include flex-center;
     flex-direction: column;
     justify-content: center;
-        height: 90vh;
+        height: 100vh;
 }
 
 @mixin main-card-content {
