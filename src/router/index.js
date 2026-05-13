@@ -27,7 +27,8 @@ const routes = [{
     name: 'Index',
     component: () => import('../page/Front/Home.vue'),
     meta: {
-      title: '大廳'
+      title: '大廳',
+      isFront: true
     }
   },
   {
@@ -44,7 +45,8 @@ const routes = [{
     name: 'TeacherDashboard',
     component: () => import('../page/Back/TeacherDashboard.vue'),
     meta: {
-      title: '教師儀錶板'
+      title: '教師儀錶板',
+      isAdmin: true
     }
   },
   {
@@ -52,7 +54,8 @@ const routes = [{
     name: 'IslandAnalysis',
     component: () => import('../page/Back/IslandAnalysis.vue'),
     meta: {
-      title: '競技島分析'
+      title: '競技島分析',
+      isAdmin: true
     }
   },
   {
@@ -60,7 +63,8 @@ const routes = [{
     name: 'ExamAnalysis',
     component: () => import('../page/Back/ExamAnalysis.vue'),
     meta: {
-      title: '考試分析'
+      title: '考試分析',
+      isAdmin: true
     }
   },
   {
@@ -68,7 +72,8 @@ const routes = [{
     name: 'ExamDetail',
     component: () => import('../page/Back/ExamDetail.vue'),
     meta: {
-      title: '考試詳細數據'
+      title: '考試詳細數據',
+      isAdmin: true
     }
   },
   {
@@ -76,7 +81,8 @@ const routes = [{
     name: 'NewsManagement',
     component: () => import('../page/Back/NewsManagement.vue'),
     meta: {
-      title: '公告管理'
+      title: '公告管理',
+      isAdmin: true
     }
   },
   {
@@ -84,24 +90,26 @@ const routes = [{
     name: 'F_Home',
     component: () => import('../page/Front/Home.vue'),
     meta: {
-      title: '大廳'
+      title: '大廳',
+      isFront: true
     }
   },
-  {
-    path: '/sitemap',
-    name: 'Sitemap',
-    component: () => import('../page/Front/Sitemap.vue'),
-    meta: {
-      isPublic: true,
-      title: '網站導覽'
-    }
-  },
+{
+  path: '/sitemap',
+  name: 'Sitemap',
+  component: () => import('../page/Front/Sitemap.vue'),
+  meta: {
+    isPublic: true, 
+    title: '網站導覽'
+  }
+},
   {
     path: '/primaryisland',
     name: 'PrimaryIsland',
     component: () => import('../page/Front/PrimaryIsland.vue'),
     meta: {
-      title: '國小學習島嶼'
+      title: '國小學習島嶼',
+      isFront: true
     }
   },
   {
@@ -109,7 +117,8 @@ const routes = [{
     name: 'SecondaryIsland',
     component: () => import('../page/Front/SecondaryIsland.vue'),
     meta: {
-      title: '國中學習島嶼'
+      title: '國中學習島嶼',
+      isFront: true
     }
   },
   {
@@ -117,7 +126,8 @@ const routes = [{
     name: 'AchievementIsland',
     component: () => import('../page/Front/AchievementIsland.vue'),
     meta: {
-      title: '我的成就島'
+      title: '我的成就島',
+      isFront: true
     }
   },
   {
@@ -126,7 +136,8 @@ const routes = [{
     component: () => import('../page/Front/WordIslandDetail.vue'),
     props: true,
     meta: {
-      title: '單字量挑戰'
+      title: '單字量挑戰',
+      isFront: true
     }
   },
   {
@@ -135,10 +146,11 @@ const routes = [{
     component: () => import('../page/Front/AbcIsland.vue'),
     props: {
       level: 'primary',
-      wordCount: 'abc'
+      wordCount: 'abc',
     },
     meta: {
-      title: 'ABC 啟航島'
+      title: 'ABC 啟航島',
+      isFront: true
     }
   },
   {
@@ -147,7 +159,8 @@ const routes = [{
     component: () => import('../page/Front/LessonDetail.vue'),
     props: true,
     meta: {
-      title: '課程關卡選擇'
+      title: '課程關卡選擇',
+      isFront: true
     }
   },
   {
@@ -159,7 +172,8 @@ const routes = [{
       level: 'primary'
     },
     meta: {
-      title: '國小聽力海灣'
+      title: '國小聽力海灣',
+      isFront: true
     }
   },
   {
@@ -171,7 +185,8 @@ const routes = [{
       level: 'primary'
     },
     meta: {
-      title: '國小小英雄大本營'
+      title: '國小小英雄大本營',
+      isFront: true
     }
   },
   {
@@ -180,7 +195,8 @@ const routes = [{
     component: () => import('../page/Front/HeroQuizPage.vue'),
     props: true,
     meta: {
-      title: '英雄挑戰測驗中'
+      title: '英雄挑戰測驗中',
+      isFront: true
     }
   },
   {
@@ -192,7 +208,8 @@ const routes = [{
       level: 'secondary'
     },
     meta: {
-      title: '國中聽力海灣'
+      title: '國中聽力海灣',
+      isFront: true
     }
   },
   {
@@ -204,7 +221,8 @@ const routes = [{
       level: 'secondary'
     },
     meta: {
-      title: '會考大殿堂'
+      title: '會考大殿堂',
+      isFront: true
     }
   },
   {
@@ -213,7 +231,8 @@ const routes = [{
     component: () => import('../page/Front/QuizPage.vue'),
     props: true,
     meta: {
-      title: '練習測驗進行中'
+      title: '練習測驗進行中',
+      isFront: true
     }
   },
   {
@@ -222,7 +241,8 @@ const routes = [{
     component: () => import('../page/Front/LearnPage.vue'),
     props: true,
     meta: {
-      title: '單字學習進行中'
+      title: '單字學習進行中',
+      isFront: true
     }
   },
   {
@@ -230,7 +250,8 @@ const routes = [{
     name: 'CompetitionIsland',
     component: () => import('../page/Front/CompetitionIsland.vue'),
     meta: {
-      title: '競技島'
+      title: '競技島',
+      isFront: true
     }
   },
   {
@@ -239,7 +260,8 @@ const routes = [{
     component: () => import('../page/Front/SpeedQuiz.vue'),
     props: true,
     meta: {
-      title: '速度競賽'
+      title: '速度競賽',
+      isFront: true
     }
   },
   {
@@ -248,7 +270,8 @@ const routes = [{
     component: () => import('../page/Front/ComboQuiz.vue'),
     props: true,
     meta: {
-      title: '連擊競賽'
+      title: '連擊競賽',
+      isFront: true
     }
   },
   {
@@ -257,7 +280,8 @@ const routes = [{
     component: () => import('../page/Front/AlphabetWheelQuiz.vue'),
     props: true,
     meta: {
-      title: '字母轉盤'
+      title: '字母轉盤',
+      isFront: true
     }
   },
   {
@@ -265,7 +289,8 @@ const routes = [{
     name: 'TrialHall',
     component: () => import('../page/Front/TrialHall.vue'),
     meta: {
-      title: '試煉殿堂'
+      title: '試煉殿堂',
+      isFront: true
     }
   },
   {
@@ -274,7 +299,8 @@ const routes = [{
     component: () => import('../page/Front/TrialQuizPage.vue'),
     props: true,
     meta: {
-      title: '正式試煉測驗中'
+      title: '正式試煉測驗中',
+      isFront: true
     }
   },
   {
@@ -283,7 +309,8 @@ const routes = [{
     component: () => import('../page/Front/ResultDetail.vue'),
     props: true,
     meta: {
-      title: '測驗結果詳情'
+      title: '測驗結果詳情',
+      isFront: true
     }
   },
   {
@@ -312,49 +339,49 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('accessToken');
+  const userRole = localStorage.getItem('userRole');
 
-  //  動態處理網頁標題 
+  //  處理標題 
   let pageTitle = to.meta.title || '';
-
-  // 針對具有動態參數的路由優化標題描述
   if (to.name === 'WordIslandDetail') {
     pageTitle = `${to.params.wordCount} 單字量挑戰島`;
   } else if (to.name === 'LessonDetail') {
     const levelName = to.params.level === 'primary' ? '國小' : '國中';
     pageTitle = `${levelName}課程詳細內容`;
   }
-
-  // 設定最終標題：頁面名 - 網站名
   document.title = pageTitle ? `${pageTitle} - ${baseSiteTitle}` : baseSiteTitle;
 
-
-  //  登入與權限攔截
-
-  // OIDC 強制攔截
-  if (to.query.code && to.path !== '/login') {
-    return next({
-      path: '/login',
-      query: to.query
-    });
-  }
-
-  // 定義白名單
-  const publicNames = ['Login', 'Sitemap', 'OidcCallback', 'OidcCallbackSlash'];
-  const publicPaths = ['/login', '/sitemap', '/api/oidccallback'];
-
-  const isPublicPage =
-    publicNames.includes(to.name) ||
-    to.path.startsWith('/sitemap') ||
-    to.path.startsWith('/login') ||
-    to.path.includes('/api/oidccallback');
+  // 定義公共頁面 (白名單)
+  const isPublicPage = to.meta.isPublic || ['Login', 'Sitemap', 'OidcCallback', 'OidcCallbackSlash'].includes(to.name) ||
+    to.path.startsWith('/login');
 
   if (isPublicPage) {
-    next();
-  } else if (!token) {
-    next('/login');
-  } else {
-    next();
+    return next();
   }
+
+  //  檢查是否登入
+  if (!token) {
+    return next('/login');
+  }
+  
+
+  //角色與頁面權限隔離
+  if (userRole === 'student') {
+    // 學生：禁止進入後台頁面 (標記了 isAdmin 的路由)
+    if (to.meta.isAdmin) {
+      console.warn('學生身份禁止訪問後台，跳回大廳');
+      return next('/'); // 跳回前台首頁
+    }
+  } else {
+    // 管理員/老師 (非學生)：禁止進入前台頁面 (標記了 isFront 的路由)
+    if (to.meta.isFront) {
+      console.warn('管理身份禁止訪問前台，跳回儀表板');
+      return next('/dashboard'); // 跳回後台首頁
+    }
+  }
+
+  // 通過檢查，放行
+  next();
 });
 
 export default router;

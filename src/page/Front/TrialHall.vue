@@ -54,7 +54,7 @@
                                     <div class="exam-info">
                                         <h3 class="exam-title">{{ formatExamName(nextAvailableExam.name) }}</h3>
                                         <div class="exam-details">
-                                            <p class="detail-item"><i class="far fa-clock"></i> 檢測期程: 2026-05-01 ~
+                                            <p class="detail-item"><i class="far fa-clock"></i> 檢測期程: 2026-06-01 ~
                                                 2026-06-30</p>
                                             <p class="detail-item"><i class="fas fa-hourglass-half"></i> 考試時長: {{
                                                 totalExamTime }} 分鐘</p>
@@ -234,7 +234,7 @@ export default {
     computed: {
         isExamOpen() {
             const now = new Date();
-            const startTime = new Date('2026-05-01T00:00:00');
+            const startTime = new Date('2026-06-01T00:00:00');
             const endTime = new Date('2026-06-30T23:59:59');
             return now >= startTime && now <= endTime;
         },
@@ -356,13 +356,13 @@ export default {
             const now = new Date();
 
             // 定義 6 月的起訖時間
-            const startTime = new Date('2026-05-01T00:00:00');
+            const startTime = new Date('2026-06-01T00:00:00');
             const endTime = new Date('2026-06-30T23:59:59');
 
             if (!target.isPractice) {
                 // --- 正式考試卷 ---
                 if (now < startTime) {
-                    this.$message.warning('此正式考試尚未開放（開放時間：2026-05-01 起）');
+                    this.$message.warning('此正式考試尚未開放（開放時間：2026-06-01 起）');
                     this.examDialogVisible = false;
                     return;
                 }
