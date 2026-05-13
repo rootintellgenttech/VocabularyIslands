@@ -1,11 +1,11 @@
 <template>
   <div id="app" :class="{ 'has-global-bg': $route.path !== '/login' }">
-    <nav class="global-access-nav" aria-label="無障礙工具欄">
+  <nav v-if="shouldShowGlobalNav" class="global-access-nav" aria-label="無障礙工具欄">
       <a href="#main-content" class="sr-only-focusable">跳到主要內容</a>
       
       <div class="top-utility-links">
         <router-link to="/sitemap" class="access-link" title="網站導覽">網站導覽</router-link>
-        </div>
+      </div>
     </nav>
 
     <div v-if="isFrontPage && isWrongOrientation" class="orientation-lock-overlay">
@@ -74,6 +74,10 @@ export default {
     }
   },
 computed: {
+  shouldShowGlobalNav() {
+      // 如果目前是後台路徑，就不顯示頂部導覽
+      return this.isFrontPage;
+    },
   shouldShowSidebar() {
     const token = localStorage.getItem('accessToken');
     const routeMetaHide = this.$route.meta.hideSidebar;
