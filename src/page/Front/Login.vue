@@ -758,15 +758,15 @@ $bg-path: "~@/assets/image/login-bg.jpg";
     margin-top: .5rem;
     overflow-y: auto;
 
-    .news-title,
-    .item-content {
-      flex: 1;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      width: auto;
-      min-width: 0;
-    }
+   // .news-title,
+    //.item-content {
+//flex: 1;
+     // white-space: nowrap;
+      //overflow: hidden;
+      //text-overflow: ellipsis;
+     // width: auto;
+     // min-width: 0;
+    //}
   }
 
   .role-notice-text {
