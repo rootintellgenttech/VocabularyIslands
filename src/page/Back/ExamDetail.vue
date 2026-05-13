@@ -160,10 +160,17 @@
 <script>
 import api from '@/config/api';
 
+const EXAM_TYPE_MAP = {
+  '1': 'primary', // 國小英語單字檢測-2
+  '2': 'junior',  // 7年級英語單字檢測-2
+  '3': 'junior'   // 8年級英語單字檢測-2
+};
+
 
 export default {
   name: 'ExamDetail',
   data() {
+    
     return {
       userRole: localStorage.getItem('userRole') || 'school_admin',
       examName: this.$route.query.name || '未定義試卷',
@@ -453,85 +460,118 @@ export default {
       //  關閉文件流以觸發渲染
       printWindow.document.close();
     },
-    async fetchExamDetailData() {
-      try {
-        const [statsRes, listRes] = await Promise.all([
-          api.post('/students/exam-stats/', { exam_id: this.examId }),
-          api.get('/students/list/')
-        ]);
+  async fetchExamDetailData() {
+  try {
+    const [statsRes, listRes] = await Promise.all([
+      api.post('/students/exam-stats/', { exam_id: this.examId }),
+      api.get('/students/list/')
+    ]);
 
-        this.rawStatsData = statsRes.data;
-        this.rawListData = listRes.data.results || [];
+    this.rawStatsData = statsRes.data;
+    this.rawListData = listRes.data.results || listRes.data || []; 
 
-        // 1. 設定頂部總指標 (依身分取對應的 total_avg)
-        const d = statsRes.data;
-        this.globalStats.avg = d.global_avg_score || d.total_avg_score || 0;
-        this.globalStats.participants = d.participants || 0;
+    const d = statsRes.data;
+    const firstData = Array.isArray(d) ? d[0] : d;
+    this.globalStats.avg = firstData.global_avg_score || firstData.league_avg_score || 0;
+    this.globalStats.participants = firstData.participants || 0;
 
-        // 2. 根據身分進行資料平鋪與合併
-        if (this.userRole === 'global_leader') {
-          this.processGlobalData(d, this.rawListData);
-        } else if (this.userRole === 'union_leader') {
-          this.processUnionData(d, this.rawListData);
-        } else {
-          this.processTeacherData(d, this.rawListData);
-        }
-      } catch (err) {
-        console.error("載入失敗", err);
-      }
-    },
+    if (this.userRole === 'global_leader') {
+      this.processGlobalData(d, this.rawListData);
+    } else if (this.userRole === 'union_leader') {
+      this.processUnionData(d, this.rawListData);
+    } else {
+      this.processTeacherData(d, this.rawListData);
+    }
+  } catch (err) {
+    console.error("載入失敗", err);
+  }
+},
 
     //  總召資料處理 
-    processGlobalData(stats, list) {
-      this.allianceOptions = (stats.leagues || []).map(l => ({ name: l.league_name, id: l.league_name }));
-      this.schoolResultData = (stats.leagues || []).map(l => {
-        const matchedLeague = list.find(ld => ld.league_name === l.league_name) || {};
-        const listSchools = matchedLeague.schools || [];
+processGlobalData(stats, list) {
+  const leagueData = Array.isArray(stats) ? stats : (stats.leagues || []);
+  const currentExamType = EXAM_TYPE_MAP[this.examId];
 
-        // 只累加「有考這份卷子」的學校人數
-        const activeTotal = (l.schools || []).reduce((sum, s) => {
-          if (s.participants > 0) {
-            const matched = listSchools.find(ms => ms.school_name === s.school_name) || {};
-            return sum + (matched.student_total || 0);
-          }
-          return sum;
-        }, 0);
+  // 名稱判斷函式
+  const filterByKeyword = (name) => {
+    return currentExamType === 'primary' ? name.includes('國小') : name.includes('國中');
+  };
 
-        return {
-          allianceName: l.league_name,
-          schoolCount: (l.schools || []).length,
-          totalStudents: activeTotal,
-          participants: l.participants,
-          avgScore: l.league_avg_score,
-          schools: l.schools.map(s => {
-            const matched = listSchools.find(ms => ms.school_name === s.school_name) || {};
-            return { ...s, student_total: matched.student_total || 0 };
-          })
-        };
-      });
-      this.selectedAlliance = this.allianceOptions[0]?.id;
-      this.handleAllianceChange(this.selectedAlliance);
-    },
+  this.allianceOptions = leagueData.map(l => ({ name: l.league_name, id: l.league_name }));
+
+  this.schoolResultData = leagueData.map(l => {
+    const matchedLeague = list.find(ld => ld.league_name === l.league_name) || {};
+    const listSchools = matchedLeague.results || matchedLeague.schools || [];
+
+    // 過濾符合類型的學校
+    const validSchoolsAtThisLevel = (l.schools || []).filter(s => filterByKeyword(s.school_name));
+
+    return {
+      allianceName: l.league_name,
+      schoolCount: validSchoolsAtThisLevel.length,
+      totalStudents: validSchoolsAtThisLevel.reduce((sum, s) => {
+        const ms = listSchools.find(v => v.school_name === s.school_name) || {};
+        return sum + (ms.student_total || 0);
+      }, 0),
+      participants: validSchoolsAtThisLevel.reduce((sum, s) => sum + (s.participants || 0), 0),
+      avgScore: l.league_avg_score || 0,
+      schools: validSchoolsAtThisLevel.map(s => {
+        const ms = listSchools.find(v => v.school_name === s.school_name) || {};
+        return { ...s, student_total: ms.student_total || 0 };
+      })
+    };
+  }).filter(item => item.schoolCount > 0); // 若該聯盟沒有對應學校則不顯示
+
+  if (this.allianceOptions.length > 0) {
+    this.selectedAlliance = this.allianceOptions[0].id;
+    this.handleAllianceChange(this.selectedAlliance);
+  }
+},
 
     //  聯盟召集人資料處理 
-    processUnionData(stats, list) {
-      const leagueStats = Array.isArray(stats) ? stats[0] : stats.leagues[0];
-      const matchedLeague = list.find(l => l.league_name === leagueStats.league_name) || {};
+processUnionData(stats, list) {
+  // 1. 取得當前試卷類型 (primary 或 junior)
+  const currentExamType = EXAM_TYPE_MAP[this.examId];
+  
+  // 2. 處理 API 回傳格式 (陣列或物件)
+  const leagueStats = Array.isArray(stats) ? stats[0] : (stats.leagues ? stats.leagues[0] : stats);
+  if (!leagueStats) return;
 
-      this.schoolOptions = (leagueStats.schools || []).map(s => ({ name: s.school_name, id: s.school_name }));
-      this.selectedSchools = this.schoolOptions.map(s => s.id);
+  const matchedLeague = list.find(l => l.league_name === leagueStats.league_name) || {};
+  const listSchools = matchedLeague.results || matchedLeague.schools || [];
 
-      this.schoolResultData = (leagueStats.schools || []).map(s => {
-        const matched = (matchedLeague.schools || []).find(ms => ms.school_name === s.school_name) || {};
-        return {
-          schoolName: s.school_name,
-          totalStudents: matched.student_total || 0,
-          participants: s.participants,
-          avgScore: s.avg_score
-        };
-      });
-      this.updateChartData();
-    },
+  // 3. 【關鍵過濾邏輯】根據學校名稱包含 "國小" 或 "國中" 來判斷
+  const filterByKeyword = (schoolName) => {
+    if (currentExamType === 'primary') {
+      return schoolName.includes('國小'); // 國小試卷只顯示名稱有"國小"的
+    } else if (currentExamType === 'junior') {
+      return schoolName.includes('國中'); // 國中試卷只顯示名稱有"國中"的
+    }
+    return true;
+  };
+
+  // 4. 過濾並設定下拉選單
+  this.schoolOptions = (leagueStats.schools || [])
+    .filter(s => filterByKeyword(s.school_name))
+    .map(s => ({ name: s.school_name, id: s.school_name }));
+
+  this.selectedSchools = this.schoolOptions.map(s => s.id);
+
+  // 5. 設定表格顯示資料
+  this.schoolResultData = (leagueStats.schools || [])
+    .filter(s => filterByKeyword(s.school_name))
+    .map(s => {
+      const ms = listSchools.find(v => v.school_name === s.school_name) || {};
+      return {
+        schoolName: s.school_name,
+        totalStudents: ms.student_total || 0,
+        participants: s.participants || 0,
+        avgScore: s.avg_score || 0
+      };
+    });
+
+  this.updateChartData();
+},
 
     //  老師資料處理 
     processTeacherData(stats, list) {
@@ -569,26 +609,29 @@ export default {
       }
     },
 
-    updateChartData() {
-      if (!this.rawStatsData) return;
-      const categories = ['0-9', '10-19', '20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80-89', '90-99', '100'];
+   updateChartData() {
+  if (!this.rawStatsData) return;
+  const categories = ['0-9', '10-19', '20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80-89', '90-99', '100'];
 
-      let source = [];
-      if (this.userRole === 'global_leader') {
-        const league = this.rawStatsData.leagues.find(l => l.league_name === this.selectedAlliance);
-        source = (league?.schools || []).filter(s => this.selectedSchools.includes(s.school_name));
-      } else if (this.userRole === 'union_leader') {
-        const league = Array.isArray(this.rawStatsData) ? this.rawStatsData[0] : this.rawStatsData.leagues[0];
-        source = (league?.schools || []).filter(s => this.selectedSchools.includes(s.school_name));
-      } else {
-        source = (this.rawStatsData.classes || []).filter(c => this.selectedClasses.includes(`${c.grade}年${c.classroom}班`));
-      }
+  let source = [];
+  // 統一處理資料來源
+  const allLeagues = Array.isArray(this.rawStatsData) ? this.rawStatsData : (this.rawStatsData.leagues || []);
 
-      this.filteredDistSeries = source.map(item => ({
-        name: item.school_name || `${item.grade}年${item.classroom}班`,
-        data: categories.map(k => item.score_distribution[k] || 0)
-      }));
-    },
+  if (this.userRole === 'global_leader') {
+    const league = allLeagues.find(l => l.league_name === this.selectedAlliance);
+    source = (league?.schools || []).filter(s => this.selectedSchools.includes(s.school_name));
+  } else if (this.userRole === 'union_leader') {
+    const league = allLeagues[0]; 
+    source = (league?.schools || []).filter(s => this.selectedSchools.includes(s.school_name));
+  } else {
+    source = (this.rawStatsData.classes || []).filter(c => this.selectedClasses.includes(`${c.grade}年${c.classroom}班`));
+  }
+
+  this.filteredDistSeries = source.map(item => ({
+    name: item.school_name || `${item.grade}年${item.classroom}班`,
+    data: categories.map(k => (item.score_distribution && item.score_distribution[k]) || 0)
+  }));
+},
     openClassDetail(row) {
       // 1. 設定標題
       this.dialogTitle = `${row.grade} 年級 ${row.classroom} 班 成績明細`;

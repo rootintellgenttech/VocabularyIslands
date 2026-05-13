@@ -139,19 +139,31 @@ export default {
   },
   computed: {
     // 根據身分與學校類型過濾後的列表
-    filteredExamListData() {
-      let list = (this.userRole === 'global_leader')
-        ? this.rawExamList
-        : (this.schoolType === 'primary'
-          ? this.rawExamList.filter(item => item.type === 'primary')
-          : this.rawExamList.filter(item => item.type === 'junior'));
+filteredExamListData() {
+    let list = this.rawExamList;
 
-      return list.map(exam => {
-        const settings = EXAM_MASTER_SETTINGS[exam.id];
-        const totalMinutes = settings ? Object.values(settings).reduce((sum, item) => sum + item.time, 0) : 0;
-        return { ...exam, duration: `${totalMinutes}分鐘` };
-      });
-    },
+    // 1. 如果是總召，直接看到全部，不進行過濾
+    if (this.userRole === 'global_leader') {
+      return this.formatExamList(list);
+    }
+
+    // 2. 獲取當前學校名稱（從 API 回傳的數據中取得）
+    const schoolName = this.currentSchoolName || ""; 
+
+    // 3. 根據學校名稱關鍵字過濾
+    if (schoolName.includes('國小')) {
+      list = this.rawExamList.filter(item => item.type === 'primary');
+    } else if (schoolName.includes('國中')) {
+      list = this.rawExamList.filter(item => item.type === 'junior');
+    } else {
+      // 如果名稱判斷不出（例如聯盟召集人），則依照原本的 schoolType 邏輯
+      list = (this.schoolType === 'primary')
+        ? this.rawExamList.filter(item => item.type === 'primary')
+        : this.rawExamList.filter(item => item.type === 'junior');
+    }
+
+    return this.formatExamList(list);
+  },
     filteredOverviewData() {
       if (this.userRole === 'school_admin') {
         // 學校管理員：顯示班級資訊
@@ -178,6 +190,13 @@ export default {
     }
   },
   methods: {
+    formatExamList(list) {
+    return list.map(exam => {
+      const settings = EXAM_MASTER_SETTINGS[exam.id];
+      const totalMinutes = settings ? Object.values(settings).reduce((sum, item) => sum + item.time, 0) : 0;
+      return { ...exam, duration: `${totalMinutes}分鐘` };
+    });
+  },
     exportFullTable(containerId) {
       // 1. 取得當前選中的試卷資訊
       const currentExam = this.rawExamList.find(e => e.id === this.selectedExamId);
@@ -307,6 +326,9 @@ export default {
         const res = await api.get('/students/list/');
         const rawData = res.data || {};
         const results = rawData.results || [];
+
+        // 存下 API 回傳的學校名稱
+      this.currentSchoolName = rawData.school_name || "";
 
         if (rawData.level === 'league') {
           // 總召模式：生成聯盟選項與匯總數據

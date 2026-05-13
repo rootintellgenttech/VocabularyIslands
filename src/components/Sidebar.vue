@@ -80,10 +80,20 @@
 
 
         <div class="bottom-menu">
-            <div v-if="!isStudent" ref="passwordTrigger" class="menu-item" tabindex="0" role="button" aria-label="修改密碼"
-                @click="passwordDialogVisible = true" @keydown.enter.prevent="passwordDialogVisible = true">
-                <i class="fas fa-key" aria-hidden="true"></i>
-                <span v-if="isMenuExpanded">修改密碼</span>
+
+            <div v-if="!isStudent" class="menu-item-wrapper">
+                <div ref="passwordTrigger" class="menu-item" tabindex="0" role="button" aria-label="修改密碼"
+                    @click="passwordDialogVisible = true">
+                    <i class="fas fa-key" aria-hidden="true"></i>
+                    <span v-if="isMenuExpanded">修改密碼</span>
+                </div>
+            </div>
+             <div v-if="!isStudent" class="menu-item-wrapper">
+                <div ref="passwordTrigger" class="menu-item" tabindex="0" role="button" aria-label="使用説明"
+                     @click.stop="helpDialogVisible = true">
+                    <i  class="fas fa-question-circle help-icon" aria-hidden="true"></i>
+                    <span v-if="isMenuExpanded">使用說明</span>
+                </div>
             </div>
             <div ref="contactTrigger" class="menu-item" tabindex="0" role="button" aria-label="聯絡我們"
                 @click="contactDialogVisible = true" @keydown.enter.prevent="contactDialogVisible = true">
@@ -165,6 +175,31 @@
                 <span v-if="isMenuExpanded">登出</span>
             </div>
         </div>
+
+        <el-dialog title="使用說明文件" :visible.sync="helpDialogVisible" width="500px" center append-to-body
+            custom-class="help-modal ">
+            <div class="help-content">
+                <p class="help-desc">請點擊下方連結下載對應的操作說明文件或觀看教學影片：</p>
+                <div class="download-links">
+                    <a href="/docs/學生端使用教學說明.pdf" target="_blank" class="doc-link">
+                        <i class="fas fa-file-pdf"></i> 學生端使用教學說明.pdf
+                    </a>
+                    <a href="/docs/後台使用教學說明.pdf" target="_blank" class="doc-link">
+                        <i class="fas fa-file-pdf"></i> 後台使用教學說明.pdf
+                    </a>
+                    <a href="/docs/英閱奇航-單字表.pdf" target="_blank" class="doc-link">
+                        <i class="fas fa-file-pdf"></i> 英閱奇航 單字表.pdf
+                    </a>
+                    <!-- <hr>
+                    <a href="https://www.youtube.com/watch?v=你的影片代碼" target="_blank" class="video-link">
+                        <i class="fab fa-youtube"></i> 系統操作教學影片 (YouTube)
+                    </a> -->
+                </div>
+            </div>
+            <span slot="footer">
+                <el-button @click="helpDialogVisible = false">關閉</el-button>
+            </span>
+        </el-dialog>
 
         <el-dialog :visible.sync="passwordDialogVisible" width="400px" center custom-class="password-modal"
             append-to-body @opened="$refs.newPassInput.focus()" @closed="$refs.passwordTrigger.focus()">
@@ -268,6 +303,7 @@ export default {
             passwordLoading: false,
             newPassword: '',
             confirmPassword: '',
+            helpDialogVisible: false,
         };
     },
 
@@ -568,6 +604,54 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+.help-modal {
+    .help-desc {
+        margin-bottom: 1.5rem;
+        color: #666;
+    }
+
+    .download-links {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+
+        .doc-link,
+        .video-link {
+            @include flex-center;
+            padding: 0.75rem 1rem;
+            background-color: #f5f7fa;
+            border-radius: 0.5rem;
+            color: #333;
+            transition: background-color 0.2s;
+
+            i {
+                margin-right: 0.75rem;
+                font-size: 1.25rem;
+            }
+
+            &:hover {
+                background-color: #e6f7f5;
+                color: #2aaea0;
+            }
+        }
+
+        .doc-link i {
+            color: #ff4d4f;
+        }
+
+        .video-link i {
+            color: #ff0000;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 0.5rem 0;
+        }
+    }
+}
+
 .el-dialog {
 
     .setting-item,

@@ -460,7 +460,7 @@ html {
 .settings-modal,
 .mails-modal,
 .exit-confirm-modal,
-.password-modal {
+.password-modal,.help-modal {
   border: .375rem solid var(--btn-g, #4ABCB1);
   border-radius: 1rem !important;
   padding-bottom: 1.5rem;
