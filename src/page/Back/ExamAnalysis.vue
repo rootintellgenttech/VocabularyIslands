@@ -142,21 +142,19 @@ export default {
 filteredExamListData() {
     let list = this.rawExamList;
 
-    // 1. 如果是總召，直接看到全部，不進行過濾
-    if (this.userRole === 'global_leader') {
+    //  如果是總召 (global_leader) 或 聯盟召集人 (union_leader)，直接看到全部
+    if (this.userRole === 'global_leader' || this.userRole === 'union_leader') {
       return this.formatExamList(list);
     }
 
-    // 2. 獲取當前學校名稱（從 API 回傳的數據中取得）
+    // 學校管理員 (school_admin) 才會執行的過濾邏輯
     const schoolName = this.currentSchoolName || ""; 
 
-    // 3. 根據學校名稱關鍵字過濾
     if (schoolName.includes('國小')) {
       list = this.rawExamList.filter(item => item.type === 'primary');
     } else if (schoolName.includes('國中')) {
       list = this.rawExamList.filter(item => item.type === 'junior');
     } else {
-      // 如果名稱判斷不出（例如聯盟召集人），則依照原本的 schoolType 邏輯
       list = (this.schoolType === 'primary')
         ? this.rawExamList.filter(item => item.type === 'primary')
         : this.rawExamList.filter(item => item.type === 'junior');
