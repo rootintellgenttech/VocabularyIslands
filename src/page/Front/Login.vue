@@ -314,9 +314,24 @@ export default {
         if (!idToken) throw new Error("沒有收到 id_token");
         const decodedUser = jwtDecode(idToken);
 
+        //  資料清洗
+        const rawSchools = decodedUser.kh_profile?.schools || {};
+        const cleanedSchools = {};
+
+        Object.keys(rawSchools).forEach(schoolId => {
+          let schoolName = rawSchools[schoolId];
+          // 正則表達式：匹配字串開頭的任何字元直到「區」字，並將其替換為空字串
+          // 例如 "鳳山區快樂示範小學" -> "快樂示範小學"
+          // 支援 XX區 或 XXX區
+          cleanedSchools[schoolId] = schoolName.replace(/^.*?區/, '');
+        });
+
         const postData = {
           sub: decodedUser.sub,
-          kh_profile: decodedUser.kh_profile || {},
+          kh_profile: {
+            ...decodedUser.kh_profile,
+            schools: cleanedSchools // 使用清洗過後的資料
+          },
           kh_titles: decodedUser.kh_titles || {},
           kh_classes: decodedUser.kh_classes || {}
         };
@@ -758,14 +773,14 @@ $bg-path: "~@/assets/image/login-bg.jpg";
     margin-top: .5rem;
     overflow-y: auto;
 
-   // .news-title,
+    // .news-title,
     //.item-content {
-//flex: 1;
-     // white-space: nowrap;
-      //overflow: hidden;
-      //text-overflow: ellipsis;
-     // width: auto;
-     // min-width: 0;
+    //flex: 1;
+    // white-space: nowrap;
+    //overflow: hidden;
+    //text-overflow: ellipsis;
+    // width: auto;
+    // min-width: 0;
     //}
   }
 
