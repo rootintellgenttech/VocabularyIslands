@@ -68,6 +68,12 @@ export default {
             },
         };
     },
+      mounted() {
+        window.addEventListener('resize', this.handleResize);
+    },
+    beforeDestroy() {
+        window.removeEventListener('resize', this.handleResize);
+    },
     computed: {
         formattedDescription() {
             return this.lessonData.description ? this.lessonData.description.replace(/\n/g, '<br>') : '';
@@ -236,13 +242,48 @@ export default {
 
 <style lang="scss" scoped>
 .lesson-detail-page {
-    @include main-card-page
+    @include main-card-page;
 }
 
 .main-card {
-    @include lesson-detail-boxs-two-row
+    @include lesson-detail-boxs-two-row;
+
+    .header-info {
+        .lesson-title,
+        .lesson-description {
+            margin: 0;
+        }
+
+        .lesson-description {
+            font-size: 28px;
+        }
+    }
 }
 
+.star-rating {
+    cursor: help;
+}
+
+.level-scroll-container {
+    width: 100%;
+    height: 500px; 
+    overflow: hidden; 
+    position: relative;
+    margin-top: 1rem;
+}
+
+.lesson-options {
+    display: flex;
+    flex-direction: column;
+    width: 100%;           
+    padding: 1rem 2rem 2rem;
+    gap: 2rem;
+
+    .option-item {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+}
 
 @media (max-width: 768px) {
     .lesson-detail-page {
@@ -250,10 +291,16 @@ export default {
         padding: 5% 12%;
 
         .main-card {
-            margin: 5% auto;
-            width: max-content;
+            min-width: 31.25rem !important;
+            margin: 5% 4rem;
             padding: 1rem;
+            width: unset;
         }
     }
+        .level-scroll-container {
+        height: auto !important;
+        overflow: visible !important;
+        touch-action: auto;
+    } 
 }
 </style>

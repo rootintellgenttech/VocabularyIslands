@@ -85,7 +85,12 @@ export default {
     props: {
         level: { type: String, required: true },
         wordCount: { type: String, default: '300' },
-        unitId: { type: String, required: true }
+        unitId: { type: String, required: true },
+          dynamicScrollSettings: {
+            suppressScrollY: true,  // 關閉直向
+            suppressScrollX: false, // 開啟橫向
+            wheelPropagation: false // 防止滾動冒泡
+        }
     },
     data() {
         return {
@@ -115,16 +120,16 @@ export default {
             }
         }
     },
-    computed: {
-        dynamicScrollSettings() {
-            // 小於 768 時 (包含 400% 放大)：關閉橫向、開啟直向
-            if (this.windowWidth <= 768) {
-                return { suppressScrollY: false, suppressScrollX: true, wheelPropagation: false };
-            }
-            // 電腦版正常時：開啟橫向、關閉直向
-            return { suppressScrollY: true, suppressScrollX: false, wheelPropagation: false };
-        }
-    },
+    // computed: {
+    //     dynamicScrollSettings() {
+    //         // 小於 768 時 (包含 400% 放大)：關閉橫向、開啟直向
+    //         if (this.windowWidth <= 768) {
+    //             return { suppressScrollY: false, suppressScrollX: true, wheelPropagation: false };
+    //         }
+    //         // 電腦版正常時：開啟橫向、關閉直向
+    //         return { suppressScrollY: true, suppressScrollX: false, wheelPropagation: false };
+    //     }
+    // },
     mounted() {
         window.addEventListener('resize', this.handleResize);
     },
