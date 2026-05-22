@@ -447,14 +447,18 @@ export default {
           });
           this.performLogin(response.data, '/dashboard');
         } catch (error) {
-          const errMsg = error.response?.data?.detail || '帳號或密碼錯誤，請重新確認。';
-          this.$message.error(errMsg);
+      const errMsg = error.response?.data?.detail || '帳號或密碼錯誤，請重新確認。';
+      this.$message.error(errMsg);
 
-          this.$nextTick(() => {
-            const accountInput = document.getElementById('teacher-account');
-            if (accountInput) accountInput.focus();
-          });
+      this.$nextTick(() => {
+        const passwordInput = document.getElementById('teacher-password');
+        if (passwordInput) {
+          passwordInput.focus();
+          const innerInput = passwordInput.querySelector('input') || passwordInput;
+          if (innerInput.select) innerInput.select();
         }
+      });
+    }
       });
     },
     async fetchNews() {
