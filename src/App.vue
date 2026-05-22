@@ -1,8 +1,8 @@
 <template>
   <div id="app" :class="{ 'has-global-bg': $route.path !== '/login' }">
-  <nav v-if="shouldShowGlobalNav" class="global-access-nav" aria-label="無障礙工具欄">
-      <a href="#main-content" class="sr-only-focusable">跳到主要內容</a>
-      
+    <nav v-if="shouldShowGlobalNav" class="global-access-nav" aria-label="無障礙工具欄">
+      <a href="javascript:void(0)" @click="skipToMain" class="sr-only-focusable">跳到主要內容</a>
+
       <div class="top-utility-links">
         <router-link to="/sitemap" class="access-link" title="網站導覽">網站導覽</router-link>
       </div>
@@ -18,11 +18,11 @@
         <p class="sub-text">請將您的設備橫放以繼續使用</p>
       </div>
     </div>
-<aside v-if="shouldShowSidebar" role="complementary" aria-label="側邊選單">
-  <Sidebar />
-</aside>
+    <aside v-if="shouldShowSidebar" role="complementary" aria-label="側邊選單">
+      <Sidebar />
+    </aside>
 
-    <main id="main-content" role="main" class="router-view-content">
+    <main id="main-content" role="main" class="router-view-content" tabindex="-1">
       <router-view />
 
       <nav v-if="isDevelopment" aria-label="開發者檢測導航" style="display: none;">
@@ -73,27 +73,35 @@ export default {
       }
     }
   },
-computed: {
-  shouldShowGlobalNav() {
+  computed: {
+    shouldShowGlobalNav() {
       // 如果目前是後台路徑，就不顯示頂部導覽
       return this.isFrontPage;
     },
-  shouldShowSidebar() {
-    const token = localStorage.getItem('accessToken');
-    const routeMetaHide = this.$route.meta.hideSidebar;
-    const isSitemap = this.$route.name === 'Sitemap';
-    
-    // 1. 如果 meta 寫死要隱藏 (如 Login 頁)，絕對隱藏
-    if (routeMetaHide) return false;
+    shouldShowSidebar() {
+      const token = localStorage.getItem('accessToken');
+      const routeMetaHide = this.$route.meta.hideSidebar;
+      const isSitemap = this.$route.name === 'Sitemap';
 
-    // 2. 如果是 Sitemap 頁面：沒登入不給看側欄
-    if (isSitemap && !token) return false;
+      // 1. 如果 meta 寫死要隱藏 (如 Login 頁)，絕對隱藏
+      if (routeMetaHide) return false;
 
-    // 3. 只要有 Token，且不是在 Login/404，就應該顯示
-    return !!token;
-  }
-},
+      // 2. 如果是 Sitemap 頁面：沒登入不給看側欄
+      if (isSitemap && !token) return false;
+
+      // 3. 只要有 Token，且不是在 Login/404，就應該顯示
+      return !!token;
+    }
+  },
   methods: {
+    skipToMain() {
+      const mainContent = document.getElementById('main-content');
+      if (mainContent) {
+        mainContent.focus();
+        // 確保沒有被 overflow hidden 遮擋，並讓視覺上知道焦點已移動
+        mainContent.scrollIntoView({ behavior: 'smooth' });
+      }
+    },
     checkOrientation() {
       const width = window.innerWidth;
       const height = window.innerHeight;
@@ -464,7 +472,8 @@ html {
 .settings-modal,
 .mails-modal,
 .exit-confirm-modal,
-.password-modal,.help-modal {
+.password-modal,
+.help-modal {
   border: .375rem solid var(--btn-g, #4ABCB1);
   border-radius: 1rem !important;
   padding-bottom: 1.5rem;
@@ -564,7 +573,8 @@ button {
 
 .router-view-content {
   min-height: 100vh;
-    &.full-width {
+
+  &.full-width {
     padding-left: 0;
   }
 }
@@ -616,9 +626,9 @@ button {
   width: 100%;
   z-index: 1000;
   display: flex;
-  justify-content: flex-end; 
+  justify-content: flex-end;
   padding: 0 20px;
-  pointer-events: none; 
+  pointer-events: none;
 
   .top-utility-links {
     pointer-events: auto;
@@ -629,14 +639,14 @@ button {
     padding: 5px 12px;
     text-decoration: none;
     background-color: rgba(255, 255, 255, 0.8);
-    color: #0369a1; 
+    color: #0369a1;
     font-size: 14px;
     font-weight: bold;
     border-radius: 0 0 5px 5px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 
     &:focus {
-      outline: 3px solid #ffed4a; 
+      outline: 3px solid #ffed4a;
       background-color: #fff;
     }
   }
@@ -644,20 +654,20 @@ button {
 
 .sr-only-focusable {
   position: absolute;
-  top: -100px;
-  left: 20px;
-  background: #ffed4a;
-  color: #000;
-  padding: 10px 20px;
-  z-index: 10001;
-  font-weight: bold;
-  pointer-events: auto;
-  text-decoration: none;
-  border: 2px solid #000;
+  top: -40px;
+  left: 0;
+  z-index: 9999;
+  background: #000;
+  color: #fff;
+  padding: 10px;
+}
 
-  &:focus {
-    top: 10px;
-  }
+.sr-only-focusable:focus {
+  top: 0;
+}
+
+#main-content:focus {
+  outline: 2px solid #ff9900;
 }
 
 // 裝置旋轉示意動畫

@@ -22,7 +22,7 @@
                 <i class="fa-solid fa-spinner fa-spin"></i> 公告載入中...
               </div>
               <div v-else-if="announcements.length === 0" class="no-news-text">
-                目前尚無公告
+                Currently no announcements
               </div>
               <div v-for="(item, index) in announcements" :key="item.id" class="announcement-item">
                 <div class="item-header">
@@ -85,31 +85,35 @@
               </div>
 
               <div v-if="currentRole === 'teacher'" class="teacher-input-zone">
-                <div class="input-group">
-                  <label class="input-label" for="teacher-account">帳號</label>
-                  <el-input id="teacher-account" v-model="teacherForm.account" placeholder="請輸入教職員帳號"
-                    class="custom-input">
-                  </el-input>
-                </div>
-                <div class="input-group">
-                  <label class="input-label" for="teacher-password">密碼</label>
-                  <el-input id="teacher-password" v-model="teacherForm.password"
-                    :type="isPasswordVisible ? 'text' : 'password'" placeholder="請輸入密碼" class="custom-input"
-                    @keyup.enter.native="handleLogin">
-                    <button slot="suffix" type="button" class="password-toggle-btn"
-                      :aria-label="isPasswordVisible ? '隱藏密碼' : '顯示密碼'"
-                      :aria-pressed="isPasswordVisible ? 'true' : 'false'"
-                      @click="isPasswordVisible = !isPasswordVisible">
-                      <i :class="isPasswordVisible ? 'el-icon-view' : 'el-icon-lock'" aria-hidden="true"></i>
-                    </button>
-                  </el-input>
-                </div>
-                <button @click="handleLogin">
-                  <i class="fa-solid fa-chalkboard-user"></i> 教職員登入
-                </button>
-                <button ref="forgetPasswordBtn" type="button" class="forgot-password-link" @click="openForgetPassModal">
-                  忘記密碼？
-                </button>
+                <el-form ref="teacherForm" :model="teacherForm" :rules="teacherRules" label-position="top"
+                  @submit.native.prevent="handleLogin">
+                  <el-form-item prop="account">
+                    <label class="input-label" for="teacher-account">帳號</label>
+                    <el-input id="teacher-account" v-model="teacherForm.account" placeholder="請輸入教職員帳號"
+                      class="custom-input"></el-input>
+                  </el-form-item>
+
+                  <el-form-item prop="password">
+                    <label class="input-label" for="teacher-password">密碼</label>
+                    <el-input id="teacher-password" v-model="teacherForm.password"
+                      :type="isPasswordVisible ? 'text' : 'password'" placeholder="請輸入密碼" class="custom-input">
+                      <button slot="suffix" type="button" class="password-toggle-btn"
+                        :aria-label="isPasswordVisible ? '隱藏密碼' : '顯示密碼'"
+                        :aria-pressed="isPasswordVisible ? 'true' : 'false'"
+                        @click="isPasswordVisible = !isPasswordVisible">
+                        <i :class="isPasswordVisible ? 'el-icon-view' : 'el-icon-lock'" aria-hidden="true"></i>
+                      </button>
+                    </el-input>
+                  </el-form-item>
+
+                  <button type="submit" style="margin-top: 10px;">
+                    <i class="fa-solid fa-chalkboard-user"></i> 教職員登入
+                  </button>
+                  <button ref="forgetPasswordBtn" type="button" class="forgot-password-link"
+                    @click="openForgetPassModal">
+                    忘記密碼？
+                  </button>
+                </el-form>
               </div>
             </div>
           </div>
@@ -245,6 +249,10 @@ export default {
         account: '',
         password: '',
       },
+      teacherRules: {
+        account: [{ required: true, message: '請填寫教職員帳號欄位。', trigger: 'submit' }],
+        password: [{ required: true, message: '請填寫密碼欄位。', trigger: 'submit' }]
+      },
       alertMessage: '',
       alertType: 'error',
       showAlert: false,
@@ -255,8 +263,8 @@ export default {
       passForm: { new_password: '' },
       passRules: {
         new_password: [
-          { required: true, message: '請輸入密碼', trigger: 'blur' },
-          { min: 6, message: '密碼長度至少為 6 個單位', trigger: 'blur' }
+          { required: true, message: '請填寫新密碼。', trigger: 'blur' },
+          { min: 6, message: '密碼長度安全性不足，至少需要 6 個單位。', trigger: 'blur' }
         ]
       },
       showForgetPassDialog: false,
@@ -265,10 +273,10 @@ export default {
         email: ''
       },
       forgetRules: {
-        username: [{ required: true, message: '請輸入帳號', trigger: 'blur' }],
+        username: [{ required: true, message: '用戶帳號為必填欄位，請檢查後輸入。', trigger: 'blur' }],
         email: [
-          { required: true, message: '請輸入 Email', trigger: 'blur' },
-          { type: 'email', message: '請輸入正確的 Email 格式', trigger: 'blur' }
+          { required: true, message: '電子郵件為必填欄位，請填寫。', trigger: 'blur' },
+          { type: 'email', message: '電子郵件格式不正確，請重新檢查。', trigger: 'blur' }
         ]
       },
       showResetPassDialog: false,
@@ -287,7 +295,6 @@ export default {
     const code = this.$route.query.code || urlParams.get('code');
     const errorParam = this.$route.query.error || urlParams.get('error');
 
-    // 如果這不是回調 (Callback) 狀態，代表是用戶「第一次」進來登入頁
     if (!code && !errorParam) {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
@@ -314,15 +321,11 @@ export default {
         if (!idToken) throw new Error("沒有收到 id_token");
         const decodedUser = jwtDecode(idToken);
 
-        //  資料清洗
         const rawSchools = decodedUser.kh_profile?.schools || {};
         const cleanedSchools = {};
 
         Object.keys(rawSchools).forEach(schoolId => {
           let schoolName = rawSchools[schoolId];
-          // 正則表達式：匹配字串開頭的任何字元直到「區」字，並將其替換為空字串
-          // 例如 "鳳山區快樂示範小學" -> "快樂示範小學"
-          // 支援 XX區 或 XXX區
           cleanedSchools[schoolId] = schoolName.replace(/^.*?區/, '');
         });
 
@@ -330,7 +333,7 @@ export default {
           sub: decodedUser.sub,
           kh_profile: {
             ...decodedUser.kh_profile,
-            schools: cleanedSchools // 使用清洗過後的資料
+            schools: cleanedSchools
           },
           kh_titles: decodedUser.kh_titles || {},
           kh_classes: decodedUser.kh_classes || {}
@@ -404,36 +407,55 @@ export default {
         }
       });
     },
+    // 忘記密碼表單驗證失敗時，自動將焦點移至錯誤欄位
     async handleForgetPassword() {
       this.$refs.forgetForm.validate(async (valid) => {
-        if (!valid) return;
+        if (!valid) {
+          this.$nextTick(() => {
+            const firstErrorInput = document.querySelector('.challenge-confirm-modal .el-form-item.is-error input');
+            if (firstErrorInput) firstErrorInput.focus();
+          });
+          return;
+        }
         try {
           await api.post('students/forget-password/', {
             username: this.forgetForm.username,
             email: this.forgetForm.email
           });
-          alert('重設密碼請求已送出，請檢查您的信箱。');
+          this.$message.success('重設密碼請求已送出，請檢查您的信箱。');
           this.showForgetPassDialog = false;
         } catch (error) {
-          alert(error.response?.data?.detail || '發送失敗');
+          this.$message.error(error.response?.data?.detail || '發送失敗');
         }
       });
     },
+    //教職員登入使用正規 el-form 驗證，失敗時精準導航焦點
     async handleLogin() {
-      if (!this.teacherForm.account || !this.teacherForm.password) {
-        alert('請輸入帳號和密碼');
-        return;
-      }
+      this.$refs.teacherForm.validate(async (valid) => {
+        if (!valid) {
+          this.$nextTick(() => {
+            const firstErrorInput = document.querySelector('.teacher-input-zone .el-form-item.is-error input');
+            if (firstErrorInput) firstErrorInput.focus();
+          });
+          return;
+        }
 
-      try {
-        const response = await api.post('students/login/', {
-          username: this.teacherForm.account,
-          password: this.teacherForm.password,
-        });
-        this.performLogin(response.data, '/dashboard');
-      } catch (error) {
-        alert(error.response?.data?.detail || '登入失敗');
-      }
+        try {
+          const response = await api.post('students/login/', {
+            username: this.teacherForm.account,
+            password: this.teacherForm.password,
+          });
+          this.performLogin(response.data, '/dashboard');
+        } catch (error) {
+          const errMsg = error.response?.data?.detail || '帳號或密碼錯誤，請重新確認。';
+          this.$message.error(errMsg);
+
+          this.$nextTick(() => {
+            const accountInput = document.getElementById('teacher-account');
+            if (accountInput) accountInput.focus();
+          });
+        }
+      });
     },
     async fetchNews() {
       this.loadingNews = true;
@@ -469,19 +491,51 @@ export default {
         this.$refs.passForm.resetFields();
       }
     },
+    skipToMainContent() {
+      const mainContent = document.getElementById('main-content');
+      if (mainContent) {
+        mainContent.setAttribute('tabindex', '-1');
+        mainContent.focus();
+      }
+    },
     async submitNewPassword() {
       this.$refs.passForm.validate(async (valid) => {
-        if (!valid) return;
-        this.performLogin(this.tempLoginData, null);
+        if (!valid) {
+          this.$nextTick(() => {
+            const firstErrorInput = document.querySelector('.confirm-change-pw-modal .el-form-item.is-error input');
+            if (firstErrorInput) {
+              firstErrorInput.focus();
+            }
+          });
+          return;
+        }
+
         try {
+          this.performLogin(this.tempLoginData, null);
           await api.post('students/first-change-password/', {
             new_password: this.passForm.new_password
           });
-          alert('密碼修改成功，請使用新密碼重新登入');
+
+          this.$message({
+            message: '密碼修改成功，請使用新密碼重新登入',
+            type: 'success'
+          });
+
           this.closeChangePassDialog();
           this.logoutAndReset();
+
         } catch (err) {
-          alert('修改失敗，請稍後再試');
+          console.error(err);
+          this.$message({
+            message: '修改失敗，請稍後再試',
+            type: 'error'
+          });
+
+          this.$nextTick(() => {
+            if (this.$refs.changeInput) {
+              this.$refs.changeInput.focus();
+            }
+          });
         }
       });
     },
@@ -490,7 +544,7 @@ export default {
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('userRole');
       if (window.tokenTimer) clearInterval(window.tokenTimer);
-      this.loginForm.password = '';
+      this.teacherForm.password = '';
     },
     async performLogin(loginData, path) {
       const token = loginData.token || loginData.access || loginData.access_token;
@@ -542,26 +596,34 @@ export default {
         }
       }, 25 * 60 * 1000);
     },
+    //重設新密碼表單驗證失敗時，自動將焦點移至錯誤欄位
     async handleResetPasswordSubmit() {
       this.$refs.resetPassForm.validate(async (valid) => {
-        if (!valid) return;
+        if (!valid) {
+          this.$nextTick(() => {
+            const firstErrorInput = document.querySelector('.confirm-change-pw-modal .el-form-item.is-error input');
+            if (firstErrorInput) firstErrorInput.focus();
+          });
+          return;
+        }
         try {
           await api.post('students/reset-password/', {
             token: this.resetPassToken,
             new_password: this.resetPassForm.new_password
           });
-          alert('密碼重設成功！');
+          this.$message.success('密碼重設成功！');
           this.showResetPassDialog = false;
           this.resetPassForm.new_password = '';
           this.$router.replace('/login');
         } catch (error) {
-          alert(error.response?.data?.detail || '重設失敗，連結可能過期');
+          this.$message.error(error.response?.data?.detail || '重設失敗，連結可能過期');
         }
       });
     }
   },
 }
 </script>
+
 
 <style lang="scss">
 $primary-color: #38bdf8;
@@ -612,7 +674,7 @@ $bg-path: "~@/assets/image/login-bg.jpg";
 
 .item-content {
   font-size: 1rem;
-  color: #444444;
+  color: #0e1214;
   margin: .5rem 0;
 }
 
@@ -772,21 +834,11 @@ $bg-path: "~@/assets/image/login-bg.jpg";
     flex: 1;
     margin-top: .5rem;
     overflow-y: auto;
-
-    // .news-title,
-    //.item-content {
-    //flex: 1;
-    // white-space: nowrap;
-    //overflow: hidden;
-    //text-overflow: ellipsis;
-    // width: auto;
-    // min-width: 0;
-    //}
   }
 
   .role-notice-text {
     font-size: 0.875rem;
-    color: #854d0e;
+    color: #362d23;
     margin-top: -1.25rem;
     margin-bottom: 1.25rem;
     text-align: center;
@@ -868,7 +920,7 @@ $bg-path: "~@/assets/image/login-bg.jpg";
 
       .item-content {
         font-size: 1rem;
-        color: $main-grey-text;
+        color: #0e1214;
         margin: .5rem 0;
       }
 
@@ -1119,6 +1171,16 @@ $bg-path: "~@/assets/image/login-bg.jpg";
 @media (orientation: landscape) and (max-height: 74.9988rem) and (pointer: coarse) {
   .login-container {
     padding: 0;
+  }
+
+  .announcement-item {
+    .item-header {
+      flex-direction: column;
+    }
+
+    .news-tag {
+      align-self: flex-end;
+    }
   }
 
   // .login-page {

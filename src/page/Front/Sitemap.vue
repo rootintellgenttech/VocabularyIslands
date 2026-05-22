@@ -1,5 +1,4 @@
 <template>
-    <!-- 動態綁定 class：沒登入時 padding-left 縮回 (因為沒 Sidebar) -->
     <div :class="['sitemap-page-container', { 'no-sidebar': !isLoggedIn }]">
         <div class="return-last-page" @click="goBack">
             <i class="fas fa-angle-left"></i> 返回
