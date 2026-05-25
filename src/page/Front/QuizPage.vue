@@ -661,7 +661,7 @@ i {
     font-size: 32px;
     font-weight: 600;
     color: $main-black-text;
-    margin-bottom: 48px;
+    margin-bottom: 32px;
     text-align: center;
 }
 
@@ -765,7 +765,15 @@ i {
     border-top-left-radius: 0;
 }
 
-@media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
+
+@media (orientation: landscape) and (max-height: 74.9988rem) and (pointer: coarse) {
+  .question-content .question-wrap .question-title{
+    font-size: 5rem;
+  }
+}
+
+
+@media (orientation: landscape) and (max-height: 47.9988rem) and (pointer: coarse) {
     .wrong-explanation-mode {
         width: 500px;
     }

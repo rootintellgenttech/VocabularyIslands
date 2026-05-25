@@ -1,863 +1,843 @@
-$main-green: #13786F;
+$main-green: #13786f;
 $main-black-text: #010101;
 $main-blue-text: #325362;
-$main-dark-blue: #097C70;
+$main-dark-blue: #097c70;
 $main-grey-text: #151c1f;
-$main-quiz-blue: #194BAE;
-$main-back-blue-text: #00332D;
-
+$main-quiz-blue: #194bae;
+$main-back-blue-text: #00332d;
 
 @mixin second-green-bg {
-    background-color: #4ABCB1;
-    color: $main-black-text;
+  background-color: #4abcb1;
+  color: $main-black-text;
 }
 
 @mixin flex-center {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
-
 @mixin main-box-shadow {
-    box-shadow: .125rem .3125rem 1rem -0.75rem #000000;
+  box-shadow: 0.125rem 0.3125rem 1rem -0.75rem #000000;
 }
 
 @mixin island-map-wrap {
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: center;
-    align-items: baseline;
-    gap: 0 5%;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0 5%;
 }
 
 @mixin island-action-section {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 
 @mixin island-design {
+  width: 18.75rem;
+  text-align: center;
+  position: relative;
+  transition: transform 0.3s ease;
+  @include flex-center;
+  flex-direction: column;
+  padding: 0.625rem 0;
+
+  &:hover {
+    transform: translateY(-0.625rem) scale(1.05);
+  }
+
+  .island-image {
     width: 18.75rem;
-    text-align: center;
-    position: relative;
-    transition: transform 0.3s ease;
-    @include flex-center;
-    flex-direction: column;
-    padding: .625rem 0;
+    height: auto;
+    display: block;
+  }
 
-    &:hover {
-        transform: translateY(-0.625rem) scale(1.05);
-    }
-
-    .island-image {
-        width: 18.75rem;
-        height: auto;
-        display: block;
-    }
-
-    .island-name {
-        font-size: 1.25rem;
-        font-weight: bold;
-        color: $main-blue-text;
-        margin: .625rem 0 1rem;
-        background-color: #F0FAFF;
-        padding: .3125rem 1rem;
-        border-radius: 1rem;
-        display: inline-block;
-        width: 8.125rem;
-        @include main-box-shadow;
-    }
-
-    .enter-btn {
-        background-color: $main-dark-blue;
-        color: white;
-        border: .125rem solid #DAE2E7;
-        padding: .5rem 1.5625rem;
-        border-radius: 1rem;
-        font-size: .875rem;
-        font-weight: bold;
-        box-shadow: .125rem .3125rem 1rem -0.625rem #000000;
-        transition: background-color 0.1s, transform 0.1s, box-shadow 0.1s;
-
-        &:hover {
-            background-color: #2872a3;
-        }
-
-        &:active {
-            background-color: #3b88b7;
-            transform: translateY(.25rem);
-            box-shadow: 0 0rem 0 #3b88b7;
-        }
-    }
-}
-
-
-@mixin page-main-title {
-    text-align: center;
-    font-size: 2rem;
-    color: $main-black-text;
-    margin-top: 3.25rem;
-    background-color: white;
-    width: 13.75rem;
-    padding: .25rem 0;
-    display: inline-block;
-    border-radius: 1rem;
-    @include main-box-shadow;
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%);
-    white-space: nowrap;
-}
-
-@mixin unit-title {
+  .island-name {
     font-size: 1.25rem;
-    font-weight: 800;
-    padding: .3125rem 1.25rem;
-    border-radius: 1rem;
-    color: $main-blue-text;
-    width: max-content;
-    background-color: #F0FAFF;
-    @include main-box-shadow;
-    margin-bottom: .75rem;
-}
-
-@mixin enter-unit-yellow-btn {
-    background-color: #FFD876;
-    color: $main-black-text;
-    padding: .5rem 1.875rem;
-    border: none;
-    border-radius: 1rem;
     font-weight: bold;
+    color: $main-blue-text;
+    margin: 0.625rem 0 1rem;
+    background-color: #f0faff;
+    padding: 0.3125rem 1rem;
+    border-radius: 1rem;
+    display: inline-block;
+    width: 8.125rem;
     @include main-box-shadow;
-    transition: all 0.1s;
-    font-size: .875rem;
+  }
 
-    &:hover {
-        background-color: #ffecbc;
-    }
-}
-
-@mixin lesson-detail-box-one-row {
-    width: 38.75rem;
-    background-color: #fff;
-    border-radius: 1.25rem;
-    @include main-box-shadow;
-    padding: 1.875rem;
-    margin: 1rem 0;
-
-    .back-link {
-        color: $main-black-text;
-        font-size: 1.125rem;
-        font-weight: bold;
-        margin-bottom: 1rem;
-        cursor: pointer;
-    }
-
-
-
-    .option-label,
-    .learn-text {
-        font-size: 1.75rem;
-        font-weight: bold;
-        color: $main-black-text;
-    }
-
-    .card-header {
-        @include flex-center;
-        margin-bottom: 1.875rem;
-        text-align: left;
-
-        .avatar-img {
-            width: 9.375rem;
-            height: 100%;
-            margin-right: 1.25rem;
-        }
-
-        .header-info {
-            flex-grow: 1;
-        }
-
-        .lesson-title {
-            font-size: 3.125rem;
-            font-weight: 900;
-            color: $main-blue-text;
-            margin-bottom: .3125rem;
-        }
-
-        .lesson-description {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: $main-black-text;
-        }
-    }
-
-    .lesson-options {
-        .option-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: .9375rem 1.25rem;
-            margin-bottom: .9375rem;
-            background-color: white;
-            border: .125rem solid #C7D3D1;
-            border-radius: .9375rem;
-            @include main-box-shadow;
-            transition: background-color 0.2s;
-
-            .action-text,
-            .challenge-label {
-                cursor: pointer;
-
-                &:hover {
-                    color: #7c95af;
-                    filter: unset
-                }
-            }
-
-            &:hover {
-                transform: translateY(-0.125rem);
-                box-shadow: 0 .375rem .75rem rgba(0, 0, 0, 0.15);
-            }
-
-            &.is-disabled {
-                cursor: not-allowed;
-                opacity: 0.6;
-                background-color: #FAFAFA;
-            }
-
-            .option-icon-group {
-                display: flex;
-                align-items: center;
-                flex: 1;
-
-                .option-icon {
-                    width: 1.875rem;
-                    height: 1.875rem;
-                    margin-right: .9375rem;
-                }
-
-            }
-
-
-            .star-rating {
-                margin-right: 1.25rem;
-
-                .fa-star {
-                    font-size: 1.25rem;
-                    margin: 0 .125rem;
-
-
-                    &.filled {
-                        color: #ffc107;
-                        text-shadow: .0625rem .0625rem 0 #d39e00;
-                    }
-
-                    &.outline {
-                        color: #dcdcdc;
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-@mixin lesson-detail-boxs-two-row {
-    width: 38.75rem;
-    background-color: #fff;
-    border-radius: 1.25rem;
-    @include main-box-shadow;
-    padding: 1.875rem;
-    margin: 1rem 0;
-
-    .back-link {
-        color: $main-black-text;
-        font-size: 1.125rem;
-        font-weight: bold;
-        margin-bottom: 1rem;
-        cursor: pointer;
-    }
-
-
-
-    .option-label,
-    .learn-text {
-        font-size: 1.75rem;
-        font-weight: bold;
-        color: $main-black-text;
-    }
-
-    .card-header {
-        @include flex-center;
-        margin-bottom: 1.875rem;
-        text-align: left;
-
-        .avatar-img {
-            width: 9.375rem;
-            height: 100%;
-            margin-right: 1.25rem;
-        }
-
-        .header-info {
-            flex-grow: 1;
-        }
-
-        .lesson-title {
-            font-size: 3.125rem;
-            font-weight: 900;
-            color: $main-blue-text;
-            margin-bottom: .3125rem;
-        }
-
-        .lesson-description {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: $main-black-text;
-        }
-    }
-
-    .lesson-options {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        gap: .9375rem;
-        padding: 0 .625rem;
-
-        .option-item {
-            background-color: white;
-            border: .125rem solid #C7D3D1;
-            border-radius: .9375rem;
-            @include main-box-shadow;
-            transition: background-color 0.2s;
-
-            &.is-learn-mode {
-
-                .item-top {
-                    border-bottom: none;
-                    height: 100%;
-                }
-            }
-
-
-            &:hover {
-                transform: translateY(-0.125rem);
-                box-shadow: 0 .375rem .75rem rgba(0, 0, 0, 0.15);
-            }
-
-            .action-text,
-            .challenge-label {
-                font-size: 1.5rem;
-                font-weight: bold;
-                cursor: pointer;
-                color: $main-black-text;
-
-                &:hover {
-                    color: #7c95af;
-                    filter: unset
-                }
-            }
-
-            .item-top {
-                @include flex-center;
-                justify-content: space-between;
-                padding: .75rem .9375rem;
-                border-bottom: .125rem solid #f0f0f0;
-
-
-
-
-            }
-
-            .main-icon,
-            .fire-icon {
-                width: 2rem;
-                height: 2rem;
-                object-fit: contain;
-
-                &.is-bw {
-                    filter: grayscale(100%);
-                    opacity: 0.6;
-                }
-            }
-
-            .top-left,
-            .bottom-left,
-            .single-left {
-                display: flex;
-                align-items: center;
-                gap: .625rem;
-
-            }
-
-            .single-right,
-            .bottom-right {
-                .star-rating {
-                    @include flex-center;
-                    gap: .3125rem;
-
-                    i {
-                   font-size: 1.4rem;
-
-                        &.filled {
-                            color: #ffc107;
-                            text-shadow: .0625rem .0625rem 0 #d39e00;
-                        }
-
-                        &.outline {
-                            color: #dcdcdc;
-                        }
-                    }
-                }
-            }
-
-            .item-bottom,
-            .item-single-row {
-                @include flex-center;
-                justify-content: space-between;
-                padding: .5rem .9375rem;
-                cursor: pointer;
-                border-radius: 0 0 .75rem .75rem;
-
-                &.is-final-mode {
-                    padding: 0;
-                }
-            }
-
-        }
-    }
-
-}
-
-@mixin common-btn {
+  .enter-btn {
     background-color: $main-dark-blue;
     color: white;
-    border: .125rem solid #DAE2E7;
-    padding: .5rem 1.5625rem;
+    border: 0.125rem solid #dae2e7;
+    padding: 0.5rem 1.5625rem;
     border-radius: 1rem;
-    font-size: .875rem;
+    font-size: 0.875rem;
     font-weight: bold;
-    @include main-box-shadow;
+    box-shadow: 0.125rem 0.3125rem 1rem -0.625rem #000000;
     transition: background-color 0.1s, transform 0.1s, box-shadow 0.1s;
 
     &:hover {
-        background-color: #2872a3;
+      background-color: #2872a3;
     }
+
+    &:active {
+      background-color: #3b88b7;
+      transform: translateY(0.25rem);
+      box-shadow: 0 0rem 0 #3b88b7;
+    }
+  }
+}
+
+@mixin page-main-title {
+  text-align: center;
+  font-size: 2rem;
+  color: $main-black-text;
+  margin-top: 3.25rem;
+  background-color: white;
+  width: 13.75rem;
+  padding: 0.25rem 0;
+  display: inline-block;
+  border-radius: 1rem;
+  @include main-box-shadow;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+@mixin unit-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  padding: 0.3125rem 1.25rem;
+  border-radius: 1rem;
+  color: $main-blue-text;
+  width: max-content;
+  background-color: #f0faff;
+  @include main-box-shadow;
+  margin-bottom: 0.75rem;
+}
+
+@mixin enter-unit-yellow-btn {
+  background-color: #ffd876;
+  color: $main-black-text;
+  padding: 0.5rem 1.875rem;
+  border: none;
+  border-radius: 1rem;
+  font-weight: bold;
+  @include main-box-shadow;
+  transition: all 0.1s;
+  font-size: 0.875rem;
+
+  &:hover {
+    background-color: #ffecbc;
+  }
+}
+
+@mixin lesson-detail-box-one-row {
+  width: 38.75rem;
+  background-color: #fff;
+  border-radius: 1.25rem;
+  @include main-box-shadow;
+  padding: 1.875rem;
+  margin: 1rem 0;
+
+  .back-link {
+    color: $main-black-text;
+    font-size: 1.125rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    cursor: pointer;
+  }
+
+  .option-label,
+  .learn-text {
+    font-size: 1.75rem;
+    font-weight: bold;
+    color: $main-black-text;
+  }
+
+  .card-header {
+    @include flex-center;
+    margin-bottom: 1.875rem;
+    text-align: left;
+
+    .avatar-img {
+      width: 9.375rem;
+      height: 100%;
+      margin-right: 1.25rem;
+    }
+
+    .header-info {
+      flex-grow: 1;
+    }
+
+    .lesson-title {
+      font-size: 3.125rem;
+      font-weight: 900;
+      color: $main-blue-text;
+      margin-bottom: 0.3125rem;
+    }
+
+    .lesson-description {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: $main-black-text;
+    }
+  }
+
+  .lesson-options {
+    .option-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.9375rem 1.25rem;
+      margin-bottom: 0.9375rem;
+      background-color: white;
+      border: 0.125rem solid #c7d3d1;
+      border-radius: 0.9375rem;
+      @include main-box-shadow;
+      transition: background-color 0.2s;
+
+      .action-text,
+      .challenge-label {
+        cursor: pointer;
+
+        &:hover {
+          color: #7c95af;
+          filter: unset;
+        }
+      }
+
+      &:hover {
+        transform: translateY(-0.125rem);
+        box-shadow: 0 0.375rem 0.75rem rgba(0, 0, 0, 0.15);
+      }
+
+      &.is-disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+        background-color: #fafafa;
+      }
+
+      .option-icon-group {
+        display: flex;
+        align-items: center;
+        flex: 1;
+
+        .option-icon {
+          width: 1.875rem;
+          height: 1.875rem;
+          margin-right: 0.9375rem;
+        }
+      }
+
+      .star-rating {
+        margin-right: 1.25rem;
+
+        .fa-star {
+          font-size: 1.25rem;
+          margin: 0 0.125rem;
+
+          &.filled {
+            color: #ffc107;
+            text-shadow: 0.0625rem 0.0625rem 0 #d39e00;
+          }
+
+          &.outline {
+            color: #dcdcdc;
+          }
+        }
+      }
+    }
+  }
+}
+
+@mixin lesson-detail-boxs-two-row {
+  width: 38.75rem;
+  background-color: #fff;
+  border-radius: 1.25rem;
+  @include main-box-shadow;
+  padding: 1.875rem;
+  margin: 1rem 0;
+
+  .back-link {
+    color: $main-black-text;
+    font-size: 1.125rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    cursor: pointer;
+  }
+
+  .option-label,
+  .learn-text {
+    font-size: 1.75rem;
+    font-weight: bold;
+    color: $main-black-text;
+  }
+
+  .card-header {
+    @include flex-center;
+    margin-bottom: 1.875rem;
+    text-align: left;
+
+    .avatar-img {
+      width: 9.375rem;
+      height: 100%;
+      margin-right: 1.25rem;
+    }
+
+    .header-info {
+      flex-grow: 1;
+    }
+
+    .lesson-title {
+      font-size: 3.125rem;
+      font-weight: 900;
+      color: $main-blue-text;
+      margin-bottom: 0.3125rem;
+    }
+
+    .lesson-description {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: $main-black-text;
+    }
+  }
+
+  .lesson-options {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9375rem;
+    padding: 0 0.625rem;
+
+    .option-item {
+      background-color: white;
+      border: 0.125rem solid #c7d3d1;
+      border-radius: 0.9375rem;
+      @include main-box-shadow;
+      transition: background-color 0.2s;
+
+      &.is-learn-mode {
+        .item-top {
+          border-bottom: none;
+          height: 100%;
+        }
+      }
+
+      &:hover {
+        transform: translateY(-0.125rem);
+        box-shadow: 0 0.375rem 0.75rem rgba(0, 0, 0, 0.15);
+      }
+
+      .action-text,
+      .challenge-label {
+        font-size: 1.5rem;
+        font-weight: bold;
+        cursor: pointer;
+        color: $main-black-text;
+
+        &:hover {
+          color: #7c95af;
+          filter: unset;
+        }
+      }
+
+      .item-top {
+        @include flex-center;
+        justify-content: space-between;
+        padding: 0.75rem 0.9375rem;
+        border-bottom: 0.125rem solid #f0f0f0;
+      }
+
+      .main-icon,
+      .fire-icon {
+        width: 2rem;
+        height: 2rem;
+        object-fit: contain;
+
+        &.is-bw {
+          filter: grayscale(100%);
+          opacity: 0.6;
+        }
+      }
+
+      .top-left,
+      .bottom-left,
+      .single-left {
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+      }
+
+      .single-right,
+      .bottom-right {
+        .star-rating {
+          @include flex-center;
+          gap: 0.3125rem;
+
+          i {
+            font-size: 1.4rem;
+
+            &.filled {
+              color: #ffc107;
+              text-shadow: 0.0625rem 0.0625rem 0 #d39e00;
+            }
+
+            &.outline {
+              color: #dcdcdc;
+            }
+          }
+        }
+      }
+
+      .item-bottom,
+      .item-single-row {
+        @include flex-center;
+        justify-content: space-between;
+        padding: 0.5rem 0.9375rem;
+        cursor: pointer;
+        border-radius: 0 0 0.75rem 0.75rem;
+
+        &.is-final-mode {
+          padding: 0;
+        }
+      }
+    }
+  }
+}
+
+@mixin common-btn {
+  background-color: $main-dark-blue;
+  color: white;
+  border: 0.125rem solid #dae2e7;
+  padding: 0.5rem 1.5625rem;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  font-weight: bold;
+  @include main-box-shadow;
+  transition: background-color 0.1s, transform 0.1s, box-shadow 0.1s;
+
+  &:hover {
+    background-color: #2872a3;
+  }
 }
 
 @mixin qa-submit-continue-btn {
-    width: 100%;
-    border: none;
-    color: $main-black-text;
-    font-size: 1.5rem;
-    font-weight: bold;
-    border-radius: 1.25rem;
-    transition: background-color 0.2s;
-    background-color: #FAE162;
-    box-shadow: none;
-    @include main-box-shadow;
+  width: 100%;
+  border: none;
+  color: $main-black-text;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border-radius: 1.25rem;
+  transition: background-color 0.2s;
+  background-color: #fae162;
+  box-shadow: none;
+  @include main-box-shadow;
 
-    &:hover {
-        background-color: #ffe8ab;
-    }
+  &:hover {
+    background-color: #ffe8ab;
+  }
 
-    &:disabled {
-        background-color: #E0E0E0;
-        color: #999;
-        cursor: not-allowed;
-    }
+  &:disabled {
+    background-color: #e0e0e0;
+    color: #999;
+    cursor: not-allowed;
+  }
 }
 
 @mixin card-return-text {
-    color: $main-black-text;
-    font-size: 1.125rem;
-    font-weight: bold;
-    text-wrap: nowrap;
-    cursor: pointer;
-    text-align: left;
-    @include flex-center;
-    align-self: flex-start;
+  color: $main-black-text;
+  font-size: 1.125rem;
+  font-weight: bold;
+  text-wrap: nowrap;
+  cursor: pointer;
+  text-align: left;
+  @include flex-center;
+  align-self: flex-start;
 
-    // .fa-angle-left {
-    //     margin-right: .3125rem;
-    // }
+  // .fa-angle-left {
+  //     margin-right: .3125rem;
+  // }
 }
 
 @mixin main-card {
-    @include flex-center;
-    flex-direction: column;
-    min-width: 40.625rem;
-    @include main-box-shadow;
-    border-radius: 1.25rem;
+  @include flex-center;
+  flex-direction: column;
+  width: 40.625rem;
+  max-width: 90vw;
+  @include main-box-shadow;
+  border-radius: 1.25rem;
+  margin: 1rem 0;
+  background-color: #fff;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  text-align: center;
+  justify-self: center;
+  justify-content: space-between;
+
+  .final-star {
+    font-size: 1.75rem;
     margin: 1rem 0;
-    background-color: #fff;
-    text-align: center;
-    justify-self: center;
+  }
+
+  .header-wrap {
+    padding: 1.5rem 1.5rem 0;
+    display: flex;
     justify-content: space-between;
+    width: 100%;
+    color: $main-black-text;
+    font-weight: 600;
+    font-size: 1.25rem;
+  }
 
-
-
-    .final-star {
-        font-size: 1.75rem;
-        margin:1rem 0;
-    }
-
-    .header-wrap {
-        padding: 1.5rem 1.5rem 0;
-        display: flex;
-        justify-content: space-between;
-        width: 100%;
-        color: $main-black-text;
-        font-weight: 600;
-        font-size: 1.25rem
-    }
+  .question-title {
+    width: 100%;
+    justify-content: center;
+    padding: 0 1.5rem;
+    box-sizing: border-box;
+    white-space: normal;
+  }
 }
 
 @mixin main-card-page {
-    @include flex-center;
-    flex-direction: column;
-    justify-content: center;
-        height: 100vh;
+  @include flex-center;
+  flex-direction: column;
+  justify-content: center;
+  height: 100vh;
+  overflow-y: auto;
 }
 
 @mixin main-card-content {
-    text-align: center;
-    width: 100%;
-    height: 100%;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+
+  .question-wrap {
     display: flex;
+    align-items: baseline;
+    gap: 0 1rem;
+    padding: 0 1.5rem;
     justify-content: center;
-    flex-direction: column;
+   word-break: break-all;
+    overflow-wrap: break-word;
 
-    .question-wrap {
-        display: flex;
-        align-items: baseline;
-        gap: 0 1rem;
-        padding: 0 1.5rem;
-        justify-content: center;
-
-        .filled {
-            margin: 0 .5rem;
-        }
-
-
-        .question-title {
-            display: flex;
-            align-items: self-end;
-            color: $main-quiz-blue;
-            font-size: 7.5rem;
-            font-weight: 900;
-            margin: 2rem 0;
-            // padding: 2rem 1rem;
-        }
-
-        .audio-trigger {
-            border-radius: 50%;
-            @include flex-center;
-           font-size: 4rem;
-            cursor: pointer;
-            color: $main-quiz-blue;
-        }
-
+    .filled {
+      margin: 0 0.5rem;
     }
 
-
-    .listen-quiz-audio {
-
-        i {
-            margin: 40% 0 16%;
- font-size: 10rem;
-        }
-
-        &:hover {
-            transform: scale(1.1);
-        }
+    .question-title {
+      display: flex;
+      align-items: self-end;
+      color: $main-quiz-blue;
+      font-size: 5rem;
+      font-weight: 900;
+      margin: 2rem 0 0;
+      // padding: 2rem 1rem;
     }
+
+    .audio-trigger {
+      border-radius: 50%;
+      @include flex-center;
+      font-size: 4rem;
+      cursor: pointer;
+      color: $main-quiz-blue;
+    }
+  }
+
+  .listen-quiz-audio {
+    i {
+      margin: 40% 0 16%;
+      font-size: 10rem;
+    }
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
 }
 
 @mixin progress-star {
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  .progress-bar-wrapper {
+    flex-grow: 1;
+    height: 1.25rem;
+    background-color: #e0e0e0;
+    border-radius: 1.5rem;
+    margin: 0 0.75rem;
+    overflow: hidden;
+
+    .progress-bar {
+      height: 100%;
+      background-color: #50c2b7;
+      border-radius: 1.5rem;
+      transition: width 0.3s ease-out;
+    }
+  }
+
+  .star-count {
     display: flex;
     align-items: center;
-    width: 100%;
+    font-size: 1.25rem;
+    color: #ffc107;
+    font-weight: bold;
 
-    .progress-bar-wrapper {
-        flex-grow: 1;
-        height: 1.25rem;
-        background-color: #E0E0E0;
-        border-radius: 1.5rem;
-        margin: 0 .75rem;
-        overflow: hidden;
-
-        .progress-bar {
-            height: 100%;
-            background-color: #50C2B7;
-            border-radius: 1.5rem;
-            transition: width 0.3s ease-out;
-        }
+    .fa-star {
+      font-size: 1.5rem;
+      margin-right: 0.3125rem;
     }
-
-    .star-count {
-        display: flex;
-        align-items: center;
-        font-size: 1.25rem;
-        color: #FFC107;
-        font-weight: bold;
-
-        .fa-star {
-            font-size: 1.5rem;
-            margin-right: .3125rem;
-        }
-    }
+  }
 }
 
 @mixin option-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.25rem;
-    width: 90%;
-    margin: 0 auto 1.875rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  width: 90%;
+  margin: 0 auto 1.875rem;
 
-    .option-btn {
-        background-color: #F5FFFF;
-        border: .125rem solid #C7D3D1;
-        color: $main-quiz-blue;
-        padding: .9375rem .625rem;
-        border-radius: .9375rem;
-        font-size: 1.5rem;
-        transition: background-color 0.2s, border-color 0.2s, transform 0.1s;
-        @include main-box-shadow;
+  .option-btn {
+    background-color: #f5ffff;
+    border: 0.125rem solid #c7d3d1;
+    color: $main-quiz-blue;
+    padding: 0.9375rem 0.625rem;
+    border-radius: 0.9375rem;
+    font-size: 1.5rem;
+    transition: background-color 0.2s, border-color 0.2s, transform 0.1s;
+    @include main-box-shadow;
 
-
-        .fa-volume-up {
-            font-size: 1.875rem;
-        }
-
-        &:hover {
-            background-color: #D3EAF8;
-            border-color: #5D9CEC;
-        }
-
-        &.is-selected {
-            background-color: #5D9CEC;
-            border-color: #4A89DC;
-            color: $main-black-text;
-        }
+    .fa-volume-up {
+      font-size: 1.875rem;
     }
+
+    &:hover {
+      background-color: #d3eaf8;
+      border-color: #5d9cec;
+    }
+
+    &.is-selected {
+      background-color: #5d9cec;
+      border-color: #4a89dc;
+      color: $main-black-text;
+    }
+  }
 }
 
 @mixin island-main-grid {
-    overflow-y: auto;
-    padding: 1.25rem;
-    justify-content: start;
+  overflow-y: auto;
+  padding: 1.25rem;
+  justify-content: start;
 
-    .page-title {
-        @include page-main-title
+  .page-title {
+    @include page-main-title;
+  }
+
+  .top-bar {
+    @include flex-center;
+    justify-content: space-between;
+    margin-bottom: 2.5rem;
+    padding: 0 2.5rem;
+  }
+
+  .back-btn {
+    background-color: #f0faff;
+    border: none;
+    padding: 0.5rem 1.25rem;
+    border-radius: 1.25rem;
+    font-size: 1.125rem;
+    font-weight: bold;
+    box-shadow: 0 0.25rem 0 rgba(0, 0, 0, 0.1);
+    transition: transform 0.1s;
+
+    &:hover {
+      background-color: #cce4f0;
+    }
+  }
+
+  .island-map {
+    @include island-map-wrap;
+    // margin-top: 2%;
+
+    .action-section {
+      @include island-action-section;
     }
 
-    .top-bar {
-        @include flex-center;
-        justify-content: space-between;
-        margin-bottom: 2.5rem;
-        padding: 0 2.5rem;
+    .island-container {
+      @include island-design;
     }
-
-
-    .back-btn {
-        background-color: #F0FAFF;
-        border: none;
-        padding: .5rem 1.25rem;
-        border-radius: 1.25rem;
-        font-size: 1.125rem;
-        font-weight: bold;
-        box-shadow: 0 .25rem 0 rgba(0, 0, 0, 0.1);
-        transition: transform 0.1s;
-
-        &:hover {
-            background-color: #cce4f0;
-        }
-
-    }
-
-    .island-map {
-        @include island-map-wrap;
-        // margin-top: 2%;
-
-        .action-section {
-            @include island-action-section
-        }
-
-        .island-container {
-            @include island-design
-        }
-    }
+  }
 }
 
 @mixin island-stats-row {
-    display: flex;
-    gap: .9375rem;
-    margin-bottom: .5rem;
-    font-size: 1.125rem;
-    color: $main-black-text;
-    font-weight: bold;
+  display: flex;
+  gap: 0.9375rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.125rem;
+  color: $main-black-text;
+  font-weight: bold;
 
-    .stat-group {
-        display: flex;
-        align-items: anchor-center;
-        gap: .25rem;
-    }
+  .stat-group {
+    display: flex;
+    align-items: anchor-center;
+    gap: 0.25rem;
+  }
 }
 
 @mixin blue-island-title {
-    background-color: #34495E;
-    color: #fff;
-    padding: .3125rem 1.25rem;
-    border-radius: .9375rem;
-    font-weight: bold;
-    margin-bottom: .9375rem;
-    font-size: 1.25rem;
-    width: fit-content;
-    text-align: center;
-    box-shadow: 0 .25rem .375rem rgba(0, 0, 0, 0.1);
+  background-color: #34495e;
+  color: #fff;
+  padding: 0.3125rem 1.25rem;
+  border-radius: 0.9375rem;
+  font-weight: bold;
+  margin-bottom: 0.9375rem;
+  font-size: 1.25rem;
+  width: fit-content;
+  text-align: center;
+  box-shadow: 0 0.25rem 0.375rem rgba(0, 0, 0, 0.1);
 }
 
 @mixin md-island-layout {
-    padding: 1.25rem 0;
+  padding: 1.25rem 0;
 
-    .top-bar {
-        align-items: end;
-    }
+  .top-bar {
+    align-items: end;
+  }
 
-    .island-map {
-        margin-top: 0;
-        padding: 0 8% 1.5rem;
-        justify-content: flex-start;
-    }
+  .island-map {
+    margin-top: 0;
+    padding: 0 8% 1.5rem;
+    justify-content: flex-start;
+  }
 }
 
 @mixin sm-island-layout {
-    .top-bar {
-        align-items: end;
-        margin-bottom: 1rem;
+  .top-bar {
+    align-items: end;
+    margin-bottom: 1rem;
+  }
+
+  .island-title {
+    font-size: 0.875rem;
+  }
+
+  .stats-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .islands-grid {
+    padding: 0 1.25rem 1.25rem;
+
+    .island-map {
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      padding: 0 0.625rem;
     }
 
-    .island-title {
-        font-size: .875rem;
+    .island-map .island-container .island-image {
+      width: 9.375rem;
     }
-
-    .stats-row {
-        flex-direction: column;
-        align-items: center;
-        gap: .25rem;
-    }
-
-    .islands-grid {
-        padding: 0 1.25rem 1.25rem;
-
-        .island-map {
-            overflow-x: auto;
-            flex-wrap: nowrap;
-            justify-content: flex-start;
-            padding: 0 .625rem;
-        }
-
-        .island-map .island-container .island-image {
-            width: 9.375rem;
-        }
-
-
-    }
+  }
 }
 
 @mixin exit-confirm-modal {
-    .dialog-content {
-        @include flex-center;
-        flex-direction: column;
-        padding: 1.875rem 1.25rem;
-    }
+  .dialog-content {
+    @include flex-center;
+    flex-direction: column;
+    padding: 1.875rem 1.25rem;
+  }
 
-    .current-score-preview {
-        font-size: 1.25rem;
-        font-weight: bold;
-        color: #F56C6C;
-        margin-top: .5rem;
-    }
-
+  .current-score-preview {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #f56c6c;
+    margin-top: 0.5rem;
+  }
 }
 
 @mixin game-result-card {
-    background-color: white;
-    @include flex-center;
-    flex-direction: column;
-    text-align: center;
-    padding: 1.875rem;
-    border: .25rem solid #38C7A7;
-    border-radius: 1.25rem;
-    width: 21.875rem;
-    margin-bottom: 1rem;
+  background-color: white;
+  @include flex-center;
+  flex-direction: column;
+  text-align: center;
+  padding: 1.875rem;
+  border: 0.25rem solid #38c7a7;
+  border-radius: 1.25rem;
+  width: 21.875rem;
+  margin-bottom: 1rem;
 
-    img {
-        width: 12.5rem;
-    }
+  img {
+    width: 12.5rem;
+  }
 
-    .result-title,
-    .result-description {
-        font-weight: bold;
-        color: $main-black-text;
-    }
+  .result-title,
+  .result-description {
+    font-weight: bold;
+    color: $main-black-text;
+  }
 
+  .result-title {
+    margin: 0 0 0.5rem;
+    font-size: 2.25rem;
+  }
 
-    .result-title {
-        margin: 0 0 .5rem;
-        font-size: 2.25rem;
-    }
+  .result-description {
+    font-size: 1.375rem;
+  }
 
-    .result-description {
-        font-size: 1.375rem;
-    }
+  .result-score {
+    font-size: 1.25rem;
+    margin: 0;
+    color: $main-dark-blue;
+    font-weight: 600;
+  }
 
-    .result-score {
-        font-size: 1.25rem;
-        margin: 0;
-        color: $main-dark-blue;
-        font-weight: 600;
-    }
-
-.correct-quiz-count{
+  .correct-quiz-count {
     color: $main-black-text;
     font-weight: 600;
-}
+  }
 }
 
 @mixin result-back-btn {
-    background-color: #38C7A7;
-    color: $main-black-text;
-    padding: .75rem 3.75rem;
-    font-size: 1.25rem;
-    font-weight: 600;
-    border-radius: .75rem;
-    width: 21.875rem;
-    border: none;
-    box-shadow: 0rem .25rem .25rem 0rem #00000040;
+  background-color: #38c7a7;
+  color: $main-black-text;
+  padding: 0.75rem 3.75rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  width: 21.875rem;
+  border: none;
+  box-shadow: 0rem 0.25rem 0.25rem 0rem #00000040;
 
-    &:hover {
-        background-color: #2db698;
-    }
+  &:hover {
+    background-color: #2db698;
+  }
 }
 
-
 @mixin back-system-action-btn {
-    border: none;
-    border-radius: .375rem;
-    padding: .5rem 1rem;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    @include flex-center;
-    gap: .375rem;
-    transition: opacity 0.2s;
-    background-color: $main-green;
-    color: white;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  @include flex-center;
+  gap: 0.375rem;
+  transition: opacity 0.2s;
+  background-color: $main-green;
+  color: white;
 
-    &:hover {
-        background-color: #08635a;
-    }
+  &:hover {
+    background-color: #08635a;
+  }
 }

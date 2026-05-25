@@ -283,7 +283,8 @@ html {
   color: $main-black-text;
   justify-content: center;
   flex-direction: column;
-  gap: .625rem 0
+  gap: .625rem 0;
+  height:100vh
 }
 
 .result-title {
@@ -693,10 +694,12 @@ button {
 }
 
 @media (orientation: landscape) and (max-height: 74.9988rem) and (pointer: coarse) {
+  //   .quiz-page{
+  //  height: unset !important;
+  //   }
   .return-last-page {
     padding: 1rem 0 0 0;
   }
-
   .main-card,
   .intro-card {
     min-width: 31.25rem !important;
@@ -704,6 +707,10 @@ button {
 }
 
 @media (orientation: landscape) and (max-height: 47.9988rem) and (pointer: coarse) {
+  .quiz-page{
+    height: unset !important;
+  }
+
   .return-last-page {
     padding: 1rem 0 0 2rem;
   }
@@ -724,7 +731,7 @@ button {
       }
 
       .question-title {
-        font-size: 7.5rem !important;
+        font-size: 5rem !important;
       }
 
       .context-fill-title {
