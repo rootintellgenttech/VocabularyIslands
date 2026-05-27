@@ -388,22 +388,25 @@ export default {
     margin: 28px 8px;
 }
 
-@media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
+@media screen and (min-width: 576px) {
     .learn-page {
-        padding: 5%;
-
-        .learning-container {
-            padding: 5%;
-        }
+        padding: 4% 8% 0 14%
     }
 }
 
-
-@media (max-width: 768px) {
+@media (orientation: landscape) and (max-height: 47.9988rem) and (pointer: coarse) {
 
     .learn-page {
         display: unset;
         padding: 5% 12%;
+
+        .learning-container {
+            padding: 4% 8% 0 14%
+        }
+
+        .content-display .card-image {
+            max-width: 120px;
+        }
 
         .main-card {
             margin: 5% auto;

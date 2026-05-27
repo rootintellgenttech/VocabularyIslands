@@ -53,7 +53,7 @@
                                 {{ rankingType === 'all' ? '所屬聯盟排行' : '所屬學校排行' }}
                             </span>
                             <span class="stat-value">{{ currentRanking ? currentRanking.display_name : '無排行'
-                            }}</span>
+                                }}</span>
                             <span class="stat-status">排名第 {{ currentRanking ? currentRanking.my_rank : '-' }} 名</span>
                         </div>
                     </div>
@@ -95,7 +95,7 @@
                                         <div class="player-info">
                                             <span class="player-name">{{ player.displayName }}</span>
                                             <span v-if="player.school_name" class="player-school">{{ player.school_name
-                                            }}</span>
+                                                }}</span>
                                         </div>
                                     </div>
                                     <div class="score-info">
@@ -193,7 +193,7 @@
                 <div class="player-right-info">
                     <div class="player-actual-score">
                         <span class="player-score">{{ currentRanking ? formatScore(currentRanking.my_score) : 0
-                        }}</span>
+                            }}</span>
                         <span class="score-title">積分</span>
                     </div>
 
@@ -707,6 +707,7 @@ export default {
     gap: 1.875rem;
     width: 100%;
     max-width: 87.5rem;
+    flex-direction: row;
     margin: 0 auto 4%;
 }
 
@@ -1302,19 +1303,30 @@ export default {
     }
 }
 
-@media (min-width: 48rem) and (pointer: coarse) {
-    .competition-page {
-        padding: 0 4% 8% 12%;
+// @media (min-width: 48rem) {
+//     .competition-page {
+//         padding: 0 4% 8% 12%;
 
-        .content-wrapper {
-            width: 62.5rem;
-        }
+//         .content-wrapper {
+//             width: 62.5rem;
+//         }
+//     }
+// }
+
+@media (orientation: landscape) and (min-width: 768px) and (max-width: 1366px) {
+    .competition-page {
+        padding: 0 8% 6% 14%;
     }
+
+    .content-wrapper {
+        flex-direction: column !important;
+    }
+
 }
 
-@media (orientation: landscape) and (max-height: 47.9988rem) and (pointer: coarse) {
+@media (orientation: landscape) and (max-height: 47.9988rem) {
     .competition-page {
-        .page-title {
+        z .page-title {
             margin-top: 1.5rem;
         }
 
@@ -1333,31 +1345,33 @@ export default {
         .footer-fixed {
             padding: 0 4.875rem 1rem;
             display: unset;
-            left: 0;
+            left: 5%;
             right: 0;
             z-index: 0;
         }
 
-        padding:0 3.125rem 5rem !important;
-
         .content-wrapper {
             width: 100%;
             margin: 0 auto 12%;
+            flex-direction: column;
 
             .main-column {
                 min-width: unset;
             }
         }
 
-        .content-wrapper {
-            flex-direction: column;
-        }
 
         .ranking-challenge-section .game-item .game-info .game-text .game-info-wrap {
             flex-direction: column;
             gap: .625rem 0;
             align-items: flex-start;
         }
+    }
+}
+
+@media (max-width:768px) {
+    .competition-page {
+        padding: 0 8% 6% 14%;
     }
 }
 </style>

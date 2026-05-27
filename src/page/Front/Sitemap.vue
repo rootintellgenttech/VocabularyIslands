@@ -280,7 +280,7 @@ $header-teal: #4abcb1;
 
 @media (max-width: 1024px) {
     .sitemap-page-container {
-        padding: 4rem 2rem;
+        padding: 4rem 8rem;
     }
 }
 </style>

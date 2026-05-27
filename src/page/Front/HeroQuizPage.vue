@@ -6,7 +6,7 @@
         </div>
 
         <div v-else-if="currentPhase === 'quiz'" class="quiz-container-wide">
-            <el-row type="flex" justify="center" align="middle" :gutter="80" style=" max-width: 1300px;">
+            <el-row type="flex" justify="center" align="middle" :gutter="80" style="max-width: 1300px;">
                 <el-col :xs="24" :md="10" class="left-image-col">
                     <img :key="animationKey" :src="tempAvatar" alt="Role" class="side-role-img desktop-img">
 
@@ -34,14 +34,16 @@
                                     <span class="progress-count">{{ currentQuestionIndex }} / {{ maxQuestions }}</span>
                                 </div>
                             </div>
-
-                            <img :key="animationKey" :src="tempAvatar" alt="Role" class="side-role-img mobile-img">
+<div class="md-progress">
+    <img :key="animationKey" :src="tempAvatar" alt="Role" class="side-role-img mobile-img">
                             <div class="timer-bar-wrap-sm">
                                 <el-progress :text-inside="true" :stroke-width="26" :percentage="timerPercentage"
                                     :format="formatTimerText" :status="questionTimeLeft <= 5 ? 'exception' : 'success'"
                                     class="timer-progress">
                                 </el-progress>
                             </div>
+</div>
+                            
                             <div class="question-content">
                                 <div class="question-wrap">
                                     <p class="question-title context-fill-title">
@@ -649,6 +651,53 @@ export default {
     display: none;
 }
 
+@media (orientation: landscape) and (min-width: 768px) and (max-width: 1366px) {
+
+    .hero-quiz-page{
+        margin-top: 24px;
+        .main-card .question-content .context-fill-title,.question-wrap{
+            margin: 0;
+        }
+    }
+
+    .left-image-col {
+        display: none !important;
+    }
+
+    .quiz-container-wide .el-col-md-14 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .side-role-img.desktop-img {
+        display: none !important;
+    }
+.md-progress{
+  @include flex-center;
+  width: 100%;
+  justify-content: center;
+  gap: 0 16px;
+}
+    .side-role-img.mobile-img {
+        display: block !important;
+        width: 120px;
+    }
+
+    .timer-bar-wrap-sm {
+    display: block;
+    width: 40%
+}
+
+    .main-card {
+        margin: auto;
+        max-width: 850px;
+    }
+
+    .question-content{
+     padding-top: 0 !important;
+}
+}
+
 @media (orientation: landscape) and (max-height: 1199.98px) and (pointer: coarse) {
     .question-content {
         padding-top: 4%;
@@ -672,7 +721,12 @@ export default {
     }
 }
 
+
+
 @media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
+    .hero-quiz-page{
+        height: unset;
+    }
     .quiz-container-wide .el-row--flex.is-align-middle {
         justify-self: center;
     }

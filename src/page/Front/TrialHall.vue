@@ -701,6 +701,7 @@ export default {
 .trial-hall-page .main-card {
     @include main-card;
     min-width: 56.25rem;
+    width: fit-content;
     padding: 4% 3.125rem;
 
     .history-area {
@@ -913,7 +914,26 @@ export default {
 
 }
 
+@media (orientation: landscape) and (min-width: 768px) and (max-width: 1366px) {
+    .trial-hall-page {
+        padding-left: 0;
+        padding: 4% 12%;
 
+        .main-card {
+            max-width: min-content;
+
+            .exam-info-box {
+                .exam-info {
+                    padding: 16px 8px 16px 0;
+
+                    .exam-title {
+                        font-size: 2rem;
+                    }
+                }
+            }
+        }
+    }
+}
 
 @media (max-width: 48rem) and (orientation: landscape) {
     .trial-hall-page {

@@ -937,6 +937,26 @@ export default {
     }
 }
 
+@media (orientation: landscape) and (min-width: 768px) and (max-width: 1366px) {
+    .quiz-page {
+        padding: 5%;
+    }
+
+    .options-grid {
+        margin: 0 auto;
+    }
+
+    .main-card .question-content {
+        .instruction-text {
+            margin: 1.5rem 0;
+        }
+
+        .question-title {
+            font-size: 4rem !important;
+        }
+    }
+}
+
 @media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
     .quiz-page {
         padding-left: 0 !important;

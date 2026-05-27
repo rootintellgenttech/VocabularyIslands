@@ -211,6 +211,13 @@ export default {
     margin-top: 5%;
 }
 
+
+@media (orientation: landscape) and (min-width: 768px) and (max-width: 1366px) {
+    .island-map-container {
+        margin-top: 0;
+    }
+}
+
 @media (max-width: 768px) {
     .islands-scroll-container {
         height: auto !important;
@@ -220,10 +227,10 @@ export default {
     }
 
     .island-map-container {
+        margin-top: 0;
         flex-direction: column;
         flex-wrap: nowrap;
         width: 100%;
-        padding: 2rem 0;
         gap: 3rem;
     }
 

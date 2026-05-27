@@ -693,7 +693,7 @@ button {
   }
 }
 
-@media (orientation: landscape) and (max-height: 74.9988rem) and (pointer: coarse) {
+@media (orientation: landscape) and (max-height: 74.9988rem) {
   //   .quiz-page{
   //  height: unset !important;
   //   }
@@ -706,14 +706,15 @@ button {
   }
 }
 
-@media (orientation: landscape) and (max-height: 47.9988rem) and (pointer: coarse) {
+@media (orientation: landscape) and (max-height: 47.9988rem) {
   .quiz-page{
+    padding-top: 24px;
     height: unset !important;
   }
 
-  .return-last-page {
-    padding: 1rem 0 0 2rem;
-  }
+  // .return-last-page {
+  //   padding: 1rem 0 0 2rem;
+  // }
 
   .tinder-card {
     min-width: unset;

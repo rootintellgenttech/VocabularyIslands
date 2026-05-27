@@ -296,6 +296,12 @@ export default {
     gap: 4rem;
 }
 
+@media (orientation: landscape) and (min-width: 768px) and (max-width: 1366px) {
+    .island-map-container {
+        margin-top: 24px;
+    }
+}
+
 @media (orientation: landscape) and (max-height: 1199.98px) and (pointer: coarse) {
     .island-card {
         width: 150px;
@@ -312,10 +318,10 @@ export default {
     }
 
     .island-map-container {
+        margin-top: 0;
         flex-direction: column;
         flex-wrap: nowrap;
         width: 100%;
-        padding: 2rem 0;
         gap: 3rem;
     }
 

@@ -869,7 +869,7 @@ export default {
 
     &.is-expanded {
         width: 18.75rem;
-        background-color: #F0FAFFBF;
+        background-color: #f0faff;
         box-shadow: .125rem 0 .375rem rgba(0, 0, 0, 0.1);
 
         .user-info {
@@ -1077,6 +1077,44 @@ export default {
     }
 }
 
+
+@media (orientation: landscape) and (max-width: 1366px) {
+
+
+    .sidebar:not(.is-expanded) {
+
+        .menu-section,
+        .bottom-menu,
+        .achievement-section,
+        .user-info {
+            display: none;
+        }
+
+        .sidebar-header {
+            justify-content: center;
+            margin-top: .625rem;
+        }
+
+        .toggle-btn {
+            margin: 0;
+            background-color: #F0FAFFBF;
+            border: #DAE2E7 .125rem solid;
+            width: 2.625rem;
+            height: 2.625rem;
+            border-radius: .75rem;
+            box-shadow: 0 .125rem .25rem rgba(0, 0, 0, 0.1);
+        }
+    }
+     .sidebar.is-expanded {
+        width: 100%;
+        height: 100dvh;
+        background-color: #F0FAFF;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        z-index: 9999;
+        padding-bottom: 2rem;
+    }
+}
 
 @media (orientation: landscape) and (max-height: 47.9988rem) and (pointer: coarse) {
     .sidebar {

@@ -532,6 +532,17 @@ export default {
   }
 }
 
+@media (orientation: landscape) and (min-width: 768px) {
+  .achievement-island-page {
+    padding: 0 6% 0 12%;
+  }
+
+  .main-content-wrap {
+    padding: 0 4%;
+    width: 100%;
+  }
+}
+
 @media (orientation: landscape) and (max-height: 74.9988rem) and (pointer: coarse) {
   .achievement-island-page {
     padding: 0 6% 0 12%;

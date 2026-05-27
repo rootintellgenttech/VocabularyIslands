@@ -200,6 +200,15 @@ export default {
     }
 }
 
+
+@media (orientation: landscape) and (min-width: 768px) and (max-width: 1366px) {
+    .islands-grid {
+        .page-title {
+            margin: 4% 0 0;
+        }
+    }
+}
+
 @media (orientation: landscape) and (max-height: 1199.98px) and (pointer: coarse) {
     .primary-page .islands-grid {
         @include md-island-layout

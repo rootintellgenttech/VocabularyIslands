@@ -765,7 +765,6 @@ i {
     border-top-left-radius: 0;
 }
 
-
 @media (orientation: landscape) and (max-height: 74.9988rem) and (pointer: coarse) {
   .question-content .question-wrap .question-title{
     font-size: 5rem;
