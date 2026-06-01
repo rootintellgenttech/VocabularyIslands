@@ -1,13 +1,12 @@
 <template>
   <div id="app" :class="{ 'has-global-bg': $route.path !== '/login' }">
     <nav v-if="shouldShowGlobalNav" class="global-access-nav" aria-label="無障礙工具欄">
-      <a href="javascript:void(0)" @click="skipToMain" class="sr-only-focusable">跳到主要內容</a>
+      <a href="#main-content" class="sr-only-focusable">跳到主要內容</a>
 
       <div class="top-utility-links">
         <router-link to="/sitemap" class="access-link" title="網站導覽">網站導覽</router-link>
       </div>
     </nav>
-
     <div v-if="isFrontPage && isWrongOrientation" class="orientation-lock-overlay">
       <div class="lock-content">
         <div class="icon-group">
@@ -94,19 +93,11 @@ export default {
     }
   },
   methods: {
-    skipToMain() {
-      const mainContent = document.getElementById('main-content');
-      if (mainContent) {
-        mainContent.focus();
-        // 確保沒有被 overflow hidden 遮擋，並讓視覺上知道焦點已移動
-        mainContent.scrollIntoView({ behavior: 'smooth' });
-      }
-    },
     checkOrientation() {
       const width = window.innerWidth;
       const height = window.innerHeight;
 
-      // 直向判斷：高度 > 寬度，且寬度小於 1024 (通常是行動裝置)
+      // 直向判斷：高度 > 寬度，且寬度小於 1024
 
       this.isWrongOrientation = height > width && width < 1024;
 
@@ -284,7 +275,7 @@ html {
   justify-content: center;
   flex-direction: column;
   gap: .625rem 0;
-  height:100vh
+  height: 100vh
 }
 
 .result-title {
@@ -694,12 +685,14 @@ button {
 }
 
 @media (orientation: landscape) and (max-height: 74.9988rem) {
+
   //   .quiz-page{
   //  height: unset !important;
   //   }
   .return-last-page {
     padding: 1rem 0 0 0;
   }
+
   .main-card,
   .intro-card {
     min-width: 31.25rem !important;
@@ -707,7 +700,7 @@ button {
 }
 
 @media (orientation: landscape) and (max-height: 47.9988rem) {
-  .quiz-page{
+  .quiz-page {
     padding-top: 24px;
     height: unset !important;
   }

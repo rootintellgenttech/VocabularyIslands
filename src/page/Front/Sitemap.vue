@@ -1,7 +1,8 @@
 <template>
     <div :class="['sitemap-page-container', { 'no-sidebar': !isLoggedIn }]">
-        <div class="return-last-page" @click="goBack">
-            <i class="fas fa-angle-left"></i> 返回
+        <div class="return-last-page" role="button" tabindex="0" aria-label="返回上一頁" @click="goBack"
+            @keyup.enter="goBack">
+            <i class="fas fa-angle-left" aria-hidden="true"></i> 返回
         </div>
 
         <div class="main-content-wrap">
