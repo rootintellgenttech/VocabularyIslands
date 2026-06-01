@@ -151,20 +151,21 @@ const getChartLabelsAndValues = (res, role, targetField) => {
     if (res.data.level === 'league') {
         res.data.results.forEach(league => {
             (league.schools || []).forEach(school => {
-                categories.push(school.school_name);
+                const cleanName = (school.school_name || '').replace(/^.*?區/, '');
+                categories.push(cleanName);
                 values.push(school[targetField] || 0);
             });
         });
     } else {
         res.data.results.forEach(item => {
-            const label = role === 'school_admin' ? `${item.grade}年${item.classroom}班` : item.school_name;
+            const cleanName = (item.school_name || '').replace(/^.*?區/, '');
+            const label = role === 'school_admin' ? `${item.grade}年${item.classroom}班` : cleanName;
             categories.push(label);
             values.push(item[targetField] || 0);
         });
     }
     return { categories, values };
 };
-
 
 export default {
     name: 'IslandAnalysis',
@@ -223,10 +224,26 @@ export default {
             try {
                 const res = await api.get('/students/list/');
                 const rawData = res.data || {};
-                this.rawListData = rawData.results || [];
+
+                if (rawData.results && Array.isArray(rawData.results)) {
+                    this.rawListData = rawData.results.map(item => {
+                        let clonedItem = { ...item };
+                        if (clonedItem.school_name) {
+                            clonedItem.school_name = clonedItem.school_name.replace(/^.*?區/, '');
+                        }
+                        if (clonedItem.schools && Array.isArray(clonedItem.schools)) {
+                            clonedItem.schools = clonedItem.schools.map(s => ({
+                                ...s,
+                                school_name: (s.school_name || '').replace(/^.*?區/, '')
+                            }));
+                        }
+                        return clonedItem;
+                    });
+                } else {
+                    this.rawListData = [];
+                }
 
                 if (rawData.level === 'league' && this.userRole === 'global_leader') {
-                    // 總召：動態載入聯盟選項並預設選取第一個
                     this.allianceOptions = this.rawListData.map(l => l.league_name);
                     const defaultName = this.allianceOptions[0];
 
@@ -237,7 +254,6 @@ export default {
                         this.handleScoreAllianceChange(defaultName);
                     }
                 } else {
-                    // 其他身分：直接渲染
                     this.renderParticipantChart(this.rawListData);
                     this.renderScoreChart(this.rawListData);
                 }
@@ -246,7 +262,6 @@ export default {
             } catch (err) { console.error('數據加載失敗', err); }
         },
 
-        // 挑戰人數控制 (僅總召可見)
         handleParticipantAllianceChange(name) {
             const league = this.rawListData.find(l => l.league_name === name);
             if (league) {
@@ -321,16 +336,23 @@ export default {
             };
         },
 
-        // 處理身分標籤
         renderParticipantChart(dataArray) {
-            const categories = dataArray.map(item => item.school_name || (item.grade ? `${item.grade}年${item.classroom}班` : '未命名'));
+            const categories = dataArray.map(item => {
+                const rawName = item.school_name || '';
+                const cleanSchoolName = rawName.replace(/^.*?區/, '');
+                return item.school_name ? cleanSchoolName : (item.grade ? `${item.grade}年${item.classroom}班` : '未命名');
+            });
             const values = dataArray.map(item => item.today_competition_participants || 0);
             this.participantCount = categories.length;
             this.stackedBarOptions = this.getCommonBarOptions(categories, '人');
             this.stackedBarSeries = [{ name: '今日挑戰人數', data: values }];
         },
         renderScoreChart(dataArray) {
-            const categories = dataArray.map(item => item.school_name || `${item.grade}年${item.classroom}班`);
+            const categories = dataArray.map(item => {
+                const rawName = item.school_name || '';
+                const cleanSchoolName = rawName.replace(/^.*?區/, '');
+                return item.school_name ? cleanSchoolName : `${item.grade}年${item.classroom}班`;
+            });
             const values = dataArray.map(item => {
                 const p = Number(item.today_competition_participants) || 0;
                 const score = Number(item.competition_total_score) || 0;
@@ -341,7 +363,6 @@ export default {
             this.multiColorBarSeries = [{ name: '今日挑戰者平均分', data: values }];
         },
 
-        // 處理中間的參與人數表格
         processTableData(resData) {
             const rawResults = resData.results || [];
 
@@ -349,7 +370,7 @@ export default {
                 this.islandTableData = rawResults.map(item => ({
                     grade: item.grade,
                     classroom: item.classroom,
-                    schoolName: item.school_name || resData.school_name,
+                    schoolName: (item.school_name || resData.school_name || '').replace(/^.*?區/, ''),
                     totalStudents: Number(item.student_total) || 0,
                     participants: Number(item.today_competition_participants) || 0,
                     participationRate: Number(item.student_total) > 0
@@ -364,19 +385,22 @@ export default {
                     const scoreTotal = Number(item.competition_total_score) || 0;
 
                     return {
-                        schoolName: item.school_name,
+                        schoolName: (item.school_name || '').replace(/^.*?區/, ''),
                         classroom: item.classroom || '',
                         totalStudents: sTotal,
                         participants: pTotal,
                         participationRate: sTotal > 0 ? ((pTotal / sTotal) * 100).toFixed(0) + '%' : '0%',
-                        totalScore: scoreTotal
+                        totalScore: scoreTotal,
+                        schools: (item.schools || []).map(s => ({
+                            ...s,
+                            school_name: (s.school_name || '').replace(/^.*?區/, '')
+                        }))
                     };
                 });
             } else {
-                // 其他身分 (校管等) 的處理
                 this.islandTableData = rawResults.map(item => ({
                     classroom: item.classroom,
-                    schoolName: item.school_name,
+                    schoolName: (item.school_name || '').replace(/^.*?區/, ''),
                     totalStudents: Number(item.student_total) || 0,
                     participants: Number(item.today_competition_participants) || 0,
                     participationRate: Number(item.student_total) > 0 ? ((Number(item.today_competition_participants) / Number(item.student_total)) * 100).toFixed(0) + '%' : '0%',
@@ -440,8 +464,8 @@ export default {
                     <td>${item.totalStudents}</td>
                     <td>${item.participants}</td>
                     <td>${item.participationRate}</td>
-                    <td style="text-align: right; font-weight: bold; color: #2A9D8F;">
-                        ${item.totalScore.toLocaleString()}
+                    <td style="font-weight: bold; color: #2A9D8F;">
+                        ${item.totalScore.toLocaleString()} 分
                     </td>
                 </tr>
             `;

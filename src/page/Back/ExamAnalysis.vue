@@ -139,29 +139,29 @@ export default {
   },
   computed: {
     // 根據身分與學校類型過濾後的列表
-filteredExamListData() {
-    let list = this.rawExamList;
+    filteredExamListData() {
+      let list = this.rawExamList;
 
-    //  如果是總召 (global_leader) 或 聯盟召集人 (union_leader)，直接看到全部
-    if (this.userRole === 'global_leader' || this.userRole === 'union_leader') {
+      //  如果是總召 (global_leader) 或 聯盟召集人 (union_leader)，直接看到全部
+      if (this.userRole === 'global_leader' || this.userRole === 'union_leader') {
+        return this.formatExamList(list);
+      }
+
+      // 學校管理員 (school_admin) 才會執行的過濾邏輯
+      const schoolName = this.currentSchoolName || "";
+
+      if (schoolName.includes('國小')) {
+        list = this.rawExamList.filter(item => item.type === 'primary');
+      } else if (schoolName.includes('國中')) {
+        list = this.rawExamList.filter(item => item.type === 'junior');
+      } else {
+        list = (this.schoolType === 'primary')
+          ? this.rawExamList.filter(item => item.type === 'primary')
+          : this.rawExamList.filter(item => item.type === 'junior');
+      }
+
       return this.formatExamList(list);
-    }
-
-    // 學校管理員 (school_admin) 才會執行的過濾邏輯
-    const schoolName = this.currentSchoolName || ""; 
-
-    if (schoolName.includes('國小')) {
-      list = this.rawExamList.filter(item => item.type === 'primary');
-    } else if (schoolName.includes('國中')) {
-      list = this.rawExamList.filter(item => item.type === 'junior');
-    } else {
-      list = (this.schoolType === 'primary')
-        ? this.rawExamList.filter(item => item.type === 'primary')
-        : this.rawExamList.filter(item => item.type === 'junior');
-    }
-
-    return this.formatExamList(list);
-  },
+    },
     filteredOverviewData() {
       if (this.userRole === 'school_admin') {
         // 學校管理員：顯示班級資訊
@@ -189,12 +189,12 @@ filteredExamListData() {
   },
   methods: {
     formatExamList(list) {
-    return list.map(exam => {
-      const settings = EXAM_MASTER_SETTINGS[exam.id];
-      const totalMinutes = settings ? Object.values(settings).reduce((sum, item) => sum + item.time, 0) : 0;
-      return { ...exam, duration: `${totalMinutes}分鐘` };
-    });
-  },
+      return list.map(exam => {
+        const settings = EXAM_MASTER_SETTINGS[exam.id];
+        const totalMinutes = settings ? Object.values(settings).reduce((sum, item) => sum + item.time, 0) : 0;
+        return { ...exam, duration: `${totalMinutes}分鐘` };
+      });
+    },
     exportFullTable(containerId) {
       // 1. 取得當前選中的試卷資訊
       const currentExam = this.rawExamList.find(e => e.id === this.selectedExamId);
@@ -325,16 +325,14 @@ filteredExamListData() {
         const rawData = res.data || {};
         const results = rawData.results || [];
 
-        // 存下 API 回傳的學校名稱
-      this.currentSchoolName = rawData.school_name || "";
+        // 清洗目前登入學校名稱中的「XX區」
+        this.currentSchoolName = (rawData.school_name || "").replace(/^.*?區/, '');
 
         if (rawData.level === 'league') {
-          // 總召模式：生成聯盟選項與匯總數據
           this.allianceOptions = results.map(l => l.league_name);
 
           this.examOverviewData = results.map(league => {
             const schools = league.schools || [];
-            // 計算匯總：從子學校累加
             const sTotal = schools.reduce((sum, s) => sum + (Number(s.student_total) || 0), 0);
             const cTotal = schools.reduce((sum, s) => sum + (Number(s.today_competition_participants) || 0), 0);
 
@@ -343,7 +341,11 @@ filteredExamListData() {
               schoolCount: league.school_total || schools.length,
               studentCount: sTotal,
               completedCount: cTotal,
-              schools: schools
+              // 將底下所有子學校名單的「XX區」通通切掉
+              schools: schools.map(s => ({
+                ...s,
+                school_name: (s.school_name || "").replace(/^.*?區/, '')
+              }))
             };
           });
         } else {
@@ -351,7 +353,8 @@ filteredExamListData() {
           this.examOverviewData = results.map(item => ({
             grade: item.grade ? `${item.grade}年` : null,
             classroom: item.classroom ? `${item.classroom}班` : null,
-            schoolName: item.school_name || '',
+            // 一般重組時切除「XX區」
+            schoolName: (item.school_name || '').replace(/^.*?區/, ''),
             studentCount: item.student_total || 0,
             completedCount: item.today_competition_participants || 0
           }));
@@ -419,21 +422,24 @@ filteredExamListData() {
           schoolCount: (l.schools || []).length,
           completedCount: l.participants || 0,
           avgScore: l.league_avg_score ?? 0,
+          // 點擊切換時，過濾總召下方的子學校名稱
           schools: (l.schools || []).map(s => ({
             ...s,
+            school_name: (s.school_name || "").replace(/^.*?區/, ''),
             avg_score: s.avg_score ?? 0
           }))
         }));
       } else if (this.userRole === 'union_leader') {
         // 召集人模式
         const league = Array.isArray(data) ? data[0] : (data.leagues ? data.leagues[0] : {});
+        // 過濾聯盟召集人模式看到的學校列表名稱
         this.examOverviewData = (league.schools || []).map(s => ({
-          schoolName: s.school_name,
+          schoolName: (s.school_name || "").replace(/^.*?區/, ''),
           completedCount: s.participants || 0,
           avgScore: s.avg_score ?? 0
         }));
       } else {
-        // 學校管理員模式
+        // 學校管理員模式（班級名稱，不需處理學校名稱）
         this.examOverviewData = (data.classes || []).map(c => ({
           grade: c.grade + '年',
           classroom: c.classroom + '班',
@@ -441,6 +447,7 @@ filteredExamListData() {
           avgScore: c.avg_score ?? 0
         }));
       }
+      // console.log('[考試分析] 當前渲染的下方表格數據:', this.examOverviewData);
     },
     handleExamClick(row) {
       this.updateBottomTable(row.id);

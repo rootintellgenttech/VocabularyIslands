@@ -205,20 +205,21 @@
 <script>
 import api from '@/config/api';
 
-// 獲取圖表標籤與數值的助手函數
 const getChartLabelsAndValues = (res, role, targetField) => {
     let categories = [];
     let values = [];
     if (res.data.level === 'league') {
         res.data.results.forEach(league => {
             (league.schools || []).forEach(school => {
-                categories.push(school.school_name);
+                const cleanSchoolName = (school.school_name || '').replace(/^.*?區/, '');
+                categories.push(cleanSchoolName);
                 values.push(school[targetField] || 0);
             });
         });
     } else {
         res.data.results.forEach(item => {
-            const label = role === 'school_admin' ? `${item.grade}年${item.classroom}班` : item.school_name;
+            const cleanSchoolName = (item.school_name || '').replace(/^.*?區/, '');
+            const label = role === 'school_admin' ? `${item.grade}年${item.classroom}班` : cleanSchoolName;
             categories.push(label);
             values.push(item[targetField] || 0);
         });
@@ -267,24 +268,31 @@ export default {
         }
     },
     async mounted() {
-
         try {
-            // 同步載入所有基礎數據
             const results = await Promise.all([
                 this.fetchSummaryData(),
                 this.fetchLearningData(),
                 this.fetchExamData()
             ]);
-            // console.log('1. [Promise.all 基礎數據] 已全部回傳');
 
-            // 載入列表數據並渲染圖表
             const res = await api.get('/students/list/');
-            // console.log('2. [API: /students/list/] 原始回傳:', res.data);
+            const rawData = res.data.results || [];
 
-            this.rawListData = res.data.results || [];
+            this.rawListData = rawData.map(item => {
+                let clonedItem = { ...item };
+                if (clonedItem.school_name) {
+                    clonedItem.school_name = clonedItem.school_name.replace(/^.*?區/, '');
+                }
+                if (clonedItem.schools && Array.isArray(clonedItem.schools)) {
+                    clonedItem.schools = clonedItem.schools.map(s => ({
+                        ...s,
+                        school_name: (s.school_name || '').replace(/^.*?區/, '')
+                    }));
+                }
+                return clonedItem;
+            });
 
             if (res.data.level === 'league' && this.userRole === 'global_leader') {
-                // console.log('3. [身分判定] 總召集人模式 (聯盟層級)');
                 this.allianceOptions = this.rawListData.map(l => l.league_name);
                 const defaultLeague = this.allianceOptions[0];
 
@@ -294,7 +302,6 @@ export default {
                 this.selectedChallengeAlliance = defaultLeague;
                 this.handleChallengeAllianceChange(defaultLeague);
             } else {
-                // console.log('3. [身分判定] 召集人/管理員模式 (學校/班級層級)');
                 this.renderAttendanceChart(this.rawListData);
                 this.renderChallengeChart(this.rawListData);
             }
@@ -339,8 +346,6 @@ export default {
                 console.error('獲取總覽失敗', err);
             }
         },
-
-        // 獲取學習成效表格 (計算登入率與完成率)
         async fetchLearningData() {
             try {
                 const res = await api.get('/students/list/');
@@ -348,12 +353,10 @@ export default {
                 let finalData = [];
                 const results = res.data.results || [];
 
-
                 if (res.data.level === 'league' && this.userRole === 'global_leader') {
                     finalData = res.data.results.map(league => {
-
                         const schools = (league.schools || []).map(s => ({
-                            schoolName: s.school_name,
+                            schoolName: (s.school_name || '').replace(/^.*?區/, ''),
                             studentCount: s.student_total || 0,
                             loginRate: s.student_total > 0
                                 ? Math.round((s.today_participation / s.student_total) * 100) + '%'
@@ -381,10 +384,8 @@ export default {
                     });
                 } else if (this.userRole === 'union_leader') {
                     // 召集人
-                    const source = res.data.level === 'league' ? results[0].schools : results;
-
                     finalData = results.map(s => ({
-                        schoolName: s.school_name,
+                        schoolName: (s.school_name || '').replace(/^.*?區/, ''),
                         studentCount: s.student_total || 0,
                         loginRate: s.student_total > 0
                             ? Math.round((s.today_participation / s.student_total) * 100) + '%'
@@ -393,8 +394,7 @@ export default {
                             ? ((s.total_stars / (s.student_total * PERSONAL_MAX_STARS)) * 100).toFixed(1) + '%'
                             : '0.0%'
                     }));
-                }
-                else {
+                } else {
                     // 學校管理員/老師
                     finalData = results.map(item => ({
                         grade: item.grade ? `${item.grade}年` : null,
@@ -413,7 +413,8 @@ export default {
                 console.error('學習成效獲取失敗', err);
             }
         },
-        //  獲取考試概況表格
+
+        // 獲取考試概況表格
         async fetchExamData() {
             try {
                 const res = await api.get('/students/list/');
@@ -421,15 +422,13 @@ export default {
                 const results = res.data.results || [];
 
                 if (res.data.level === 'league' && this.userRole === 'global_leader') {
-                    // 總召專用：彙總聯盟數據
                     finalData = res.data.results.map(league => {
                         const schoolsData = (league.schools || []).map(s => ({
-                            schoolName: s.school_name,
+                            schoolName: (s.school_name || '').replace(/^.*?區/, ''),
                             studentCount: s.student_total || 0,
                             examCompleteCount: s.today_competition_participants || 0
                         }));
 
-                        // 累加該聯盟的總和
                         const totalStudents = schoolsData.reduce((sum, s) => sum + s.studentCount, 0);
                         const totalComplete = schoolsData.reduce((sum, s) => sum + s.examCompleteCount, 0);
 
@@ -441,14 +440,13 @@ export default {
                         };
                     });
                 } else if (this.userRole === 'union_leader') {
-                    // 縂召集人
+                    // 聯盟召集人
                     finalData = results.map(s => ({
-                        schoolName: s.school_name,
+                        schoolName: (s.school_name || '').replace(/^.*?區/, ''),
                         studentCount: s.student_total || 0,
                         examCompleteCount: s.today_competition_participants || 0
                     }));
-                }
-                else {
+                } else {
                     // 老師模式
                     finalData = results.map(item => ({
                         grade: item.grade ? `${item.grade}年` : null,
@@ -462,7 +460,8 @@ export default {
                 console.error('考試數據獲取失敗', err);
             }
         },
-        //簽到人數圖
+
+        // 簽到人數圖
         async fetchAttendanceData() {
             try {
                 const res = await api.get('/students/list/');
@@ -477,40 +476,21 @@ export default {
                     colors: ['#2A9D8F', '#E76F51', '#264653', '#F4A261', '#E9C46A', '#6366F1', '#A8DADC'],
                     dataLabels: {
                         enabled: true,
-                        style: {
-                            fontSize: '12px',
-                            colors: ['#FFFFFF'],
-                            fontWeight: 'bold'
-                        },
+                        style: { fontSize: '12px', colors: ['#FFFFFF'], fontWeight: 'bold' },
                         offsetY: 0,
                         formatter: (val) => val > 0 ? val : ''
                     },
                     plotOptions: {
-                        bar: {
-                            columnWidth: '20%',
-                            borderRadius: 4,
-                            distributed: true,
-                            dataLabels: {
-                                position: 'center'
-                            }
-                        }
+                        bar: { columnWidth: '20%', borderRadius: 4, distributed: true, dataLabels: { position: 'center' } }
                     },
                     xaxis: {
                         categories: categories,
-                        labels: {
-                            rotate: 0,
-                            style: { fontSize: '12px', fontWeight: 500 }
-                        }
+                        labels: { rotate: 0, style: { fontSize: '12px', fontWeight: 500 } }
                     },
-                    yaxis: {
-                        labels: { formatter: (val) => Math.floor(val) }
-                    },
+                    yaxis: { labels: { formatter: (val) => Math.floor(val) } },
                     legend: { show: true },
                     grid: { borderColor: '#f1f1f1', strokeDashArray: 4 },
-                    tooltip: {
-                        theme: 'light',
-                        y: { formatter: (val) => val + " 人" }
-                    }
+                    tooltip: { theme: 'light', y: { formatter: (val) => val + " 人" } }
                 };
 
                 this.lineSeries = [{ name: '今日簽到人數', data: values }];
@@ -576,12 +556,10 @@ export default {
             const role = this.userRole;
 
             const printWindow = window.open('', '_blank');
-
             let tableHtml = '';
 
             data.forEach(item => {
                 if (role === 'global_leader') {
-                    //  總召模式：聯盟彙總行 + 學校明細 
                     tableHtml += `
                 <tr class="league-row">
                     <td colspan="4" style="text-align: center;">${item.alliance} (聯盟彙總)</td>
@@ -593,13 +571,14 @@ export default {
                 </tr>
             `;
 
-                    // 渲染該聯盟下的所有學校
                     if (item.schools && item.schools.length > 0) {
                         item.schools.forEach(school => {
+                            const currentComplete = Number(school.examCompleteCount) || 0;
+                            const currentStudent = Number(school.studentCount) || 0;
+
                             const rate = isLearn
                                 ? school.loginRate
-                                : (school.studentCount > 0 ? Math.round((school.examCompleteCount / school.studentCount) * 100) + '%' : '0%');
-
+                                : (currentStudent > 0 ? Math.round((currentComplete / currentStudent) * 100) + '%' : '0%');
                             tableHtml += `
                         <tr class="school-row">
                             <td style="text-align: left; padding-left: 30px;">└ ${school.schoolName}</td>
@@ -611,10 +590,13 @@ export default {
                         });
                     }
                 } else {
-                    //  召集人/學校管理員模式：平鋪結構 
                     const label = (role === 'school_admin') ? `${item.grade}${item.classroom}` : item.schoolName;
-                    const rate = isLearn ? item.loginRate : (item.studentCount > 0 ? Math.round((item.completedCount / item.studentCount) * 100) + '%' : '0%');
+                    const teacherComplete = Number(item.examCompleteCount) || 0;
+                    const teacherStudent = Number(item.studentCount) || 0;
 
+                    const rate = isLearn
+                        ? item.loginRate
+                        : (teacherStudent > 0 ? Math.round((teacherComplete / teacherStudent) * 100) + '%' : '0%');
                     tableHtml += `
                 <tr class="school-row">
                     <td style="text-align: left;">${label}</td>
@@ -626,7 +608,6 @@ export default {
                 }
             });
 
-            // 根據身分決定第一欄標題
             const firstColLabel = (role === 'global_leader') ? '名稱' : (role === 'school_admin' ? '班級' : '學校名稱');
 
             printWindow.document.write(`
@@ -643,28 +624,12 @@ export default {
                 th, td { border: 1px solid #ddd; padding: 10px; text-align: center; word-break: break-all; font-size: 13px; }
                 th { background-color: #f4f4f4; font-weight: bold; }
                 
-                /* 聯盟行樣式 */
-        .league-row td { 
-          background-color: #2A9D8F !important; 
-          font-weight: bold; 
-          font-size: 16px;
-        }
-        
-        /* 彙總行樣式 */
-        .summary-header td { 
-          background-color: #E9F5F4 !important; 
-          font-weight: bold; 
-          color: #264653 !important;
-        }
+                .league-row td { background-color: #2A9D8F !important; font-weight: bold; font-size: 16px; }
+                .summary-header td { background-color: #E9F5F4 !important; font-weight: bold; color: #264653 !important; }
                 .school-row td { border-bottom: 1px solid #eee; }
-
                 .btn-box { margin-bottom: 20px; }
                 .print-btn { padding: 10px 20px; background: #2A9D8F; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-
-                @media print {
-                    .no-print { display: none; }
-                    body { padding: 0; }
-                }
+                @media print { .no-print { display: none; } body { padding: 0; } }
             </style>
         </head>
         <body>
@@ -692,7 +657,6 @@ export default {
         </body>
         </html>
     `);
-
             printWindow.document.close();
         },
         handleAttendanceAllianceChange(name) {
