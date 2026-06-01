@@ -29,7 +29,7 @@
                                 </div>
                                 <div class="single-right">
                                     <span v-if="option.type === 'learn'" class="action-text">總學習</span>
-                                    <div v-else class="star-rating" role="img" :title="`獲得 ${option.stars} 顆星`"
+                                    <div v-else class="star-rating" role="img"
                                         :aria-label="`難度得分：${option.stars} 顆星`">
                                         <i v-for="n in 5" :key="n"
                                             :class="['fas', option.stars >= n ? 'fa-star filled' : 'fa-star outline']">
@@ -52,7 +52,7 @@
 
                             <div class="item-bottom" @click.stop="startActivity('quiz', option)">
                                 <div class="bottom-right">
-                                    <div class="star-rating" role="img" :title="`獲得 ${option.stars} 顆星`"
+                                    <div class="star-rating" role="img"
                                         :aria-label="`難度得分：${option.stars} 顆星`">
                                         <img :src="firePath" alt="" aria-hidden="true" class="fire-icon"
                                             :class="{ 'is-bw': option.stars <= 0 }" />

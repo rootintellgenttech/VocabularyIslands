@@ -5,7 +5,7 @@
             <main role="main" class="islands-grid">
                 <div class="top-bar">
                     <h1 class="page-title">國小</h1>
-                    <button class="back-btn" @click="goBack" title="返回大廳">
+                    <button class="back-btn" @click="goBack">
                         返回大廳
                     </button>
                 </div>

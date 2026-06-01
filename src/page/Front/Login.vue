@@ -74,8 +74,7 @@
                 <div class="input-group" style="opacity: 0.6;">
                   <label class="input-label" for="student-account-placeholder">帳號 / 密碼</label>
 
-                  <el-input id="student-account-placeholder" placeholder="請於跳轉後的教育局頁面輸入" disabled class="custom-input"
-                    title="帳號密碼輸入說明：請於跳轉後的教育局頁面輸入" aria-label="帳號密碼輸入說明：請於跳轉後的教育局頁面輸入">
+                  <el-input id="student-account-placeholder" placeholder="請於跳轉後的教育局頁面輸入" disabled class="custom-input" aria-label="帳號密碼輸入說明：請於跳轉後的教育局頁面輸入">
                   </el-input>
                 </div>
 

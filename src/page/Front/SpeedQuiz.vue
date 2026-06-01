@@ -14,7 +14,7 @@
                         </div>
                         <div class="timer-bar">
                             <el-progress :show-text="false" :stroke-width="26" :percentage="timerPercentage"
-                                status="exception" class="timer-progress" aria-label="挑戰剩餘時間進度" title="剩餘時間進度">
+                                status="exception" class="timer-progress" aria-label="挑戰剩餘時間進度">
                             </el-progress>
                         </div>
                     </div>

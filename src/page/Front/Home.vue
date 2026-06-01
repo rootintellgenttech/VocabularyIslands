@@ -12,7 +12,7 @@
                             <div class="action-section">
                                 <h2 class="island-name">{{ island.name }}</h2>
                                 <button class="enter-btn" @click="goToIsland(island.route)"
-                                    :aria-label="`進入${island.name}`" :title="`進入${island.name}`">
+                                    :aria-label="`進入${island.name}`">
                                     進入學習
                                 </button>
                             </div>

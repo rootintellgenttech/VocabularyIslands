@@ -62,10 +62,9 @@
                                     </div>
                                     <button :class="['start-exam-btn', { 'is-disabled': !isExamOpen }]"
                                         :disabled="!isExamOpen" @click="showStartExamDialog(nextAvailableExam)"
-                                        :title="`${isExamOpen ? (hasLocalProgress(nextAvailableExam.id) ? '繼續' : '開始') : '尚未開放'} ${formatExamName(nextAvailableExam.name)} 測驗`"
                                         :aria-label="`${isExamOpen ? (hasLocalProgress(nextAvailableExam.id) ? '繼續' : '開始') : '尚未開放'} ${formatExamName(nextAvailableExam.name)} 測驗`">
                                         {{ isExamOpen ? (hasLocalProgress(nextAvailableExam.id) ? '繼續作答' : '開始作答') :
-                                            '尚未開放' }}
+                                        '尚未開放' }}
                                     </button>
                                 </div>
 

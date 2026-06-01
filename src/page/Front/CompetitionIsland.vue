@@ -53,7 +53,7 @@
                                 {{ rankingType === 'all' ? '所屬聯盟排行' : '所屬學校排行' }}
                             </span>
                             <span class="stat-value">{{ currentRanking ? currentRanking.display_name : '無排行'
-                                }}</span>
+                            }}</span>
                             <span class="stat-status">排名第 {{ currentRanking ? currentRanking.my_rank : '-' }} 名</span>
                         </div>
                     </div>
@@ -95,7 +95,7 @@
                                         <div class="player-info">
                                             <span class="player-name">{{ player.displayName }}</span>
                                             <span v-if="player.school_name" class="player-school">{{ player.school_name
-                                                }}</span>
+                                            }}</span>
                                         </div>
                                     </div>
                                     <div class="score-info">
@@ -127,7 +127,7 @@
 
                             <button :class="['start-btn', getChallengeButtonProps().className]"
                                 :disabled="getChallengeButtonProps().disabled" @click="showChallengeDialog(game)"
-                                :title="`開始挑戰 ${game.title}`" :aria-label="`開始挑戰 ${game.title}`">
+                                :aria-label="`開始挑戰 ${game.title}`">
                                 {{ getChallengeButtonProps().text }}
                             </button>
                         </div>
@@ -193,7 +193,7 @@
                 <div class="player-right-info">
                     <div class="player-actual-score">
                         <span class="player-score">{{ currentRanking ? formatScore(currentRanking.my_score) : 0
-                            }}</span>
+                        }}</span>
                         <span class="score-title">積分</span>
                     </div>
 
