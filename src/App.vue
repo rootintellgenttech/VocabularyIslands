@@ -684,6 +684,7 @@ button {
   }
 }
 
+
 @media (orientation: landscape) and (max-height: 74.9988rem) {
 
   //   .quiz-page{

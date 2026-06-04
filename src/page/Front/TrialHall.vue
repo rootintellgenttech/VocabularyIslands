@@ -64,7 +64,7 @@
                                         :disabled="!isExamOpen" @click="showStartExamDialog(nextAvailableExam)"
                                         :aria-label="`${isExamOpen ? (hasLocalProgress(nextAvailableExam.id) ? '繼續' : '開始') : '尚未開放'} ${formatExamName(nextAvailableExam.name)} 測驗`">
                                         {{ isExamOpen ? (hasLocalProgress(nextAvailableExam.id) ? '繼續作答' : '開始作答') :
-                                        '尚未開放' }}
+                                            '尚未開放' }}
                                     </button>
                                 </div>
 
@@ -207,11 +207,11 @@ export default {
             dialogStep: 1, // 1: 規則說明, 2: 最後警告
             warnImage: require('@/assets/image/trial-quiz/warn.png'),
             // 正式考試
-           examTargets: [
-            { id: 'ps-2', name: '國小英語單字檢測-2', level: 'primary', parts: ['EngToChi', 'ChiToEng', 'Listening'] },
-            { id: 'ms7-2', name: '7年級英語單字檢測-2', level: '7', parts: ['EngToChi', 'ChiToEng', 'Listening', 'ContextFill'] },
-            { id: 'ms8-2', name: '8年級英語單字檢測-2', level: '8', parts: ['EngToChi', 'ChiToEng', 'Listening', 'ContextFill'] }
-        ],
+            examTargets: [
+                { id: 'ps-2', name: '國小英語單字檢測-2', level: 'primary', parts: ['EngToChi', 'ChiToEng', 'Listening'] },
+                { id: 'ms7-2', name: '7年級英語單字檢測-2', level: '7', parts: ['EngToChi', 'ChiToEng', 'Listening', 'ContextFill'] },
+                { id: 'ms8-2', name: '8年級英語單字檢測-2', level: '8', parts: ['EngToChi', 'ChiToEng', 'Listening', 'ContextFill'] }
+            ],
             // 練習卷 (隨時開放)
             // practiceExams: [
             //     { id: 'ps-1', name: '國小英語單字檢測-1', level: 'primary', parts: ['EngToChi', 'ChiToEng', 'Listening'], isPractice: true },
@@ -260,33 +260,33 @@ export default {
         //     const completedCodes = this.historyList.map(h => h.code);
         //     return this.practiceExams.filter(practice => !completedCodes.includes(practice.id));
         // },
-       nextAvailableExam() {
-        // 1. 根據目前解析出來的學生年級（'primary'、'7'、'8'），找出對應考卷
-        const gradeExam = this.examTargets.find(target => target.level === this.studentClass);
-        
-        // 2. 檢查這份考卷有沒有在歷史紀錄裡面（避免重複考）
-        const completedCodes = this.historyList.map(h => h.code);
-        const isCompleted = gradeExam ? completedCodes.includes(gradeExam.id) : false;
-        
-        // 3. 如果找到了對應考卷而且還沒考過，就優先顯示它
-        if (gradeExam && !isCompleted) {
-            return gradeExam;
-        }
-        
-        // 防呆防置：如果考過了或找不到，預設回傳符合該年級的考卷，或陣列第一個
-        return gradeExam || this.examTargets[0];
-    },
-    
-    isAllExamsCompleted() {
-        // 修改全部完成的判定：如果該年級的考卷代碼已經在 historyList 裡面，就代表該生已完成他的指定任務
-        const completedCodes = this.historyList.map(h => h.code);
-        const gradeExam = this.examTargets.find(target => target.level === this.studentClass);
-        
-        if (gradeExam) {
-            return completedCodes.includes(gradeExam.id);
-        }
-        return false;
-    },
+        nextAvailableExam() {
+            // 1. 根據目前解析出來的學生年級（'primary'、'7'、'8'），找出對應考卷
+            const gradeExam = this.examTargets.find(target => target.level === this.studentClass);
+
+            // 2. 檢查這份考卷有沒有在歷史紀錄裡面（避免重複考）
+            const completedCodes = this.historyList.map(h => h.code);
+            const isCompleted = gradeExam ? completedCodes.includes(gradeExam.id) : false;
+
+            // 3. 如果找到了對應考卷而且還沒考過，就優先顯示它
+            if (gradeExam && !isCompleted) {
+                return gradeExam;
+            }
+
+            // 防呆防置：如果考過了或找不到，預設回傳符合該年級的考卷，或陣列第一個
+            return gradeExam || this.examTargets[0];
+        },
+
+        isAllExamsCompleted() {
+            // 修改全部完成的判定：如果該年級的考卷代碼已經在 historyList 裡面，就代表該生已完成他的指定任務
+            const completedCodes = this.historyList.map(h => h.code);
+            const gradeExam = this.examTargets.find(target => target.level === this.studentClass);
+
+            if (gradeExam) {
+                return completedCodes.includes(gradeExam.id);
+            }
+            return false;
+        },
 
         // 判斷當前顯示的這份試卷是否已經考過
         isExamCompleted() {
@@ -297,33 +297,33 @@ export default {
     },
     methods: {
         async fetchStudentInfoAndLevel() {
-        try {
-            const response = await api.get('students/dashboard/student/');
-            const className = response.data.class_name || ''; // 例如 "7年4班"
-            
-            console.log(`[試煉殿堂] 成功獲取學生班級資訊: "${className}"`);
+            try {
+                const response = await api.get('students/dashboard/student/');
+                const className = response.data.class_name || ''; // 例如 "7年4班"
 
-            const match = className.match(/^(\d+)/);
-            
-            if (match) {
-                const gradeNum = match[1]; // 拿到開頭的數字字串
-                if (gradeNum === '7' || gradeNum === '8') {
-                    this.studentClass = gradeNum; // 設定為 '7' 或 '8'
+                console.log(`[試煉殿堂] 成功獲取學生班級資訊: "${className}"`);
+
+                const match = className.match(/^(\d+)/);
+
+                if (match) {
+                    const gradeNum = match[1]; // 拿到開頭的數字字串
+                    if (gradeNum === '7' || gradeNum === '8') {
+                        this.studentClass = gradeNum; // 設定為 '7' 或 '8'
+                    } else {
+                        this.studentClass = 'primary'; // 其他數字預設回歸國小
+                    }
                 } else {
-                    this.studentClass = 'primary'; // 其他數字預設回歸國小
+                    // 如果沒有數字（例如：六年一班 或 快樂國小組），判定為國小
+                    this.studentClass = 'primary';
                 }
-            } else {
-                // 如果沒有數字（例如：六年一班 或 快樂國小組），判定為國小
-                this.studentClass = 'primary';
-            }
-            
-            console.log(`[試煉殿堂分流成功] 該學生最終判定考卷級別為: "${this.studentClass}"`);
 
-        } catch (err) {
-            console.error('[試煉殿堂] 獲取學生級別失敗，預設回歸國小級別:', err);
-            this.studentClass = 'primary'; // API 失敗時的防呆預設
-        }
-    },
+                console.log(`[試煉殿堂分流成功] 該學生最終判定考卷級別為: "${this.studentClass}"`);
+
+            } catch (err) {
+                console.error('[試煉殿堂] 獲取學生級別失敗，預設回歸國小級別:', err);
+                this.studentClass = 'primary'; // API 失敗時的防呆預設
+            }
+        },
         async fetchAllHistory() {
             this.isLoadingHistory = true;
             this.historyList = [];
@@ -639,13 +639,13 @@ export default {
         }
     },
     async mounted() {
-    this.isLoadingHistory = true;
-    
-    await this.fetchStudentInfoAndLevel();
-    await this.fetchAllHistory();
-    
-    this.isLoadingHistory = false;
-},
+        this.isLoadingHistory = true;
+
+        await this.fetchStudentInfoAndLevel();
+        await this.fetchAllHistory();
+
+        this.isLoadingHistory = false;
+    },
 
 };
 </script>

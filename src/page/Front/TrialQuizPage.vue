@@ -702,14 +702,26 @@ export default {
 }
 
 .main-card {
-    @include main-card;
-    min-height: 600px;
-
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;            
+    max-width: 55rem;       
+    box-shadow: 0.125rem 0.3125rem 1rem -0.75rem #000000;
+    border-radius: 1.25rem;
+    margin: 1rem 0;
+    background-color: #fff;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    text-align: center;
+    justify-self: center;
+    justify-content: space-between;
+    min-height: 600px;     
     .header-wrap {
         box-sizing: border-box;
+        width: 100%;         
     }
 }
-
 .intro-card {
     @include main-card;
     width: 800px;
@@ -854,6 +866,9 @@ export default {
 
 .question-content {
     @include main-card-content;
+    .question-title{
+        display: unset !important
+    }
 }
 
 .instruction-text {
@@ -878,7 +893,20 @@ export default {
 
 
 .context-fill-title {
-    font-size: 2.4rem !important
+    font-size: 2.4rem !important; 
+    line-height: 1.6;           
+    text-align: center;
+    word-break: break-word;   
+
+    span {
+        display: inline;      
+        white-space: normal;  
+    }
+    .fill-placeholder {
+        display: inline-block; 
+        white-space: nowrap;   
+        margin: 0 4px;         
+    }
 }
 
 .question-wrap {
@@ -946,7 +974,8 @@ export default {
         margin: 0 auto;
     }
 
-    .main-card .question-content {
+    .main-card {
+        .question-content {
         .instruction-text {
             margin: 1.5rem 0;
         }
@@ -954,14 +983,18 @@ export default {
         .question-title {
             font-size: 4rem !important;
         }
-    }
+    }}
 }
 
-@media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
+@media (orientation: landscape) and (max-height: 74.9988rem) {
     .quiz-page {
         padding-left: 0 !important;
     }
-
+.main-card {
+        min-height: auto;   
+        height: 100%;
+        width: auto;
+    }
     .intro-card {
         height: 100%;
 
