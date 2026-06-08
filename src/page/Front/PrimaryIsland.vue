@@ -113,29 +113,49 @@ export default {
     },
     methods: {
         async fetchIslandStars() {
-            try {
-                const STATIC_TOTAL_CONFIG = {
-                    'abc': 65,
-                    '300': 180,
-                    'hero': 30,
-                    'listen': 30
-                };
+    try {
+        const STATIC_TOTAL_CONFIG = {
+            'abc': 65,
+            '300': 180,
+            'hero': 30,
+            'listen': 30
+        };
 
-                const res = await api.get('/students/test-summary/');
-                this.islands = this.islands.map(isl => {
-                    const matchedIsland = res.data.islands.find(i => i.island_name === isl.name);
+        const res = await api.get('/students/test-summary/');
+        const allRemoteIslands = res.data.islands || [];
 
-                    return {
-                        ...isl,
-                        stars: matchedIsland ? matchedIsland.total_stars : 0,
-                        // 使用靜態配置的總分母，確保不會因為 API 沒記錄而變小
-                        totalStars: STATIC_TOTAL_CONFIG[isl.id] || 0
-                    };
-                });
-            } catch (err) {
-                console.error('更新島嶼星星失敗:', err);
-            }
-        },
+        this.islands = this.islands.map(isl => {
+            let currentStars = 0;
+
+            // 建立大廳島嶼名稱與後端可能回傳的「所有關卡名稱清單」對照表
+            const islandNameMap = {
+                'ABC啟航島': ['ABC啟航島', 'ABC 總復習'],
+                '300字島': ['300字島', '300字複習'],
+                '800字島': ['800字島', '800字複習'], // 預留未來國中島使用
+                '1200字島': ['1200字島', '1200字複習'] // 預留未來國中島使用
+            };
+
+            // 取得當前島嶼需要加總的後端名稱陣列（若不在對照表內，就只查原本的名字）
+            const targetNames = islandNameMap[isl.name] || [isl.name];
+
+            // 遍歷目標名稱，把所有符合的後端關卡星星通通累加起來
+            targetNames.forEach(name => {
+                const matched = allRemoteIslands.find(i => i.island_name === name);
+                if (matched) {
+                    currentStars += (matched.total_stars || 0);
+                }
+            });
+
+            return {
+                ...isl,
+                stars: currentStars,
+                totalStars: STATIC_TOTAL_CONFIG[isl.id] || 0
+            };
+        });
+    } catch (err) {
+        console.error('更新島嶼星星失敗:', err);
+    }
+},
         goBack() {
             this.$router.push('/home'); // 回到大廳
         },

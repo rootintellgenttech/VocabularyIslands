@@ -254,83 +254,81 @@ export default {
 
             this.currentKey = mapKey;
         },
-        async fetchUserStars() {
-            try {
-                const response = await api.get('/students/test-summary/');
+       async fetchUserStars() {
+    try {
+        const response = await api.get('/students/test-summary/');
 
-                // 針對 ABC 總復習 (unitId 為 final) 的精確匹配
-                if (this.unitId === 'final') {
-                    const islandData = response.data.islands.find(i => i.island_name === 'ABC 總復習');
-
-                    if (islandData && islandData.units) {
-                        // 找到該島嶼下名為 "ABC 總復習" 的單元
-                        const finalUnit = islandData.units.find(u => u.unit_name === 'ABC 總復習');
-
-                        this.lessonData.options = this.lessonData.options.map(opt => {
-                            let stars = 0;
-
-                            // 優先從 stages 陣列裡比對 (例如: "A-F")
-                            if (finalUnit && finalUnit.stages) {
-                                const matchedStage = finalUnit.stages.find(s => s.stage === opt.label);
-                                if (matchedStage) stars = matchedStage.stars;
-                            }
-
-                            // 如果 stages 找不到，再嘗試從 units 層級比對
-                            if (stars === 0) {
-                                const matchedUnit = islandData.units.find(u => u.unit_name === opt.label);
-                                if (matchedUnit) stars = matchedUnit.total_stars;
-                            }
-
-                            return { ...opt, stars: stars };
-                        });
-                    }
-                    console.log('[ABC 總復習] 星星精確匹配成功');
-                    return;
-                }
-
-                // ---  一般單字島邏輯 ---
-                let islandSearchName = '';
-                if (this.wordCount === '300') islandSearchName = '300字島';
-                else if (this.wordCount === '800') islandSearchName = '800字島';
-                else if (this.wordCount === '1200') islandSearchName = '1200字島';
-                else if (['af', 'gl', 'mr', 'sz'].includes(this.unitId)) islandSearchName = 'ABC啟航島';
-
-                const islandData = response.data.islands.find(i => i.island_name === islandSearchName);
-                if (!islandData) return;
-
-                const unitData = islandData.units.find(u => u.unit_name === this.lessonData.name);
-
+        // --- 1. ABC 總復習特例 ---
+        if (this.unitId === 'final') {
+            const islandData = response.data.islands.find(i => i.island_name === 'ABC 總復習');
+            if (islandData && islandData.units) {
+                const finalUnit = islandData.units.find(u => u.unit_name === 'ABC 總復習');
                 this.lessonData.options = this.lessonData.options.map(opt => {
                     let stars = 0;
-                    if (unitData && unitData.stages) {
-                        // A. 優先匹配 Review 關卡成績 (例如：300字複習裡的「圖書館島」)
-                        const matchedStage = unitData.stages.find(s => s.stage === opt.label);
-
-                        if (matchedStage) {
-                            stars = matchedStage.stars;
-                        }
-                        else {
-                            // 判斷是否為「嚴格複習模式」(300/800 的第 6 單元)
-                            const isStrictReview = ['06', '800-06'].includes(this.unitId) || (this.wordCount === '300' && this.unitId === '06');
-
-                            if (!isStrictReview) {
-                                // 只有 1200字總複習 或其他特殊單元，才允許去抓同名 Unit 的星星
-                                const matchedUnitAsStage = islandData.units.find(u => u.unit_name === opt.label);
-                                if (matchedUnitAsStage) {
-                                    stars = matchedUnitAsStage.total_stars;
-                                }
-                            }
-                        }
+                    if (finalUnit && finalUnit.stages) {
+                        const matchedStage = finalUnit.stages.find(s => s.stage === opt.label);
+                        if (matchedStage) stars = matchedStage.stars;
+                    }
+                    if (stars === 0) {
+                        const matchedUnit = islandData.units.find(u => u.unit_name === opt.label);
+                        if (matchedUnit) stars = matchedUnit.total_stars;
                     }
                     return { ...opt, stars: stars };
                 });
-
-                console.log(`[${islandSearchName}] 星星綁定成功 (嚴格模式: ${['06', '800-06'].includes(this.unitId)})`);
-
-            } catch (error) {
-                console.error('LessonDetail 星星更新失敗:', error);
             }
-        },
+            return;
+        }
+
+        // --- 2. 一般單字島 ---
+        let islandSearchName = '';
+        if (this.wordCount === '300') islandSearchName = '300字島';
+        else if (this.wordCount === '800') islandSearchName = '800字島';
+        else if (this.wordCount === '1200') islandSearchName = '1200字島';
+        else if (['af', 'gl', 'mr', 'sz'].includes(this.unitId)) islandSearchName = 'ABC啟航島';
+
+        // 嘗試找主島嶼
+        let islandData = response.data.islands.find(i => i.island_name === islandSearchName);
+        let unitData = islandData ? islandData.units.find(u => u.unit_name === this.lessonData.name) : null;
+
+        // 如果在主島嶼找不到這個單元，代表後端把它獨立成一個島嶼了 (例如 "300字複習")
+        if (!unitData) {
+            islandData = response.data.islands.find(i => i.island_name === this.lessonData.name);
+            if (islandData && islandData.units) {
+                // 通常獨立島嶼的單元名稱會跟島嶼同名，或者直接抓第一個單元
+                unitData = islandData.units.find(u => u.unit_name === this.lessonData.name) || islandData.units[0];
+            }
+        }
+
+        if (!islandData || !unitData) {
+            console.warn(`[星星對照警告] 找不到島嶼或單元: ${this.lessonData.name}`);
+            return;
+        }
+
+        // --- 3. 綁定星星資料 ---
+        this.lessonData.options = this.lessonData.options.map(opt => {
+            let stars = 0;
+            if (unitData && unitData.stages) {
+                const matchedStage = unitData.stages.find(s => s.stage === opt.label);
+                
+                if (matchedStage) {
+                    stars = matchedStage.stars;
+                } else {
+                    const isStrictReview = ['06', '800-06'].includes(this.unitId) || (this.wordCount === '300' && this.unitId === '06');
+                    if (!isStrictReview) {
+                        const matchedUnitAsStage = islandData.units.find(u => u.unit_name === opt.label);
+                        if (matchedUnitAsStage) {
+                            stars = matchedUnitAsStage.total_stars;
+                        }
+                    }
+                }
+            }
+            return { ...opt, stars: stars };
+        });
+
+    } catch (error) {
+        console.error('LessonDetail 星星更新失敗:', error);
+    }
+},
         goBack() {
             // 判斷是否為 ABC 島嶼的單元 (af, gl, mr, sz, final)
             const isAbcUnit = ['af', 'gl', 'mr', 'sz', 'final'].includes(this.unitId);

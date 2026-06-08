@@ -83,25 +83,51 @@ export default {
         handleResize() {
             this.windowWidth = window.innerWidth;
         },
-        async fetchIslandStars() {
-            try {
-                const EXPECTED_CONFIG = {
-                    '800': 55,    // (11-1)*5 + 5 = 55 關
-                    '1200': 48,   // (11-1)*4 + 8 = 48 關
-                    'hero': 13,   // 會考大殿堂共有 13 關
-                    'listen': 11  // 國中聽力海灣共有 11 關
-                };
+       async fetchIslandStars() {
+    try {
+        const EXPECTED_CONFIG = {
+            '800': 55,    // (11-1)*5 + 5 = 55 關
+            '1200': 48,   // (11-1)*4 + 8 = 48 關
+            'hero': 13,   // 會考大殿堂共有 13 關
+            'listen': 11  // 國中聽力海灣共有 11 關
+        };
 
-                const res = await api.get('/students/test-summary/');
-                this.islands = this.islands.map(isl => {
-                    const matchedIsland = res.data.islands.find(i => i.island_name === isl.name);
-                    let earnedStars = matchedIsland ? matchedIsland.total_stars : 0;
-                    let totalPossibleStars = (EXPECTED_CONFIG[isl.id] || 0) * 5;
+        const res = await api.get('/students/test-summary/');
+        const allRemoteIslands = res.data.islands || [];
 
-                    return { ...isl, stars: earnedStars, totalStars: totalPossibleStars };
-                });
-            } catch (err) { console.error('國中島嶼更新失敗', err); }
-        },
+        this.islands = this.islands.map(isl => {
+            let currentStars = 0;
+
+            // 建立國中大廳島嶼名稱與後端可能回傳的「所有關卡名稱清單」對照表
+            const islandNameMap = {
+                '800字島': ['800字島', '800字複習'],
+                '1200字島': ['1200字島', '1200字複習']
+            };
+
+            // 取得當前島嶼需要加總的後端名稱陣列（若不在對照表內，就只查原本的名字）
+            const targetNames = islandNameMap[isl.name] || [isl.name];
+
+            // 遍歷目標名稱，把所有符合的後端關卡星星通通累加起來
+            targetNames.forEach(name => {
+                const matched = allRemoteIslands.find(i => i.island_name === name);
+                if (matched) {
+                    currentStars += (matched.total_stars || 0);
+                }
+            });
+
+            // 每關 5 顆星，計算總可能獲得的星星數
+            let totalPossibleStars = (EXPECTED_CONFIG[isl.id] || 0) * 5;
+
+            return { 
+                ...isl, 
+                stars: currentStars, 
+                totalStars: totalPossibleStars 
+            };
+        });
+    } catch (err) { 
+        console.error('國中島嶼更新失敗', err); 
+    }
+},
         enterIsland(id) {
             if (id === 'listen') {
                 this.$router.push({ name: 'SecondaryListenDetail' });
