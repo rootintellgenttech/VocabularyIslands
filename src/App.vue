@@ -1,7 +1,7 @@
 <template>
   <div id="app" :class="{ 'has-global-bg': $route.path !== '/login' }">
     <nav v-if="shouldShowGlobalNav" class="global-access-nav" aria-label="無障礙工具欄">
-      <a href="#main-content" class="sr-only-focusable">跳到主要內容</a>
+      <a href="#main-content" class="sr-only-focusable" @click.prevent="skipToMainContent">跳到主要內容</a>
 
       <div class="top-utility-links">
         <router-link to="/sitemap" class="access-link" title="網站導覽">網站導覽</router-link>
@@ -54,18 +54,13 @@ export default {
     };
   },
   watch: {
-    // 合併後的路由監控
     '$route': {
       immediate: true,
       handler(to) {
-        // 1. 判斷是否為前台頁面
         const backOfficePaths = ['/dashboard', '/island-analysis', '/exam-analysis', '/exam-detail', '/news'];
         this.isFrontPage = !backOfficePaths.some(path => to.path.startsWith(path));
-
-        // 2. 檢查方向
         this.checkOrientation();
 
-        // 3. 檢查 Token 定時器
         if (localStorage.getItem('refreshToken') && !this.refreshTimer) {
           this.startTokenRefreshTimer();
         }
@@ -74,7 +69,6 @@ export default {
   },
   computed: {
     shouldShowGlobalNav() {
-      // 如果目前是後台路徑，就不顯示頂部導覽
       return this.isFrontPage;
     },
     shouldShowSidebar() {
@@ -82,26 +76,27 @@ export default {
       const routeMetaHide = this.$route.meta.hideSidebar;
       const isSitemap = this.$route.name === 'Sitemap';
 
-      // 1. 如果 meta 寫死要隱藏 (如 Login 頁)，絕對隱藏
       if (routeMetaHide) return false;
-
-      // 2. 如果是 Sitemap 頁面：沒登入不給看側欄
       if (isSitemap && !token) return false;
-
-      // 3. 只要有 Token，且不是在 Login/404，就應該顯示
       return !!token;
     }
   },
   methods: {
+    // 跳到主要內容的方法
+    skipToMainContent() {
+      const mainContent = document.getElementById('main-content');
+      if (mainContent) {
+        mainContent.focus();
+        // 確保某些瀏覽器在 focus 後畫面會正確滑動
+        mainContent.scrollIntoView({ behavior: 'smooth' }); 
+      }
+    },
     checkOrientation() {
       const width = window.innerWidth;
       const height = window.innerHeight;
 
-      // 直向判斷：高度 > 寬度，且寬度小於 1024
-
       this.isWrongOrientation = height > width && width < 1024;
 
-      // 同步鎖定 body 捲動
       if (this.isFrontPage && this.isWrongOrientation) {
         document.body.classList.add('locked');
       } else {
@@ -109,12 +104,10 @@ export default {
       }
     },
     async startTokenRefreshTimer() {
-      // 避免重複設定定時器
       if (this.refreshTimer) return;
 
       console.log('[系統] 啟動 Token 自動更新計時器 (每 25 分鐘刷新一次)');
 
-      // 設定定時器：25 分鐘 = 25 * 60 * 1000 毫秒
       this.refreshTimer = setInterval(async () => {
         const refreshToken = localStorage.getItem('refreshToken');
 
@@ -125,12 +118,10 @@ export default {
 
         try {
           console.log('[系統] 正在執行預約自動更新 Token...');
-          // 刷新接口
           const response = await api.post('students/refresh/', {
             refresh: refreshToken
           });
 
-          // 兼容 access 或 token 兩種 key
           const newAccessToken = response.data.token || response.data.access;
           const newRefreshToken = response.data.refresh;
 
@@ -141,7 +132,6 @@ export default {
           }
         } catch (error) {
           console.error('[系統] 自動更新失敗:', error);
-          // 如果連刷新都失敗，代表 refreshToken 也過期了，停止計時器
           this.stopTokenRefreshTimer();
         }
       }, 25 * 60 * 1000);
@@ -164,7 +154,6 @@ export default {
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.checkOrientation);
-    // 當組件銷毀時清理定時器，避免記憶體洩漏
     this.stopTokenRefreshTimer();
   }
 };
@@ -174,6 +163,25 @@ export default {
 <style lang="scss">
 // @import '~vue-multiselect/dist/vue-multiselect.min.css';
 $bg-path: "~@/assets/image/bg.png";
+
+:focus-visible {
+  outline: 3px solid #0056b3 !important; 
+  outline-offset: 2px; 
+  border-radius: 4px;
+  transition: outline 0.1s ease-in-out;
+}
+
+[role="link"]:focus,
+[role="button"]:focus,
+li[tabindex="0"]:focus,
+.group-name[tabindex="0"]:focus {
+  outline: 3px solid #0056b3;
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none !important;
+}
 
 .orientation-lock-overlay {
   position: fixed;

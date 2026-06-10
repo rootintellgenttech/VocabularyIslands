@@ -17,56 +17,50 @@
             </div>
 
             <div :class="['sitemap-grid', { 'visitor-mode': !isLoggedIn }]">
-                <!-- 1. 國小島 -->
                 <div class="sitemap-card">
                     <div class="card-header">1.國小島</div>
                     <div class="card-body">
-                        <div class="group-name" @click="goTo('PrimaryIsland')">國小島</div>
+                        <div class="group-name" tabindex="0" role="link" aria-label="前往國小島" @click="goTo('PrimaryIsland')" @keyup.enter="goTo('PrimaryIsland')">國小島</div>
                         <ul>
-                            <li @click="goTo('AbcIsland')">ABC啟航島</li>
-                            <li @click="goTo('WordIslandDetail', { level: 'primary', wordCount: '300' })">300單字島</li>
-                            <li @click="goTo('PrimaryHeroDetail')">小英雄大本營</li>
-                            <li @click="goTo('PrimaryListenDetail')">國小聽力海灣</li>
+                            <li tabindex="0" role="link" @click="goTo('AbcIsland')" @keyup.enter="goTo('AbcIsland')">ABC啟航島</li>
+                            <li tabindex="0" role="link" @click="goTo('WordIslandDetail', { level: 'primary', wordCount: '300' })" @keyup.enter="goTo('WordIslandDetail', { level: 'primary', wordCount: '300' })">300單字島</li>
+                            <li tabindex="0" role="link" @click="goTo('PrimaryHeroDetail')" @keyup.enter="goTo('PrimaryHeroDetail')">小英雄大本營</li>
+                            <li tabindex="0" role="link" @click="goTo('PrimaryListenDetail')" @keyup.enter="goTo('PrimaryListenDetail')">國小聽力海灣</li>
                         </ul>
                     </div>
                 </div>
 
-                <!-- 2. 國中島 -->
                 <div class="sitemap-card">
                     <div class="card-header">2.國中島</div>
                     <div class="card-body">
-                        <div class="group-name" @click="goTo('SecondaryIsland')">國中島</div>
+                        <div class="group-name" tabindex="0" role="link" aria-label="前往國中島" @click="goTo('SecondaryIsland')" @keyup.enter="goTo('SecondaryIsland')">國中島</div>
                         <ul>
-                            <li @click="goTo('WordIslandDetail', { level: 'secondary', wordCount: '800' })">800單字島</li>
-                            <li @click="goTo('WordIslandDetail', { level: 'secondary', wordCount: '1200' })">1200單字島
-                            </li>
-                            <li @click="goTo('SecondaryHeroDetail')">會考大殿堂</li>
-                            <li @click="goTo('SecondaryListenDetail')">國中聽力海灣</li>
+                            <li tabindex="0" role="link" @click="goTo('WordIslandDetail', { level: 'secondary', wordCount: '800' })" @keyup.enter="goTo('WordIslandDetail', { level: 'secondary', wordCount: '800' })">800單字島</li>
+                            <li tabindex="0" role="link" @click="goTo('WordIslandDetail', { level: 'secondary', wordCount: '1200' })" @keyup.enter="goTo('WordIslandDetail', { level: 'secondary', wordCount: '1200' })">1200單字島</li>
+                            <li tabindex="0" role="link" @click="goTo('SecondaryHeroDetail')" @keyup.enter="goTo('SecondaryHeroDetail')">會考大殿堂</li>
+                            <li tabindex="0" role="link" @click="goTo('SecondaryListenDetail')" @keyup.enter="goTo('SecondaryListenDetail')">國中聽力海灣</li>
                         </ul>
                     </div>
                 </div>
 
-                <!-- 3. 試煉殿堂 -->
                 <div class="sitemap-card">
                     <div class="card-header">3.試煉殿堂</div>
                     <div class="card-body">
-                        <div class="group-name" @click="goTo('TrialHall')">試煉殿堂</div>
+                        <div class="group-name" tabindex="0" role="link" aria-label="前往試煉殿堂" @click="goTo('TrialHall')" @keyup.enter="goTo('TrialHall')">試煉殿堂</div>
                     </div>
                 </div>
 
-                <!-- 4. 競技島 -->
                 <div class="sitemap-card">
                     <div class="card-header">4.競技島</div>
                     <div class="card-body">
-                        <div class="group-name" @click="goTo('CompetitionIsland')">競技島</div>
+                        <div class="group-name" tabindex="0" role="link" aria-label="前往競技島" @click="goTo('CompetitionIsland')" @keyup.enter="goTo('CompetitionIsland')">競技島</div>
                     </div>
                 </div>
 
-                <!-- 5. 成就島 -->
                 <div class="sitemap-card">
                     <div class="card-header">5.成就島</div>
                     <div class="card-body">
-                        <div class="group-name" @click="goTo('AchievementIsland')">成就島</div>
+                        <div class="group-name" tabindex="0" role="link" aria-label="前往成就島" @click="goTo('AchievementIsland')" @keyup.enter="goTo('AchievementIsland')">成就島</div>
                     </div>
                 </div>
             </div>
@@ -79,13 +73,11 @@ export default {
     name: "Sitemap",
     data() {
         return {
-            // 初始化時檢查登入狀態
             isLoggedIn: !!localStorage.getItem('accessToken')
         };
     },
     methods: {
         goTo(name, params = {}) {
-            // 如果沒登入，統一導向登入頁
             if (!this.isLoggedIn) {
                 this.$message.info('請先登入以進入學習單元');
                 this.$router.push('/login');
@@ -112,9 +104,9 @@ $header-teal: #4abcb1;
     min-height: 100vh;
     transition: padding 0.3s;
 
-    &.no-sidebar {
-        padding-left: 2rem;
-    }
+    // &.no-sidebar {
+    //     padding-left: 2rem;
+    // }
 }
 
 .login-warning-tip {
