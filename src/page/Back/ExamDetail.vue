@@ -32,7 +32,14 @@
       </div>
 
       <div class="chart-wrapper">
-        <apexchart type="bar" height="350" :options="distChartOptions" :series="filteredDistSeries"></apexchart>
+        <apexchart v-if="hasChartData" type="bar" height="350" :options="distChartOptions" :series="filteredDistSeries">
+        </apexchart>
+
+        <div v-else class="empty-chart-tips"
+          style="height: 350px; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: #fcfcfc; border-radius: 8px; border: 1px dashed #ebeef5;">
+          <i class="fas fa-chart-bar" style="font-size: 48px; color: #DCDFE6; margin-bottom: 15px;"></i>
+          <p style="margin: 0; font-size: 16px; font-weight: bold; color: #909399;">所選條件目前尚無考試數據</p>
+        </div>
       </div>
     </div>
 
@@ -219,6 +226,23 @@ export default {
   mounted() {
     this.initFilterSettings();
     this.updateChartData();
+  },
+  computed: {
+    // 判斷圖表是否有有效數據可以顯示
+    hasChartData() {
+      // 1. 如果 series 是空的，代表沒選學校，直接回傳 false
+      if (!this.filteredDistSeries || this.filteredDistSeries.length === 0) {
+        return false;
+      }
+
+      // 2. 如果有選學校，但該學校的參與人數為 0 (所有的區間數據都是 0)
+      // 視為「無數據」，避免圖表畫出一排平坦的 0
+      const isAllZero = this.filteredDistSeries.every(series =>
+        series.data.every(val => val === 0)
+      );
+
+      return !isAllZero;
+    }
   },
   methods: {
     initFilterSettings() {
@@ -625,18 +649,32 @@ export default {
       let source = [];
       const allLeagues = Array.isArray(this.rawStatsData) ? this.rawStatsData : (this.rawStatsData.leagues || []);
 
+      //  根據身分與篩選條件取得來源數據
       if (this.userRole === 'global_leader') {
         const league = allLeagues.find(l => l.league_name === this.selectedAlliance);
-        source = (league?.schools || []).filter(s => this.selectedSchools.includes(s.school_name));
+        if (league) {
+          source = (league.schools || []).filter(s => this.selectedSchools.includes(s.school_name));
+        }
       } else if (this.userRole === 'union_leader') {
         const league = allLeagues[0];
-        source = (league?.schools || []).filter(s => this.selectedSchools.includes(s.school_name));
+        if (league) {
+          source = (league.schools || []).filter(s => this.selectedSchools.includes(s.school_name));
+        }
       } else {
         source = (this.rawStatsData.classes || []).filter(c => this.selectedClasses.includes(`${c.grade}年${c.classroom}班`));
       }
 
+      // 防呆處理：如果沒有選中任何項目，給予一個預設的空 series 以避免 ApexCharts 報錯
+      if (source.length === 0) {
+        this.filteredDistSeries = [{
+          name: '無資料',
+          data: new Array(categories.length).fill(0)
+        }];
+        return;
+      }
+
+      // 正常計算 series
       this.filteredDistSeries = source.map(item => ({
-        //  統計長條圖：清洗統計圖懸浮標籤 (Tooltip) 上面顯示的學校名稱
         name: item.school_name
           ? item.school_name.replace(/^.*?區/, '')
           : `${item.grade}年${item.classroom}班`,
