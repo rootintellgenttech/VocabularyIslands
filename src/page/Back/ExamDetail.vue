@@ -223,10 +223,6 @@ export default {
       currentDetailStats: { participants: 0, avgScore: 0, highest: 0, lowest: 0 },
     };
   },
-  mounted() {
-    this.initFilterSettings();
-    this.updateChartData();
-  },
   computed: {
     // 判斷圖表是否有有效數據可以顯示
     hasChartData() {
@@ -708,8 +704,15 @@ export default {
     },
 
   },
-  mounted() {
-    this.fetchExamDetailData();
+  async mounted() {
+    // 先等待 API 取得該試卷的所有成績資料
+    await this.fetchExamDetailData();
+
+    // 資料都準備好後，初始化下拉選單的預設選項
+    this.initFilterSettings();
+
+    //  最後根據預設選項，畫出長條圖
+    this.updateChartData();
   }
 };
 </script>

@@ -121,6 +121,8 @@ export default {
       userRole: localStorage.getItem('userRole') || 'school_admin',
       schoolType: localStorage.getItem('schoolType') || 'primary',
 
+      currentSchoolName: '',
+
       // 試卷列表
       rawExamList: [
         { id: 1, name: '國小英語單字檢測-2', date: '06.01 - 06.30', type: 'primary', participants: 0, avgScore: null },
