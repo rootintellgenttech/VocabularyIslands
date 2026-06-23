@@ -5,6 +5,17 @@
 
       <div class="top-utility-links">
         <router-link to="/sitemap" class="access-link" title="網站導覽">網站導覽</router-link>
+           <footer v-if="isFrontPage" class="footer-accessibility">
+  <a href="https://accessibility.moda.gov.tw/Applications/Detail?category=20260428134917" 
+     title="無障礙網站 (另開新視窗)" 
+     target="_blank">
+    <img src="../src/assets/image/accessibilIty.png" 
+         border="0" 
+         width="88" 
+         height="31" 
+         alt="通過AA無障礙網頁檢測" />
+  </a>
+</footer>
       </div>
     </nav>
     <div v-if="isFrontPage && isWrongOrientation" class="orientation-lock-overlay">
@@ -34,6 +45,7 @@
         <a href="/trial-hall">試煉大廳</a>
       </nav>
     </main>
+ 
   </div>
 </template>
 
@@ -163,6 +175,8 @@ export default {
 <style lang="scss">
 // @import '~vue-multiselect/dist/vue-multiselect.min.css';
 $bg-path: "~@/assets/image/bg.png";
+
+
 
 :focus-visible {
   outline: 3px solid #0056b3 !important; 
@@ -631,6 +645,8 @@ button {
   pointer-events: none;
 
   .top-utility-links {
+    display: flex;
+    gap: 0 10px;
     pointer-events: auto;
   }
 
