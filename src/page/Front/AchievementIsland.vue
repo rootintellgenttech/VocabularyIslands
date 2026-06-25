@@ -108,7 +108,7 @@ export default {
         { id: 3, title: '月度冠軍', desc: '連續登入30天', icon: 'fa-solid fa-trophy', target: 30, category: 'attendance' },
         { id: 4, title: '學而時習之', desc: '累計簽到達60天', icon: 'fa-solid fa-calendar', target: 60, category: 'attendance' },
         { id: 5, title: '勤學學霸', desc: '累計簽到達90天', icon: 'fa-solid fa-book', target: 90, category: 'attendance' },
-        { id: 6, title: '字母探險者', desc: '完成ABC字母島關卡\n獲得 65 顆星星', icon: 'fa-brands fa-fort-awesome', target: 65, category: 'stars', islandKey: 'ABC啟航島' },
+        { id: 6, title: '字母探險者', desc: '完成ABC字母島關卡\n獲得 65 顆星星', icon: 'fa-brands fa-fort-awesome', target: 65, category: 'stars_multi', islandKeys: ['ABC啟航島', 'ABC 總復習'] },
         { id: 7, title: '300字霸總', desc: '完成300字島所有關卡\n獲得 180 顆星星', icon: 'fa-solid fa-user-tie', target: 180, category: 'stars', islandKey: '300字島' },
         { id: 8, title: '初階小英雄', desc: '完成小英雄大本營所有\n獲得 30 顆星星', icon: 'fa-solid fa-shield-halved', target: 30, category: 'stars', islandKey: '小英雄大本營' },
         { id: 9, title: '聽力小老師', desc: '完成國小聽力海灣所有\n獲得 30 顆星星', icon: 'fa-solid fa-ear-deaf', target: 30, category: 'stars', islandKey: '國小聽力海灣' },
@@ -135,12 +135,15 @@ export default {
     processedAchievements() {
       return this.achievements.map(item => {
         let currentVal = 0;
+
         if (item.category === 'attendance') {
           currentVal = this.studentStats.attendance_days || 0;
         } else if (item.category === 'stars') {
           currentVal = this.studentStats.island_stars[item.islandKey] || 0;
         } else if (item.category === 'stars_all') {
           currentVal = item.includes.reduce((acc, key) => acc + (this.studentStats.island_stars[key] || 0), 0);
+        } else if (item.category === 'stars_multi') {
+          currentVal = item.islandKeys.reduce((acc, key) => acc + (this.studentStats.island_stars[key] || 0), 0);
         }
 
         const canClaim = !item.isCompleted && currentVal >= item.target;

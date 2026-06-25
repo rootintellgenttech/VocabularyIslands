@@ -143,9 +143,10 @@ export default {
 
 .islands-scroll-container {
     width: 100%;
-    height: 600px;
+    height: 650px;
     overflow: hidden;
     position: relative;
+    padding-right: 5%;
 }
 
 .island-map-container {

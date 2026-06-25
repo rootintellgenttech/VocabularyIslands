@@ -241,17 +241,11 @@ export default {
     }
   },
   methods: {
-    initFilterSettings() {
-      if (this.userRole === 'school_admin') {
-        this.selectedClasses = [this.classOptions[0]];
-      } else if (this.userRole === 'union_leader') {
-        this.schoolOptions = [
-          { id: '成功國小', name: '成功國小' },
-          { id: '科學國小', name: '科學國小' }
-        ];
-        this.selectedSchools = ['成功國小'];
-      }
-    },
+ initFilterSettings() {
+  if (this.userRole === 'school_admin') {
+    this.selectedClasses = [this.classOptions[0]];
+  }
+},
     exportFullTable() {
       const reportTitle = `${this.examName} - 成績分析報表`;
       const data = this.schoolResultData;
@@ -569,12 +563,14 @@ export default {
         return true;
       };
 
-      this.schoolOptions = (leagueStats.schools || [])
-        .filter(s => filterByKeyword(s.school_name))
-        .map(s => ({
-          id: s.school_name,
-          name: (s.school_name || "").replace(/^.*?區/, '')
-        }));
+  this.schoolOptions = (leagueStats.schools || [])
+    .filter(s => filterByKeyword(s.school_name))
+    .map(s => ({
+      id: s.school_name,
+      name: s.school_name.replace(/^.*?區/, '')
+    }));
+
+  this.selectedSchools = this.schoolOptions.map(s => s.id);
 
       this.selectedSchools = (leagueStats.schools || [])
         .filter(s => filterByKeyword(s.school_name))
