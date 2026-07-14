@@ -7,8 +7,8 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
-  "overrides": {
-    "cross-spawn": "^7.0.3",
+"overrides": {
+"cross-spawn": "^7.0.3",
     "serialize-javascript": "^6.0.2",
     "postcss": "^8.4.31"
   },
