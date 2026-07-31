@@ -34,16 +34,17 @@
                                     <span class="progress-count">{{ currentQuestionIndex }} / {{ maxQuestions }}</span>
                                 </div>
                             </div>
-<div class="md-progress">
-    <img :key="animationKey" :src="tempAvatar" alt="Role" class="side-role-img mobile-img">
-                            <div class="timer-bar-wrap-sm">
-                                <el-progress :text-inside="true" :stroke-width="26" :percentage="timerPercentage"
-                                    :format="formatTimerText" :status="questionTimeLeft <= 5 ? 'exception' : 'success'"
-                                    class="timer-progress">
-                                </el-progress>
+                            <div class="md-progress">
+                                <img :key="animationKey" :src="tempAvatar" alt="Role" class="side-role-img mobile-img">
+                                <div class="timer-bar-wrap-sm">
+                                    <el-progress :text-inside="true" :stroke-width="26" :percentage="timerPercentage"
+                                        :format="formatTimerText"
+                                        :status="questionTimeLeft <= 5 ? 'exception' : 'success'"
+                                        class="timer-progress">
+                                    </el-progress>
+                                </div>
                             </div>
-</div>
-                            
+
                             <div class="question-content">
                                 <div class="question-wrap">
                                     <p class="question-title context-fill-title">
@@ -192,21 +193,25 @@ export default {
             try {
                 let payload = {};
 
-                //定義需要「全島抓題」的特殊標籤清單
-                const fullIslandLabels = ['800字複習', '1200字總複習', '會考大殿堂-1', '會考大殿堂-2'];
+                // 定義需要「全島抓題」的特殊標籤清單
+                const fullIslandLabels = ['300字複習', '800字複習', '1200字總複習', '會考大殿堂-1', '會考大殿堂-2'];
 
                 // 判斷當前標籤是否在清單內
                 if (fullIslandLabels.includes(this.stageName)) {
-                    console.log(`進入會考大殿堂特殊複習模式: ${this.stageName}`);
+                    console.log(`進入特殊全島複習模式: ${this.stageName}`);
+
+                    // 判斷如果是 300字複習，指定 "300字島"；否則預設 "1200字島"
+                    const targetIsland = this.stageName === '300字複習' ? '300字島' : '1200字島';
+
                     payload = {
-                        "島嶼": "1200字島",   // 強制指定 1200字島 (包含所有國中題)
-                        "題型": "克漏字",      // 固定題型
+                        "島嶼": targetIsland,   // 動態指定島嶼
+                        "題型": "克漏字",       // 固定題型
                         "題數": 20,
                         "include_answer": true
                     };
                 } else {
-                    //  一般關卡 (霧靄之境、永恆圖書館等) 
-                    console.log(`進入會考大殿堂一般單元模式: ${this.stageName}`);
+                    // 一般單元
+                    console.log(`進入一般單元模式: ${this.stageName}`);
                     payload = {
                         "單元": this.stageName,
                         "題型": "克漏字",
@@ -220,7 +225,6 @@ export default {
                 const res = await api.post('/questionbank/generate/', payload);
                 let apiData = res.data;
 
-                // API 已經指定克漏字，且後端會直接回傳正確數據
                 // 隨機抽 20 題
                 const targetCount = 20;
                 apiData = apiData.sort(() => Math.random() - 0.5).slice(0, targetCount);
@@ -228,7 +232,7 @@ export default {
                 this.maxQuestions = apiData.length;
                 this.questionsList = apiData.map(q => ({
                     id: q.id,
-                    // 處理克漏字空格切割邏輯
+                    // 處理克漏字空格切割
                     questionParts: q.question_text.split(/(_______)/g),
                     correctAnswer: q.answer,
                     explanation: q.explanation || '無題解',
@@ -653,9 +657,11 @@ export default {
 
 @media (orientation: landscape) and (min-width: 768px) and (max-width: 1366px) {
 
-    .hero-quiz-page{
+    .hero-quiz-page {
         margin-top: 24px;
-        .main-card .question-content .context-fill-title,.question-wrap{
+
+        .main-card .question-content .context-fill-title,
+        .question-wrap {
             margin: 0;
         }
     }
@@ -672,30 +678,32 @@ export default {
     .side-role-img.desktop-img {
         display: none !important;
     }
-.md-progress{
-  @include flex-center;
-  width: 100%;
-  justify-content: center;
-  gap: 0 16px;
-}
+
+    .md-progress {
+        @include flex-center;
+        width: 100%;
+        justify-content: center;
+        gap: 0 16px;
+    }
+
     .side-role-img.mobile-img {
         display: block !important;
         width: 120px;
     }
 
     .timer-bar-wrap-sm {
-    display: block;
-    width: 40%
-}
+        display: block;
+        width: 40%
+    }
 
     .main-card {
         margin: auto;
         max-width: 850px;
     }
 
-    .question-content{
-     padding-top: 0 !important;
-}
+    .question-content {
+        padding-top: 0 !important;
+    }
 }
 
 @media (orientation: landscape) and (max-height: 1199.98px) and (pointer: coarse) {
@@ -724,9 +732,10 @@ export default {
 
 
 @media (orientation: landscape) and (max-height: 767.98px) and (pointer: coarse) {
-    .hero-quiz-page{
+    .hero-quiz-page {
         height: unset;
     }
+
     .quiz-container-wide .el-row--flex.is-align-middle {
         justify-self: center;
     }

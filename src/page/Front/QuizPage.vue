@@ -266,20 +266,33 @@ export default {
                 // =========================================================
                 // 邏輯分流 B：300/800/1200 複習模式 (特定複習單元)
                 // =========================================================
+                // =========================================================
+                // 邏輯分流 B：300/800/1200 複習模式 (特定複習單元)
+                // =========================================================
                 else if (isReviewMode) {
                     console.log('執行複習模式');
                     sliceCount = 20;
-                    const islandLabels = ['300字複習', '300單字島', '800字複習', '800單字島', '1200字複習', '1200單字島', '超級總複習', '1200單字複習'];
-                    let p1 = { "題數": 10, "題型": "英翻中", "include_answer": true };
-                    let p2 = { "題數": 10, "題型": "中翻英", "include_answer": true };
 
-                    if (islandLabels.includes(this.stageLabel)) {
-                        let targetIsland = this.stageLabel.includes('800') ? "800字島" : (this.stageLabel.includes('1200') || this.stageLabel.includes('超級') ? "1200字島" : "300字島");
-                        p1["島嶼"] = targetIsland; p2["島嶼"] = targetIsland;
+                    // 智慧判斷究竟是哪一個島嶼的複習
+                    let targetIsland = "300字島";
+                    if (this.stageLabel.includes('800') || this.unitName.includes('800')) {
+                        targetIsland = "800字島";
+                    } else if (this.stageLabel.includes('1200') || this.unitName.includes('1200') || this.stageLabel.includes('超級')) {
+                        targetIsland = "1200字島";
+                    } else if (this.stageLabel.includes('300') || this.unitName.includes('300')) {
+                        targetIsland = "300字島";
                     } else {
-                        p1["單元"] = this.stageLabel; p2["單元"] = this.stageLabel;
+                        // 如果標籤裡都沒有寫字，根據當前的 wordCount 來決定
+                        targetIsland = this.wordCount === '1200' ? '1200字島' : (this.wordCount === '800' ? '800字島' : '300字島');
                     }
-                    const [res1, res2] = await Promise.all([api.post('/questionbank/generate/', p1), api.post('/questionbank/generate/', p2)]);
+
+                    let p1 = { "島嶼": targetIsland, "題數": 10, "題型": "英翻中", "include_answer": true };
+                    let p2 = { "島嶼": targetIsland, "題數": 10, "題型": "中翻英", "include_answer": true };
+
+                    const [res1, res2] = await Promise.all([
+                        api.post('/questionbank/generate/', p1),
+                        api.post('/questionbank/generate/', p2)
+                    ]);
                     apiData = [...res1.data, ...res2.data];
                 }
 
@@ -766,9 +779,9 @@ i {
 }
 
 @media (orientation: landscape) and (max-height: 74.9988rem) and (pointer: coarse) {
-  .question-content .question-wrap .question-title{
-    font-size: 5rem;
-  }
+    .question-content .question-wrap .question-title {
+        font-size: 5rem;
+    }
 }
 
 

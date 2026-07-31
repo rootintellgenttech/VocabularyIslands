@@ -5,17 +5,12 @@
 
       <div class="top-utility-links">
         <router-link to="/sitemap" class="access-link" title="網站導覽">網站導覽</router-link>
-           <footer v-if="isFrontPage" class="footer-accessibility">
-  <a href="https://accessibility.moda.gov.tw/Applications/Detail?category=20260428134917" 
-     title="無障礙網站 (另開新視窗)" 
-     target="_blank">
-    <img src="../src/assets/image/accessibilIty.png" 
-         border="0" 
-         width="88" 
-         height="31" 
-         alt="通過AA無障礙網頁檢測" />
-  </a>
-</footer>
+        <footer v-if="isFrontPage" class="footer-accessibility">
+          <a href="https://accessibility.moda.gov.tw/Applications/Detail?category=20260428134917" title="無障礙網站 (另開新視窗)"
+            target="_blank">
+            <img src="../src/assets/image/accessibilIty.png" border="0" width="88" height="31" alt="通過AA無障礙網頁檢測" />
+          </a>
+        </footer>
       </div>
     </nav>
     <div v-if="isFrontPage && isWrongOrientation" class="orientation-lock-overlay">
@@ -45,7 +40,7 @@
         <a href="/trial-hall">試煉大廳</a>
       </nav>
     </main>
- 
+
   </div>
 </template>
 
@@ -100,7 +95,7 @@ export default {
       if (mainContent) {
         mainContent.focus();
         // 確保某些瀏覽器在 focus 後畫面會正確滑動
-        mainContent.scrollIntoView({ behavior: 'smooth' }); 
+        mainContent.scrollIntoView({ behavior: 'smooth' });
       }
     },
     checkOrientation() {
@@ -179,8 +174,8 @@ $bg-path: "~@/assets/image/bg.png";
 
 
 :focus-visible {
-  outline: 3px solid #0056b3 !important; 
-  outline-offset: 2px; 
+  outline: 3px solid #0056b3 !important;
+  outline-offset: 2px;
   border-radius: 4px;
   transition: outline 0.1s ease-in-out;
 }
@@ -377,7 +372,7 @@ html {
   margin-top: 7%;
 
   .island-card img {
-    width: 18.75rem;
+    width: 17.75rem !important;
     height: 100%;
   }
 }

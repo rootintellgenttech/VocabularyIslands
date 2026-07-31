@@ -285,6 +285,7 @@ export default {
     height: 650px;
     overflow: hidden;
     position: relative;
+    padding-right: 2%;
 }
 
 .island-map-container {
@@ -292,7 +293,7 @@ export default {
     flex-wrap: nowrap;
     width: max-content;
     align-items: center;
-    padding: 2rem 4rem;
+    padding: 3rem 4rem 1rem 0rem;
     gap: 4rem;
 }
 
