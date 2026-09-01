@@ -567,8 +567,16 @@ button {
   box-shadow: 0 .375rem .625rem -0.125rem rgba(0, 0, 0, 0.15) !important
 }
 
+@font-face {
+  font-family: 'Inter';
+  src: url('../public/fonts/Inter.ttc') format('truetype-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 #app {
-  font-family: "Inter", sans-serif !important;
+  font-family: 'Inter', sans-serif;
   min-height: 100vh;
   overflow: hidden;
 }
