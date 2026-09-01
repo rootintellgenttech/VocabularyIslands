@@ -11,7 +11,7 @@
     "cross-spawn": "^7.0.3",
     "serialize-javascript": "^6.0.2",
     "postcss": "^8.4.31",
-    "lodash": "^4.17.23" 
+    "lodash": "^4.18.1" 
   },
   "dependencies": {
     "@lucky-canvas/vue": "^0.1.11",
