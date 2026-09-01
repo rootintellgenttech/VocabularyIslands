@@ -2,9 +2,9 @@ import Vue from 'vue';
 import App from './App.vue';
 import store from './store';
 import router from './router';
-import ElementUI from 'element-ui';
-import 'element-ui/lib/theme-chalk/index.css';
-import locale from 'element-ui/lib/locale/lang/zh-TW';
+import ElementUI from 'element-ui-ce';
+import 'element-ui-ce/lib/theme-chalk/index.css';
+import locale from 'element-ui-ce/lib/locale/lang/zh-TW';
 import VueLuckyCanvas from '@lucky-canvas/vue'
 import VueApexCharts from 'vue-apexcharts'
 import vueCustomScrollbar from 'vue-custom-scrollbar'
@@ -34,7 +34,6 @@ Vue.component('apexchart', VueApexCharts)
 Vue.component('vue-custom-scrollbar', vueCustomScrollbar);
 Vue.config.productionTip = false;
 
-// 4. 初始化 Vue
 new Vue({
   router,
   store,
