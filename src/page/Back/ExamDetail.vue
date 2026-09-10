@@ -246,7 +246,7 @@ export default {
     this.selectedClasses = [this.classOptions[0]];
   }
 },
-    exportFullTable() {
+   exportFullTable() {
       const reportTitle = `${this.examName} - 成績分析報表`;
       const data = this.schoolResultData;
       const role = this.userRole;
@@ -347,7 +347,7 @@ export default {
     </head>
     <body>
       <div class="no-print">
-        <button class="btn-print" onclick="window.print()">確認列印 / 存為 PDF</button>
+        <button id="printBtn" class="btn-print">確認列印 / 存為 PDF</button>
       </div>
       <div class="header-box">
         <h2>${reportTitle}</h2>
@@ -372,6 +372,14 @@ export default {
     </body>
     </html>
   `);
+
+      // 綁定按鈕事件 
+      const printBtn = printWindow.document.getElementById('printBtn');
+      if (printBtn) {
+        printBtn.addEventListener('click', () => {
+          printWindow.print();
+        });
+      }
 
       printWindow.document.close();
     },

@@ -413,7 +413,7 @@ export default {
             const property = column['property'];
             return row[property] === value;
         },
-        exportFullTable(containerId) {
+     exportFullTable(containerId) {
             const reportTitle = '競技島嶼參與人數與總積分報表';
             const data = this.islandTableData;
             const role = this.userRole;
@@ -474,67 +474,74 @@ export default {
 
             const firstColLabel = isGlobal ? '名稱' : (role === 'school_admin' ? '班級' : '學校名稱');
 
+            // 寫入 HTML
             printWindow.document.write(`
-        <html>
-        <head>
-            <title>${reportTitle}</title>
-            <style>
-                /* 強制背景色彩與打印優化 */
-                * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-                body { font-family: "Microsoft JhengHei", sans-serif; padding: 20px; color: #333; line-height: 1.5; }
-                .report-header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #2A9D8F; padding-bottom: 10px; }
-                .report-header h2 { color: #2A9D8F; margin: 0; }
-                .info-bar { display: flex; justify-content: space-between; font-size: 13px; color: #666; margin: 10px 0; }
-                
-                table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-                th, td { border: 1px solid #ddd; padding: 10px 8px; text-align: center; font-size: 13px; }
-                th { background-color: #f8f9fa; font-weight: bold; }
+                <html>
+                <head>
+                    <title>${reportTitle}</title>
+                    <style>
+                        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                        body { font-family: "Microsoft JhengHei", sans-serif; padding: 20px; color: #333; line-height: 1.5; }
+                        .report-header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #2A9D8F; padding-bottom: 10px; }
+                        .report-header h2 { color: #2A9D8F; margin: 0; }
+                        .info-bar { display: flex; justify-content: space-between; font-size: 13px; color: #666; margin: 10px 0; }
+                        
+                        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+                        th, td { border: 1px solid #ddd; padding: 10px 8px; text-align: center; font-size: 13px; }
+                        th { background-color: #f8f9fa; font-weight: bold; }
 
-                /* 樣式切換 */
-                .league-row td { 
-                    background-color: #2A9D8F !important; color: black; 
-                    font-weight: bold; font-size: 16px;
-                }
-                .summary-header td { 
-                    background-color: #E9F5F4 !important; font-weight: bold; color: #264653 !important;
-                }
-                .detail-row td { border-bottom: 1px solid #eee; }
+                        .league-row td { 
+                            background-color: #2A9D8F !important; color: black; 
+                            font-weight: bold; font-size: 16px;
+                        }
+                        .summary-header td { 
+                            background-color: #E9F5F4 !important; font-weight: bold; color: #264653 !important;
+                        }
+                        .detail-row td { border-bottom: 1px solid #eee; }
 
-                .print-btn {
-                    background: #2A9D8F; color: white; border: none; padding: 10px 20px;
-                    border-radius: 4px; cursor: pointer; margin-bottom: 20px; font-weight: bold;
-                }
-                @media print { .no-print { display: none !important; } }
-            </style>
-        </head>
-        <body>
-            <div class="no-print">
-                <button class="print-btn" onclick="window.print()">確認列印 / 存為 PDF</button>
-            </div>
-            <div class="report-header">
-                <h2>${reportTitle}</h2>
-            </div>
-            <div class="info-bar">
-                <span>身分：${role === 'global_leader' ? '總召集人' : (role === 'union_leader' ? '聯盟召集人' : '學校管理員')}</span>
-                <span>產生時間：${new Date().toLocaleString()}</span>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 35%;">${firstColLabel}</th>
-                        <th>學生總數</th>
-                        <th>參與人數</th>
-                        <th>參與率</th>
-                        <th>總積分</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${tableHtml}
-                </tbody>
-            </table>
-        </body>
-        </html>
-    `);
+                        .print-btn {
+                            background: #2A9D8F; color: white; border: none; padding: 10px 20px;
+                            border-radius: 4px; cursor: pointer; margin-bottom: 20px; font-weight: bold;
+                        }
+                        @media print { .no-print { display: none !important; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="no-print">
+                        <button id="printBtn" class="print-btn">確認列印 / 存為 PDF</button>
+                    </div>
+                    <div class="report-header">
+                        <h2>${reportTitle}</h2>
+                    </div>
+                    <div class="info-bar">
+                        <span>身分：${role === 'global_leader' ? '總召集人' : (role === 'union_leader' ? '聯盟召集人' : '學校管理員')}</span>
+                        <span>產生時間：${new Date().toLocaleString()}</span>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 35%;">${firstColLabel}</th>
+                                <th>學生總數</th>
+                                <th>參與人數</th>
+                                <th>參與率</th>
+                                <th>總積分</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableHtml}
+                        </tbody>
+                    </table>
+                </body>
+                </html>
+            `);
+
+            // 從外部（主視窗）直接抓取新視窗的按鈕並綁定事件，繞過 CSP 限制
+            const printBtn = printWindow.document.getElementById('printBtn');
+            if (printBtn) {
+                printBtn.addEventListener('click', () => {
+                    printWindow.print();
+                });
+            }
 
             printWindow.document.close();
         },

@@ -197,7 +197,7 @@ export default {
         return { ...exam, duration: `${totalMinutes}分鐘` };
       });
     },
-    exportFullTable(containerId) {
+   exportFullTable(containerId) {
       // 1. 取得當前選中的試卷資訊
       const currentExam = this.rawExamList.find(e => e.id === this.selectedExamId);
       const reportTitle = currentExam ? `${currentExam.name} - 考試概況報表` : '試煉殿堂考試概況報表';
@@ -294,7 +294,7 @@ export default {
     </head>
     <body>
       <div class="no-print">
-        <button class="print-btn" onclick="window.print()">確認列印 / 存為 PDF</button>
+        <button id="printBtn" class="print-btn">確認列印 / 存為 PDF</button>
       </div>
       <div class="header">
         <h2>${reportTitle}</h2>
@@ -318,6 +318,14 @@ export default {
     </body>
     </html>
   `);
+
+      // 綁定按鈕事件
+      const printBtn = printWindow.document.getElementById('printBtn');
+      if (printBtn) {
+        printBtn.addEventListener('click', () => {
+          printWindow.print();
+        });
+      }
 
       printWindow.document.close();
     },
