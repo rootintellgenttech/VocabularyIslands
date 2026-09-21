@@ -13,6 +13,21 @@ import html2canvas from 'html2canvas';
 
 Vue.prototype.$html2canvas = html2canvas;
 
+// 讀取伺服器注入的 CSP nonce,設為 ApexCharts 全域預設
+const cspNonce = document
+  .querySelector('meta[name="csp-nonce"]')
+  ?.getAttribute('content');
+
+if (cspNonce) {
+  window.Apex = {
+    ...(window.Apex || {}),
+    chart: {
+      ...(window.Apex?.chart || {}),
+      nonce: cspNonce
+    }
+  };
+}
+
 const customLocale = {
   ...locale,
   el: {
