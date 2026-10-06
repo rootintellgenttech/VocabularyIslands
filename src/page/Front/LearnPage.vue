@@ -6,32 +6,33 @@
         </div>
 
         <div v-else-if="!isFinished" class="learning-container">
-            <Tinder ref="tinder" key-name="id" :queue.sync="queue" :offset-y="10" @submit="onSubmit">
-                <template slot-scope="scope">
+            <div class="swipe-stack">
+                <div v-for="(card, index) in visibleCards" :key="card.id" class="swipe-card"
+                    :class="{ 'is-top': index === 0, 'is-dragging': isDragging }" :style="cardStyle(index)"
+                    @pointerdown="index === 0 && onPointerDown($event)"
+                    @pointermove="index === 0 && onPointerMove($event)" @pointerup="index === 0 && onPointerUp($event)"
+                    @pointercancel="index === 0 && onPointerUp($event)">
                     <div class="card-return-text" tabindex="0" role="button" aria-label="返回上一頁" @click="goBack"
                         @keydown.enter.prevent="goBack" @keydown.space.prevent="goBack">
                         <i class="fas fa-angle-left"></i> 返回
                     </div>
+
                     <div class="content-display">
                         <div class="question-wrap">
-                            <div v-if="scope.data.audioSrc" class="audio-trigger" tabindex="0" role="button"
-                                aria-label="播放發音" @click.stop="playAudio(scope.data)"
-                                @keydown.enter.stop.prevent="playAudio(scope.data)"
-                                @keydown.space.stop.prevent="playAudio(scope.data)">
+                            <div v-if="card.audioSrc" class="audio-trigger" tabindex="0" role="button" aria-label="播放發音"
+                                @click.stop="playAudio(card)" @keydown.enter.stop.prevent="playAudio(card)"
+                                @keydown.space.stop.prevent="playAudio(card)">
                                 <i class="fas fa-volume-up"></i>
                             </div>
-                            <h1 v-if="!scope.data.isImageMode" class="card-word-title">{{ scope.data.mainText }}</h1>
-
-                            <img v-if="scope.data.isImageMode" :src="getImageUrl(scope.data.mainText)"
-                                class="card-image" :alt="`${scope.data.mainText} 的學習圖片`" />
+                            <h1 v-if="!card.isImageMode" class="card-word-title">{{ card.mainText }}</h1>
+                            <img v-if="card.isImageMode" :src="getImageUrl(card.mainText)" class="card-image"
+                                :alt="`${card.mainText} 的學習圖片`" />
                         </div>
-
-                        <div v-if="scope.data.subText" class="word-translation">
-                            {{ scope.data.subText }}
-                        </div>
+                        <div v-if="card.subText" class="word-translation">{{ card.subText }}</div>
                     </div>
-                </template>
-            </Tinder>
+                </div>
+            </div>
+
 
             <div class="btns">
                 <p class="remember-btn" tabindex="0" role="button" @click="decide('pass')"
@@ -62,12 +63,10 @@
 </template>
 
 <script>
-import Tinder from "vue-tinder";
 import api from '@/config/api';
 
 export default {
     name: 'LearnPage',
-    components: { Tinder },
     props: {
         unitId: { type: String, required: true },
         level: { type: String, default: 'primary' },
@@ -82,12 +81,128 @@ export default {
             queue: [],
             isFinished: false,
             correctAvatarPath: require('@/assets/image/elementary/avatar.png'),
+            dragX: 0,
+            dragY: 0,
+            startX: 0,
+            startY: 0,
+            isDragging: false,
+            isLeaving: false,
+            threshold: 100,
         };
     },
     mounted() {
         this.fetchLearningData();
+        window.addEventListener('keydown', this.onKeydown);
+    },
+    beforeDestroy() {
+        window.removeEventListener('keydown', this.onKeydown);
+        window.speechSynthesis.cancel(); // 順便離開頁面時停止朗讀
+    },
+    computed: {
+        // 只渲染最上面兩張，效能好
+        visibleCards() {
+            return this.queue.slice(0, 2);
+        },
+        progress() {
+            return Math.min(Math.abs(this.dragX) / this.threshold, 1);
+        },
+        rememberOpacity() {
+            return this.dragX > 0 ? this.progress : 0;
+        },
+        passOpacity() {
+            return this.dragX < 0 ? this.progress : 0;
+        },
     },
     methods: {
+        onKeydown(e) {
+            // 載入中、已完成、正在飛出動畫時不處理
+            if (this.isLoading || this.isFinished || this.isLeaving) return;
+
+            // 使用者正在輸入文字時不攔截
+            const tag = e.target && e.target.tagName;
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) return;
+
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                this.decide('pass');
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                this.decide('remember');
+            }
+        },
+        cardStyle(index) {
+            if (index === 0) {
+                const rotate = this.dragX / 20;
+                return {
+                    transform: `translate(${this.dragX}px, ${this.dragY * 0.3}px) rotate(${rotate}deg)`,
+                };
+            }
+            // 後面那張：隨著前面拖動慢慢放大
+            const scale = 0.95 + this.progress * 0.05;
+            const y = 10 - this.progress * 10;
+            return { transform: `translateY(${y}px) scale(${scale})` };
+        },
+
+        onPointerDown(e) {
+            if (this.isLeaving) return;
+            // 點到發音鈕、返回鈕時不要當成拖曳
+            if (e.target.closest('.audio-trigger, .card-return-text')) return;
+            this.isDragging = true;
+            this.startX = e.clientX;
+            this.startY = e.clientY;
+            e.currentTarget.setPointerCapture(e.pointerId);
+        },
+
+        onPointerMove(e) {
+            if (!this.isDragging) return;
+            this.dragX = e.clientX - this.startX;
+            this.dragY = e.clientY - this.startY;
+        },
+
+        onPointerUp(e) {
+            if (!this.isDragging) return;
+            this.isDragging = false;
+            if (e.currentTarget.hasPointerCapture && e.currentTarget.hasPointerCapture(e.pointerId)) {
+                e.currentTarget.releasePointerCapture(e.pointerId);
+            }
+            if (this.dragX > this.threshold) this.complete('remember');
+            else if (this.dragX < -this.threshold) this.complete('pass');
+            else { this.dragX = 0; this.dragY = 0; } // 沒拖夠,彈回去
+        },
+
+        // 飛出動畫 → 移出 queue → 呼叫 onSubmit
+        complete(type) {
+            if (this.isLeaving || this.queue.length === 0) return;
+            this.isLeaving = true;
+            const dir = type === 'remember' ? 1 : -1;
+            this.dragX = dir * (window.innerWidth || 800);
+
+            setTimeout(() => {
+                const item = this.queue.shift();
+                this.dragX = 0;
+                this.dragY = 0;
+                this.isLeaving = false;
+                this.onSubmit({ item, type });
+            }, 300);
+        },
+
+        decide(choice) {
+            this.complete(choice); // 按鈕直接呼叫,取代 this.$refs.tinder.decide
+        },
+
+        onSubmit({ item, type }) {
+            if (type === 'pass') {
+                // 不熟的卡片放回隊尾(改成同步 push,避免最後一張時誤判完成)
+                this.queue.push({ ...item, id: Date.now() + Math.random() });
+            }
+            this.$nextTick(() => {
+                if (this.queue.length === 0) {
+                    this.isFinished = true;
+                } else {
+                    this.playAudio(this.queue[0]);
+                }
+            });
+        },
         goBack() {
             this.$router.push({
                 name: 'LessonDetail',
@@ -211,29 +326,6 @@ export default {
             }
         },
 
-        onSubmit({ item, type }) {
-            // console.log(`卡片: ${item.mainText}, 選擇: ${type}`);
-
-            if (type === 'pass') {
-                const retryItem = { ...item, id: Date.now() + Math.random() };
-                setTimeout(() => {
-                    this.queue.push(retryItem);
-                }, 200);
-            }
-
-            this.$nextTick(() => {
-                if (this.queue.length === 0) {
-                    this.isFinished = true;
-                } else {
-                    // 滑動後，自動播放隊列中的下一張卡片
-                    this.playAudio(this.queue[0]);
-                }
-            });
-        },
-        decide(choice) {
-            this.$refs.tinder.decide(choice);
-        },
-
         handleRestart() {
             this.isFinished = false;
             // 重新抓取資料
@@ -336,18 +428,52 @@ export default {
     }
 }
 
+.key-hint {
+    text-align: center;
+    color: $main-grey-text;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
 .card-return-text {
     @include card-return-text;
 }
 
-.vue-tinder {
+
+.swipe-stack {
+    position: relative;
     margin: 0 auto 32px auto;
     height: 500px;
     min-width: 500px;
     max-width: 800px;
 }
 
+.swipe-card {
+    position: absolute;
+    inset: 0;
+    box-sizing: border-box;
+    padding: 32px 40px;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: pan-y;
+    z-index: 1;
+    transition: transform 0.3s ease;
 
+    &.is-top {
+        z-index: 2;
+        cursor: grab;
+    }
+
+    &.is-dragging {
+        transition: none;
+        cursor: grabbing;
+    }
+}
 .content-display {
     @include main-card-content;
 
@@ -413,6 +539,12 @@ export default {
             width: max-content;
             padding: 1rem;
         }
+    }
+}
+
+@media (pointer: coarse) {
+    .key-hint {
+        display: none;
     }
 }
 </style>
