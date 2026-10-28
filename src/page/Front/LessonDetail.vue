@@ -313,7 +313,10 @@ export default {
                 if (matchedStage) {
                     stars = matchedStage.stars;
                 } else {
-                    const isStrictReview = ['06', '800-06'].includes(this.unitId) || (this.wordCount === '300' && this.unitId === '06');
+               const isStrictReview = ['final', '06', '800-06', '1200-05'].includes(this.currentKey) || 
+                       this.lessonData.name.includes('複習') || 
+                       this.lessonData.name.includes('復習');
+                       
                     if (!isStrictReview) {
                         const matchedUnitAsStage = islandData.units.find(u => u.unit_name === opt.label);
                         if (matchedUnitAsStage) {
