@@ -241,18 +241,22 @@ export default {
     }
   },
   methods: {
- initFilterSettings() {
-  if (this.userRole === 'school_admin') {
-    this.selectedClasses = [this.classOptions[0]];
-  }
-},
-   exportFullTable() {
+    initFilterSettings() {
+      if (this.userRole === 'school_admin') {
+        this.selectedClasses = [this.classOptions[0]];
+      }
+    },
+    exportFullTable() {
       const reportTitle = `${this.examName} - 成績分析報表`;
-      const data = this.schoolResultData;
+      const data = this.schoolResultData || [];
       const role = this.userRole;
       const isGlobal = role === 'global_leader';
 
       const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        this.$message ? this.$message.error('請允許瀏覽器彈出視窗以完成匯出列印') : alert('請允許瀏覽器彈出視窗以完成匯出列印');
+        return;
+      }
 
       let tableHtml = '';
 
@@ -261,13 +265,13 @@ export default {
           // 總召模式：聯盟彙總行
           tableHtml += `
         <tr class="league-row">
-          <td colspan="4">${item.allianceName} (聯盟彙總)</td>
+          <td colspan="4">${item.allianceName || '未命名聯盟'} (聯盟彙總)</td>
         </tr>
         <tr class="summary-header">
-          <td>學校總數: ${item.schoolCount} 間</td>
-          <td>學生總數: ${item.totalStudents}</td>
-          <td>參與人數: ${item.participants}</td>
-          <td style="color: #2A9D8F; font-weight: bold;">平均分數: ${item.avgScore} 分</td>
+          <td>學校總數: ${item.schoolCount || 0} 間</td>
+          <td>學生總數: ${item.totalStudents || 0}</td>
+          <td>參與人數: ${item.participants || 0}</td>
+          <td style="color: #2A9D8F; font-weight: bold;">平均分數: ${item.avgScore || 0} 分</td>
         </tr>
       `;
 
@@ -276,10 +280,10 @@ export default {
             item.schools.forEach(school => {
               tableHtml += `
             <tr class="detail-row">
-              <td style="text-align: left; padding-left: 30px;">└ ${school.school_name}</td>
-              <td>${school.student_total}</td>
-              <td>${school.participants}</td>
-              <td style="font-weight: bold;">${school.avg_score} 分</td>
+              <td style="text-align: left; padding-left: 30px;">└ ${school.school_name || ''}</td>
+              <td>${school.student_total || 0}</td>
+              <td>${school.participants || 0}</td>
+              <td style="font-weight: bold;">${school.avg_score || 0} 分</td>
             </tr>
           `;
             });
@@ -288,14 +292,14 @@ export default {
           // 一般行政/老師模式：平鋪結構 (學校或班級)
           const label = (role === 'school_admin')
             ? `${item.grade}年${item.classroom}班`
-            : item.schoolName;
+            : (item.schoolName || '-');
 
           tableHtml += `
         <tr class="detail-row">
           <td style="text-align: left;">${label}</td>
-          <td>${item.totalStudents}</td>
-          <td>${item.participants}</td>
-          <td style="font-weight: bold; color: #2A9D8F;">${item.avgScore} 分</td>
+          <td>${item.totalStudents || 0}</td>
+          <td>${item.participants || 0}</td>
+          <td style="font-weight: bold; color: #2A9D8F;">${item.avgScore || 0} 分</td>
         </tr>
       `;
         }
@@ -303,46 +307,49 @@ export default {
 
       const firstColLabel = isGlobal ? '名稱' : (role === 'school_admin' ? '班級' : '學校名稱');
 
+      printWindow.document.open();
       printWindow.document.write(`
+    <!DOCTYPE html>
     <html>
     <head>
+      <meta charset="utf-8">
       <title>${reportTitle}</title>
       <style>
-        /* 強制色彩設定 */
-        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
+        body { font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; padding: 24px; color: #333; line-height: 1.5; margin: 0; }
+        .header-box { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #2A9D8F; padding-bottom: 12px; }
+        .header-box h2 { color: #2A9D8F; margin: 0; font-size: 24px; }
+        .info-bar { display: flex; justify-content: space-between; font-size: 13px; color: #666; margin: 12px 0; }
         
-        body { font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; padding: 20px; color: #333; line-height: 1.5; }
-        .header-box { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #2A9D8F; padding-bottom: 10px; }
-        .header-box h2 { color: #2A9D8F; margin: 0; }
-        .info-bar { display: flex; justify-content: space-between; font-size: 13px; color: #666; margin: 10px 0; }
-        
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-top: 8px; }
         th, td { border: 1px solid #ddd; padding: 10px 8px; text-align: center; font-size: 13px; }
-        th { background-color: #f8f9fa; font-weight: bold; }
+        th { background-color: #f8f9fa; font-weight: bold; color: #264653; }
 
-        /* 聯盟行樣式 */
         .league-row td { 
           background-color: #2A9D8F !important; 
+          color: #FFFFFF !important; 
           font-weight: bold; 
-          font-size: 16px;
+          font-size: 15px;
         }
         
-        /* 彙總行樣式 */
         .summary-header td { 
           background-color: #E9F5F4 !important; 
           font-weight: bold; 
           color: #264653 !important;
         }
 
-        /* 明細行樣式 */
         .detail-row td { border-bottom: 1px solid #eee; }
 
         .btn-print { 
-          background: #2A9D8F; color: white; border: none; padding: 8px 16px; 
-          border-radius: 4px; cursor: pointer; margin-bottom: 20px; font-weight: bold;
+          background: #2A9D8F; color: white; border: none; padding: 10px 20px; 
+          border-radius: 6px; cursor: pointer; margin-bottom: 20px; font-weight: bold; font-size: 14px;
         }
+        .btn-print:hover { background: #238276; }
 
-        @media print { .no-print { display: none !important; } }
+        @media print { 
+          .no-print { display: none !important; }
+          body { padding: 0; }
+        }
       </style>
     </head>
     <body>
@@ -372,16 +379,14 @@ export default {
     </body>
     </html>
   `);
+      printWindow.document.close();
 
-      // 綁定按鈕事件 
       const printBtn = printWindow.document.getElementById('printBtn');
       if (printBtn) {
         printBtn.addEventListener('click', () => {
           printWindow.print();
         });
       }
-
-      printWindow.document.close();
     },
     exportClassScore() {
       // 1. 準備數據字串
@@ -571,14 +576,14 @@ export default {
         return true;
       };
 
-  this.schoolOptions = (leagueStats.schools || [])
-    .filter(s => filterByKeyword(s.school_name))
-    .map(s => ({
-      id: s.school_name,
-      name: s.school_name.replace(/^.*?區/, '')
-    }));
+      this.schoolOptions = (leagueStats.schools || [])
+        .filter(s => filterByKeyword(s.school_name))
+        .map(s => ({
+          id: s.school_name,
+          name: s.school_name.replace(/^.*?區/, '')
+        }));
 
-  this.selectedSchools = this.schoolOptions.map(s => s.id);
+      // this.selectedSchools = this.schoolOptions.map(s => s.id);
 
       this.selectedSchools = (leagueStats.schools || [])
         .filter(s => filterByKeyword(s.school_name))
