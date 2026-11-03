@@ -416,53 +416,59 @@ export default {
         exportFullTable(type) {
             const isLearn = type === 'export-learn';
             const reportTitle = isLearn ? '學習成效比較報表' : '試煉殿堂考試概況報表';
+
             // 依據點擊的按鈕動態選擇 learningData 或 examData
             const data = isLearn ? this.learningData : this.examData;
             const role = this.userRole;
             const isGlobal = role === 'global_leader';
 
             if (!data || data.length === 0) {
-                this.$message?.warning('目前無可匯出的資料');
+                this.$message ? this.$message.warning('目前無可匯出的資料') : alert('目前無可匯出的資料');
                 return;
             }
 
             const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                this.$message ? this.$message.error('請允許瀏覽器彈出視窗以完成匯出列印') : alert('請允許瀏覽器彈出視窗以完成匯出列印');
+                return;
+            }
+
             let tableHtml = '';
 
             data.forEach(item => {
                 if (isGlobal) {
                     // 總召模式：聯盟彙總列
                     tableHtml += `
-                    <tr class="league-row">
-                        <td colspan="4">${item.alliance || ''} (聯盟彙總)</td>
-                    </tr>
-                    <tr class="summary-header">
-                        <td>學校總數: ${(item.schools || []).length} 間</td>
-                        <td>學生總數: ${item.studentCount ?? 0}</td>
-                        <td>${isLearn ? '平均登入率: ' + (item.loginRate || '0%') : '考試總完成人數: ' + (item.examCompleteCount ?? 0)}</td>
-                        <td style="color: #2A9D8F; font-weight: bold;">
-                            ${isLearn ? '平均完成率: ' + (item.completionRate || '0%') : ''}
-                        </td>
-                    </tr>
-                `;
+                <tr class="league-row">
+                    <td colspan="4">${item.alliance || ''} (聯盟彙總)</td>
+                </tr>
+                <tr class="summary-header">
+                    <td>學校總數: ${(item.schools || []).length} 間</td>
+                    <td>學生總數: ${item.studentCount ?? 0}</td>
+                    <td>${isLearn ? '平均登入率: ' + (item.loginRate || '0%') : '考試總完成人數: ' + (item.examCompleteCount ?? 0)}</td>
+                    <td style="color: #2A9D8F; font-weight: bold;">
+                        ${isLearn ? '平均完成率: ' + (item.completionRate || '0%') : ''}
+                    </td>
+                </tr>
+            `;
 
                     // 下屬學校明細
                     if (item.schools && item.schools.length > 0) {
                         item.schools.forEach(school => {
                             const examRate = school.studentCount > 0
-                                ? Math.round((school.examCompleteCount / school.studentCount) * 100) + '%'
+                                ? Math.round(((school.examCompleteCount || 0) / school.studentCount) * 100) + '%'
                                 : '0%';
 
                             tableHtml += `
-                            <tr class="detail-row">
-                                <td style="text-align: left; padding-left: 30px;">└ ${school.schoolName || ''}</td>
-                                <td>${school.studentCount ?? 0}</td>
-                                <td>${isLearn ? (school.loginRate || '0%') : (school.examCompleteCount ?? 0)}</td>
-                                <td style="font-weight: bold;">
-                                    ${isLearn ? (school.completionRate || '0%') : examRate}
-                                </td>
-                            </tr>
-                        `;
+                        <tr class="detail-row">
+                            <td style="text-align: left; padding-left: 30px;">└ ${school.schoolName || ''}</td>
+                            <td>${school.studentCount ?? 0}</td>
+                            <td>${isLearn ? (school.loginRate || '0%') : (school.examCompleteCount ?? 0)}</td>
+                            <td style="font-weight: bold;">
+                                ${isLearn ? (school.completionRate || '0%') : examRate}
+                            </td>
+                        </tr>
+                    `;
                         });
                     }
                 } else {
@@ -472,19 +478,19 @@ export default {
                         : (item.schoolName || '');
 
                     const examRate = item.studentCount > 0
-                        ? Math.round((item.examCompleteCount / item.studentCount) * 100) + '%'
+                        ? Math.round(((item.examCompleteCount || 0) / item.studentCount) * 100) + '%'
                         : '0%';
 
                     tableHtml += `
-                    <tr class="detail-row">
-                        <td style="text-align: left;">${label}</td>
-                        <td>${item.studentCount ?? 0}</td>
-                        <td>${isLearn ? (item.loginRate || '0%') : (item.examCompleteCount ?? 0)}</td>
-                        <td style="font-weight: bold; color: #2A9D8F;">
-                            ${isLearn ? (item.completionRate || '0%') : examRate}
-                        </td>
-                    </tr>
-                `;
+                <tr class="detail-row">
+                    <td style="text-align: left;">${label || '-'}</td>
+                    <td>${item.studentCount ?? 0}</td>
+                    <td>${isLearn ? (item.loginRate || '0%') : (item.examCompleteCount ?? 0)}</td>
+                    <td style="font-weight: bold; color: #2A9D8F;">
+                        ${isLearn ? (item.completionRate || '0%') : examRate}
+                    </td>
+                </tr>
+            `;
                 }
             });
 
@@ -493,53 +499,60 @@ export default {
             const thirdColLabel = isLearn ? (isGlobal ? '平均登入率' : '登入率') : '完成人數';
             const fourthColLabel = isLearn ? '完成率' : '考試完成率';
 
+            printWindow.document.open();
             printWindow.document.write(`
-            <html>
-            <head>
-                <title>${reportTitle}</title>
-                <style>
-                    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-                    body { font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; padding: 20px; color: #333; line-height: 1.5; }
-                    .header-box { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #2A9D8F; padding-bottom: 10px; }
-                    .header-box h2 { color: #2A9D8F; margin: 0; }
-                    .info-bar { display: flex; justify-content: space-between; font-size: 13px; color: #666; margin: 10px 0; }
-                    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-                    th, td { border: 1px solid #ddd; padding: 10px 8px; text-align: center; font-size: 13px; }
-                    th { background-color: #f8f9fa; font-weight: bold; }
-                    .league-row td { background-color: #2A9D8F !important; font-weight: bold; font-size: 15px; color: #fff; text-align: left; padding-left: 12px; }
-                    .summary-header td { background-color: #E9F5F4 !important; font-weight: bold; color: #264653 !important; }
-                    .detail-row td { border-bottom: 1px solid #eee; }
-                    .btn-print { background: #2A9D8F; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-bottom: 20px; font-weight: bold; }
-                    @media print { .no-print { display: none !important; } }
-                </style>
-            </head>
-            <body>
-                <div class="no-print">
-                    <button id="printBtn" class="btn-print">確認列印 / 存為 PDF</button>
-                </div>
-                <div class="header-box">
-                    <h2>${reportTitle}</h2>
-                </div>
-                <div class="info-bar">
-                    <span>報表類型：${isLearn ? '學習成效分析' : '考試概況分析'}</span>
-                    <span>產生時間：${new Date().toLocaleString()}</span>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width: 35%;">${firstColLabel}</th>
-                            <th>學生總人數</th>
-                            <th>${thirdColLabel}</th>
-                            <th>${fourthColLabel}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${tableHtml}
-                    </tbody>
-                </table>
-            </body>
-            </html>
-        `);
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <title>${reportTitle}</title>
+            <style>
+                * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
+                body { font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; padding: 24px; color: #333; line-height: 1.5; margin: 0; }
+                .header-box { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #2A9D8F; padding-bottom: 12px; }
+                .header-box h2 { color: #2A9D8F; margin: 0; font-size: 24px; }
+                .info-bar { display: flex; justify-content: space-between; font-size: 13px; color: #666; margin: 12px 0; }
+                table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-top: 8px; }
+                th, td { border: 1px solid #ddd; padding: 10px 8px; text-align: center; font-size: 13px; }
+                th { background-color: #f8f9fa; font-weight: bold; color: #264653; }
+                .league-row td { background-color: #2A9D8F !important; font-weight: bold; font-size: 15px; color: #fff !important; text-align: left; padding-left: 12px; }
+                .summary-header td { background-color: #E9F5F4 !important; font-weight: bold; color: #264653 !important; }
+                .detail-row td { border-bottom: 1px solid #eee; }
+                .btn-print { background: #2A9D8F; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; margin-bottom: 20px; font-weight: bold; font-size: 14px; }
+                .btn-print:hover { background: #238276; }
+                @media print { 
+                    .no-print { display: none !important; }
+                    body { padding: 0; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="no-print">
+                <button id="printBtn" class="btn-print">確認列印 / 存為 PDF</button>
+            </div>
+            <div class="header-box">
+                <h2>${reportTitle}</h2>
+            </div>
+            <div class="info-bar">
+                <span>報表類型：${isLearn ? '學習成效分析' : '考試概況分析'}</span>
+                <span>產生時間：${new Date().toLocaleString()}</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 35%;">${firstColLabel}</th>
+                        <th>學生總人數</th>
+                        <th>${thirdColLabel}</th>
+                        <th>${fourthColLabel}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableHtml}
+                </tbody>
+            </table>
+        </body>
+        </html>
+    `);
 
             printWindow.document.close();
 
@@ -684,143 +697,6 @@ export default {
         filterHandler(value, row, column) {
             const property = column['property'];
             return row[property] === value;
-        },
-        exportFullTable() {
-            const reportTitle = `${this.examName} - 成績分析報表`;
-            const data = this.schoolResultData;
-            const role = this.userRole;
-            const isGlobal = role === 'global_leader';
-
-            const printWindow = window.open('', '_blank');
-
-            let tableHtml = '';
-
-            data.forEach(item => {
-                if (isGlobal) {
-                    // 總召模式：聯盟彙總行
-                    tableHtml += `
-        <tr class="league-row">
-          <td colspan="4">${item.allianceName} (聯盟彙總)</td>
-        </tr>
-        <tr class="summary-header">
-          <td>學校總數: ${item.schoolCount} 間</td>
-          <td>學生總數: ${item.totalStudents}</td>
-          <td>參與人數: ${item.participants}</td>
-          <td style="color: #2A9D8F; font-weight: bold;">平均分數: ${item.avgScore} 分</td>
-        </tr>
-      `;
-
-                    // 渲染下屬學校明細
-                    if (item.schools && item.schools.length > 0) {
-                        item.schools.forEach(school => {
-                            tableHtml += `
-            <tr class="detail-row">
-              <td style="text-align: left; padding-left: 30px;">└ ${school.school_name}</td>
-              <td>${school.student_total}</td>
-              <td>${school.participants}</td>
-              <td style="font-weight: bold;">${school.avg_score} 分</td>
-            </tr>
-          `;
-                        });
-                    }
-                } else {
-                    // 一般行政/老師模式：平鋪結構 (學校或班級)
-                    const label = (role === 'school_admin')
-                        ? `${item.grade}年${item.classroom}班`
-                        : item.schoolName;
-
-                    tableHtml += `
-        <tr class="detail-row">
-          <td style="text-align: left;">${label}</td>
-          <td>${item.totalStudents}</td>
-          <td>${item.participants}</td>
-          <td style="font-weight: bold; color: #2A9D8F;">${item.avgScore} 分</td>
-        </tr>
-      `;
-                }
-            });
-
-            const firstColLabel = isGlobal ? '名稱' : (role === 'school_admin' ? '班級' : '學校名稱');
-
-            printWindow.document.write(`
-    <html>
-    <head>
-      <title>${reportTitle}</title>
-      <style>
-        /* 強制色彩設定 */
-        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-        
-        body { font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; padding: 20px; color: #333; line-height: 1.5; }
-        .header-box { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #2A9D8F; padding-bottom: 10px; }
-        .header-box h2 { color: #2A9D8F; margin: 0; }
-        .info-bar { display: flex; justify-content: space-between; font-size: 13px; color: #666; margin: 10px 0; }
-        
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th, td { border: 1px solid #ddd; padding: 10px 8px; text-align: center; font-size: 13px; }
-        th { background-color: #f8f9fa; font-weight: bold; }
-
-        /* 聯盟行樣式 */
-        .league-row td { 
-          background-color: #2A9D8F !important; 
-          font-weight: bold; 
-          font-size: 16px;
-        }
-        
-        /* 彙總行樣式 */
-        .summary-header td { 
-          background-color: #E9F5F4 !important; 
-          font-weight: bold; 
-          color: #264653 !important;
-        }
-
-        /* 明細行樣式 */
-        .detail-row td { border-bottom: 1px solid #eee; }
-
-        .btn-print { 
-          background: #2A9D8F; color: white; border: none; padding: 8px 16px; 
-          border-radius: 4px; cursor: pointer; margin-bottom: 20px; font-weight: bold;
-        }
-
-        @media print { .no-print { display: none !important; } }
-      </style>
-    </head>
-    <body>
-      <div class="no-print">
-        <button id="printBtn" class="btn-print">確認列印 / 存為 PDF</button>
-      </div>
-      <div class="header-box">
-        <h2>${reportTitle}</h2>
-      </div>
-      <div class="info-bar">
-        <span>報表類型：成績分析</span>
-        <span>產生時間：${new Date().toLocaleString()}</span>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th style="width: 35%;">${firstColLabel}</th>
-            <th>學生總人數</th>
-            <th>參與人數</th>
-            <th>平均分數</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${tableHtml}
-        </tbody>
-      </table>
-    </body>
-    </html>
-  `);
-
-            // 綁定按鈕事件 
-            const printBtn = printWindow.document.getElementById('printBtn');
-            if (printBtn) {
-                printBtn.addEventListener('click', () => {
-                    printWindow.print();
-                });
-            }
-
-            printWindow.document.close();
         },
 
         handleAttendanceAllianceChange(name) {
