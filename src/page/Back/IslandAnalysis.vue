@@ -385,6 +385,8 @@ export default {
                     const scoreTotal = Number(item.competition_total_score) || 0;
 
                     return {
+                        alliance: item.league_name || '',
+                        schoolCount: (item.schools || []).length,
                         schoolName: (item.school_name || '').replace(/^.*?區/, ''),
                         classroom: item.classroom || '',
                         totalStudents: sTotal,
@@ -413,59 +415,73 @@ export default {
             const property = column['property'];
             return row[property] === value;
         },
-     exportFullTable(containerId) {
+        exportFullTable(containerId) {
             const reportTitle = '競技島嶼參與人數與總積分報表';
-            const data = this.islandTableData;
+            const data = this.islandTableData || [];
             const role = this.userRole;
             const isGlobal = role === 'global_leader';
 
+            // 1. 防呆：檢查彈窗是否被阻擋
             const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                this.$message ? this.$message.error('請允許瀏覽器彈出視窗以完成匯出列印') : alert('請允許瀏覽器彈出視窗以完成匯出列印');
+                return;
+            }
 
             let tableHtml = '';
 
             data.forEach(item => {
+                const totalScore = (item.totalScore || 0).toLocaleString();
+
                 if (isGlobal) {
                     // 總召模式：聯盟彙總 + 學校明細
                     tableHtml += `
                 <tr class="league-row">
-                    <td colspan="5" style="text-align: center;">${item.alliance} (聯盟彙總)</td>
+                    <td colspan="5" style="text-align: center;">${item.alliance || '未命名聯盟'} (聯盟彙總)</td>
                 </tr>
                 <tr class="summary-header">
-                    <td>學校數量: ${item.schoolCount} 間</td>
-                    <td>學生總數: ${item.totalStudents}</td>
-                    <td>參與人數: ${item.participants}</td>
-                    <td>參與率: ${item.participationRate}</td>
-                    <td>總積分: ${item.totalScore.toLocaleString()}</td>
+                    <td>學校數量: ${item.schoolCount || 0} 間</td>
+                    <td>學生總數: ${item.totalStudents || 0}</td>
+                    <td>參與人數: ${item.participants || 0}</td>
+                    <td>參與率: ${item.participationRate || '0%'}</td>
+                    <td>總積分: ${totalScore}</td>
                 </tr>
             `;
 
                     if (item.schools && item.schools.length > 0) {
                         item.schools.forEach(school => {
-                            const pRate = school.student_total > 0
-                                ? ((school.today_competition_participants / school.student_total) * 100).toFixed(0) + '%'
+                            const studentTotal = Number(school.student_total) || 0;
+                            const participants = Number(school.today_competition_participants) || 0;
+                            const compScore = (Number(school.competition_total_score) || 0).toLocaleString();
+                            const pRate = studentTotal > 0
+                                ? ((participants / studentTotal) * 100).toFixed(0) + '%'
                                 : '0%';
+
                             tableHtml += `
                         <tr class="detail-row">
-                            <td style="text-align: left; padding-left: 30px;">${school.school_name}</td>
-                            <td>${school.student_total}</td>
-                            <td>${school.today_competition_participants}</td>
+                            <td style="text-align: left; padding-left: 30px;">${school.school_name || ''}</td>
+                            <td>${studentTotal}</td>
+                            <td>${participants}</td>
                             <td>${pRate}</td>
-                            <td style="text-align: right;">${school.competition_total_score.toLocaleString()}</td>
+                            <td style="text-align: right;">${compScore}</td>
                         </tr>
                     `;
                         });
                     }
                 } else {
-                    // 召集人/校管模式：平鋪結構
-                    const label = (role === 'school_admin') ? item.classroom : item.schoolName;
+                    // 召集人 / 校管模式：平鋪結構
+                    const label = (role === 'school_admin')
+                        ? (item.classroom ? `${item.grade ? item.grade + '年' : ''}${item.classroom}班` : '-')
+                        : (item.schoolName || '-');
+
                     tableHtml += `
                 <tr class="detail-row">
                     <td style="text-align: left;">${label}</td>
-                    <td>${item.totalStudents}</td>
-                    <td>${item.participants}</td>
-                    <td>${item.participationRate}</td>
-                    <td style="font-weight: bold; color: #2A9D8F;">
-                        ${item.totalScore.toLocaleString()} 分
+                    <td>${item.totalStudents || 0}</td>
+                    <td>${item.participants || 0}</td>
+                    <td>${item.participationRate || '0%'}</td>
+                    <td style="font-weight: bold; color: #2A9D8F; text-align: right;">
+                        ${totalScore} 分
                     </td>
                 </tr>
             `;
@@ -474,76 +490,86 @@ export default {
 
             const firstColLabel = isGlobal ? '名稱' : (role === 'school_admin' ? '班級' : '學校名稱');
 
-            // 寫入 HTML
+            // 2. 寫入並渲染 HTML
+            printWindow.document.open();
             printWindow.document.write(`
-                <html>
-                <head>
-                    <title>${reportTitle}</title>
-                    <style>
-                        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-                        body { font-family: "Microsoft JhengHei", sans-serif; padding: 20px; color: #333; line-height: 1.5; }
-                        .report-header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #2A9D8F; padding-bottom: 10px; }
-                        .report-header h2 { color: #2A9D8F; margin: 0; }
-                        .info-bar { display: flex; justify-content: space-between; font-size: 13px; color: #666; margin: 10px 0; }
-                        
-                        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-                        th, td { border: 1px solid #ddd; padding: 10px 8px; text-align: center; font-size: 13px; }
-                        th { background-color: #f8f9fa; font-weight: bold; }
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <title>${reportTitle}</title>
+            <style>
+                * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
+                body { font-family: "Microsoft JhengHei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 24px; color: #333; line-height: 1.5; margin: 0; }
+                .report-header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #2A9D8F; padding-bottom: 12px; }
+                .report-header h2 { color: #2A9D8F; margin: 0; font-size: 24px; }
+                .info-bar { display: flex; justify-content: space-between; font-size: 13px; color: #666; margin: 12px 0; }
+                
+                table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-top: 8px; }
+                th, td { border: 1px solid #ddd; padding: 10px 8px; text-align: center; font-size: 13px; }
+                th { background-color: #f8f9fa; font-weight: bold; color: #264653; }
 
-                        .league-row td { 
-                            background-color: #2A9D8F !important; color: black; 
-                            font-weight: bold; font-size: 16px;
-                        }
-                        .summary-header td { 
-                            background-color: #E9F5F4 !important; font-weight: bold; color: #264653 !important;
-                        }
-                        .detail-row td { border-bottom: 1px solid #eee; }
+                .league-row td { 
+                    background-color: #2A9D8F !important; 
+                    color: #FFFFFF !important; 
+                    font-weight: bold; 
+                    font-size: 15px;
+                }
+                .summary-header td { 
+                    background-color: #E9F5F4 !important; 
+                    font-weight: bold; 
+                    color: #264653 !important;
+                }
+                .detail-row td { border-bottom: 1px solid #eee; }
 
-                        .print-btn {
-                            background: #2A9D8F; color: white; border: none; padding: 10px 20px;
-                            border-radius: 4px; cursor: pointer; margin-bottom: 20px; font-weight: bold;
-                        }
-                        @media print { .no-print { display: none !important; } }
-                    </style>
-                </head>
-                <body>
-                    <div class="no-print">
-                        <button id="printBtn" class="print-btn">確認列印 / 存為 PDF</button>
-                    </div>
-                    <div class="report-header">
-                        <h2>${reportTitle}</h2>
-                    </div>
-                    <div class="info-bar">
-                        <span>身分：${role === 'global_leader' ? '總召集人' : (role === 'union_leader' ? '聯盟召集人' : '學校管理員')}</span>
-                        <span>產生時間：${new Date().toLocaleString()}</span>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="width: 35%;">${firstColLabel}</th>
-                                <th>學生總數</th>
-                                <th>參與人數</th>
-                                <th>參與率</th>
-                                <th>總積分</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${tableHtml}
-                        </tbody>
-                    </table>
-                </body>
-                </html>
-            `);
+                .print-btn {
+                    background: #2A9D8F; color: white; border: none; padding: 10px 20px;
+                    border-radius: 6px; cursor: pointer; margin-bottom: 20px; font-weight: bold; font-size: 14px;
+                }
+                .print-btn:hover { background: #238276; }
+                @media print { 
+                    .no-print { display: none !important; }
+                    body { padding: 0; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="no-print">
+                <button id="printBtn" class="print-btn">確認列印 / 存為 PDF</button>
+            </div>
+            <div class="report-header">
+                <h2>${reportTitle}</h2>
+            </div>
+            <div class="info-bar">
+                <span>身分：${role === 'global_leader' ? '總召集人' : (role === 'union_leader' ? '聯盟召集人' : '學校管理員')}</span>
+                <span>產生時間：${new Date().toLocaleString()}</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 35%;">${firstColLabel}</th>
+                        <th>學生總數</th>
+                        <th>參與人數</th>
+                        <th>參與率</th>
+                        <th>總積分</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableHtml}
+                </tbody>
+            </table>
+        </body>
+        </html>
+    `);
+            printWindow.document.close();
 
-            // 從外部（主視窗）直接抓取新視窗的按鈕並綁定事件，繞過 CSP 限制
+            // 3. 綁定按鈕事件
             const printBtn = printWindow.document.getElementById('printBtn');
             if (printBtn) {
                 printBtn.addEventListener('click', () => {
                     printWindow.print();
                 });
             }
-
-            printWindow.document.close();
         },
         // 當「學校」多選切換或全選/取消全選時，統一更新兩張圖
         updateChartByFilter() {
